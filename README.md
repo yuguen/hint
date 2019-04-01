@@ -2,7 +2,7 @@
 
 Use one integer library, run it with any supported HLS tool.
 
-#Usage
+# Usage
 
 Create custom sized integer with the ```hint``` data-type:
 
