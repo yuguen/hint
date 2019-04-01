@@ -13,18 +13,18 @@
 
 template <int W, bool is_signed>
 #ifdef AP_INT_BACKEND
-struct ac_ap : public ap_int_base<W, is_signed>
+struct hint : public ap_int_base<W, is_signed>
 {
 	using ap_int_base<W, is_signed>::ap_int_base;
 
 	// high excluded, low included
 	template <int high, int low>	
-	ac_ap<high-low+1, false> from_to(){
-		return ac_ap<high-low+1, false>((*this).range(high, low));
+	hint<high-low+1, false> from_to(){
+		return hint<high-low+1, false>((*this).range(high, low));
 	}
 
-	ac_ap<1, false> get(int i){
-		return ac_ap<1, false>((*this)[i]);
+	hint<1, false> get(int i){
+		return hint<1, false>((*this)[i]);
 	}
 
 };
@@ -32,18 +32,18 @@ struct ac_ap : public ap_int_base<W, is_signed>
 
 
 #else // defined(AC_INT_BACKEND)
-struct ac_ap : public ac_int<W, is_signed>
+struct hint : public ac_int<W, is_signed>
 {
 	using ac_int<W, is_signed>::ac_int;
 
 	// high excluded, low included
 	template <int high, int low>	
-	ac_ap<high-low+1, false> from_to(){
-		return ac_ap<high-low+1, false>((*this).template slc<high-low+1>(low));
+	hint<high-low+1, false> from_to(){
+		return hint<high-low+1, false>((*this).template slc<high-low+1>(low));
 	}
 
-	ac_ap<1, false> get(int i){
-		return ac_ap<1, false>((*this)[i]);
+	hint<1, false> get(int i){
+		return hint<1, false>((*this)[i]);
 	}
 
 };
