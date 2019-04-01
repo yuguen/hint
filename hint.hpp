@@ -11,7 +11,7 @@
 #endif
 
 
-template <int W, bool is_signed>
+template <int W, bool is_signed=false>
 #ifdef AP_INT_BACKEND
 struct hint : public ap_int_base<W, is_signed>
 {
