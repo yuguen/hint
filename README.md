@@ -3,7 +3,7 @@
 Use one integer library, run it with any supported HLS tool.
 
 # Usage
-
+Include ```hint.hpp``` in your project.
 Create custom sized integer with the ```hint``` data-type:
 
 ```
