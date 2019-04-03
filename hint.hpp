@@ -13,13 +13,19 @@
 
 template <int W, bool is_signed=false>
 #ifdef AP_INT_BACKEND
-struct hint_base : public ap_int_base<W, is_signed>
+class hint_base : public ap_int_base<W, is_signed>
 {
+public:
 	using ap_int_base<W, is_signed>::ap_int_base;
 
-	// high excluded, low included
-	hint_base<W, false> slice(int high, int low) const{
-		return hint_base<W, false>((*this).range(high, low));
+	template<int size>
+	hint_base<size, is_signed> slice(int low) const{
+		return hint_base<size, is_signed>((*this).range(low+size-1, low));
+	}
+
+	template<int W1, bool is_signed1>
+	void set_slice(int low, hint_base<W1, is_signed1> value){
+		(*this).range(W1+low-1, low) = value;
 	}
 
 	hint_base<1, false> get(int i) const{
@@ -32,51 +38,62 @@ struct hint_base : public ap_int_base<W, is_signed>
 	}
 
 
-
 #else // defined(AC_INT_BACKEND)
-struct hint_base : public ac_int<W, is_signed>
+class hint_base : public ac_int<W, is_signed>
 {
-	// using ac_int<W, is_signed>::ac_int;
-	hint_base<W, is_signed>():ac_int<W, is_signed>(){}
+public:
+	using ac_int<W, is_signed>::ac_int;
 
-	template<typename T>
- 	hint_base<W, is_signed>(T val):ac_int<W, is_signed>(val){}
+	// using ac_int<W, is_signed>::ac_int;
+	// hint_base<W, is_signed>():ac_int<W, is_signed>():ac_int(){}
+
+	// template<typename T>
+ // 	hint_base<W, is_signed>(T val):ac_int<W, is_signed>():ac_int(val){}
 
 
 
 	// high excluded, low included
-	hint_base<W, false> slice(const int high, const int low) const{
-		const int size = high-low+1;
-		return hint_base<W, false>((*this).template slc<W>(low));
+	template<int size>
+	hint_base<size, is_signed> slice(int low) const{
+		return hint_base<size, is_signed>((*this).template slc<size>(low));
+	}
+
+	// high excluded, low included
+	template<int W1, bool is_signed1>
+	void set_slice(int low, hint_base<W1, is_signed1> value){
+		(*this).template set_slc(hint_base<W1, is_signed1>(low), value);
+		// (*this).range(high, low) = value;
 	}
 
 	hint_base<1, false> get(int i) const{
-		return hint_base<1, false>(this[i]);
+		return hint_base<1, false>((*this).template slc<1>(i));
 	}
 
 	template <int Wrhs, bool is_signed_rhs>	
 	hint_base<W+Wrhs, is_signed> concatenate(hint_base<Wrhs, is_signed_rhs> rhs){
 		hint_base<W+Wrhs, is_signed> result;
-		result.set_slc(0, rhs);
-		result.set_slc(Wrhs, (*this));
+		result.template set_slc(0, rhs);
+		result.template set_slc(Wrhs, (*this));
 		return result;
 	}
 
 	template<typename T>
-	hint_base<1, false> operator [] (T index) const{
-		return static_cast< hint_base<W, is_signed> >((*this)[index]);
+	hint_base<1, false> operator [] (T i) const{
+		return hint_base<W, is_signed>((*this).template slc<1>(i));
 	}
+
+	// hint_base<W, is_signed> operator=(ac_int<W, is_signed> &val) {
+	// 	return hint_base<W, is_signed>(val);
+	// }
+
 
 #endif
 
-	template<typename T>
-	hint_base<W, is_signed> operator = (T val) {
-		return static_cast< hint_base<W, is_signed> >(val);
-	}
+// const TripleData& rhs
 
 	// template<int W1, bool is_signed1>
 	// hint_base<W, is_signed> operator=(
-	// 	hint_base<W1, is_signed1> const & val
+	// 	hint_base<W1, is_signed1> 
 	//    )
 	// {
 	//  	return hint_base<W, is_signed>(val);  
