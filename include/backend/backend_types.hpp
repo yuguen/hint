@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 
 template <size_t W, bool is_signed, typename backend>
 struct BackendTypeInfos;
