@@ -1,74 +1,57 @@
 #pragma once
+#include <cstddef>
 #include <type_traits>
+#include <iostream>
 
 using namespace std;
 
-#include "backend/backend_types.hpp"
+/***
+ * CRTP Base class
+ */
+template <size_t W, bool is_signed, template<size_t, bool> class wrapper>
+class hint_base{
+public:
+    using type =  hint_base<W, is_signed, wrapper >;
+    using wrapper_type = wrapper<W, is_signed>;
+    template<size_t S, bool sign>
+    using wrapper_helper = wrapper<S, sign>;
 
-template <size_t W, typename backend, bool is_signed=false>
-struct hint_base : public BackendTypeInfos<W, is_signed, backend>::backend_type
-{
-	using backend_type = BackendTypeInfos<W, is_signed, backend>::backend_type;
+    template<size_t high, size_t low>
+    wrapper_helper<high - low + 1, false> slice(
+        typename enable_if<high >= low>::type* = 0
+    ) const
+    {
+        return static_cast<wrapper_type const *>(this)->do_slicing(high, low);
+    }
 
-	hint_base(backend_type& val):backend_type{val}{}
+    template<size_t idx>
+    wrapper_helper<1, false> get(
+       typename enable_if<idx <= W>::type* = 0
+    ) const
+    {
+        return static_cast<wrapper_type const *>(this)->do_get(idx);
+    }
 
-	// high and low included
-	template<size_t high, size_t low>
-	hint_base<high - low + 1, backend, false> slice(
-				enable_if<(high>=low)>::type* = 0
-			) const;
 
-	template<size_t idx>
-	hint_base<1, backend, false> get(
-				enable_if<(idx < W)>::type* = 0
-			) const;
+    template<size_t Wrhs, bool isSignedRhs>
+    wrapper_helper<W + Wrhs, is_signed>
+    concatenate(wrapper_helper<Wrhs, isSignedRhs> const & val) const
+    {
+        return static_cast<wrapper_type const *>(this)->do_concatenate(val);
+    }
 
-	template <size_t Wrhs, bool is_signed_rhs>	
-	hint_base<W+Wrhs, backend, is_signed> concatenate(
-			hint_base<Wrhs, backend, is_signed_rhs> const & rhs
-		) const;
+    void print(ostream & out) const
+    {
+        static_cast<wrapper_type const *>(this)->to_stream(out);
+    }
 
-	// high excluded, low included
-	/*template <int Wrhs, bool is_signed_rhs>	
-	hint_base<W+Wrhs, is_signed> concatenate(hint_base<Wrhs, is_signed_rhs> rhs){
-		hint_base<W+Wrhs, is_signed> result;
-		result.set_slc(0, rhs);
-		result.set_slc(Wrhs, (*this));
-		return result;
-	}*/
-
-	/*
-	template<typename T>
-	hint_base<W, is_signed> operator = (T val) {
-		return static_cast<hint_base<W, , backend, is_signed> >(val);
-	}*/
-
-	// template<int W1, bool is_signed1>
-	// hint_base<W, is_signed> operator=(
-	// 	hint_base<W1, is_signed1> const & val
-	//    )
-	// {
-	//  	return hint_base<W, is_signed>(val);  
-	// };
-	/*
-	void print(){
-		if(is_signed){
-			fprintf(stderr, "Signed hint: ");
-		}
-		else{
-			fprintf(stderr, "Unsigned hint: ");			
-		}
-		for(int i = W-1 ; i>=0; i--){
-			fprintf(stderr, "%d", (int)(*this).get(i));
-		}
-		fprintf(stderr, "\n");
-	}*/
+    friend ostream & operator<<(ostream & out, type const & val)
+    {
+        val.print(out);
+        return out;
+    }
 };
 
-template <int W, typename backend>
-using hint = hint_base<W, backend, false>;
-
-template <int W, typename backend>
-using hints = hint_base<W, backend, true>;
-
-#include "backend/backend_impl.in"
+#if defined(BITSET_BACKEND)
+#include "backend/bitset_impl.ipp"
+#endif
