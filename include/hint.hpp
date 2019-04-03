@@ -21,7 +21,7 @@ public:
         typename enable_if<high >= low>::type* = 0
     ) const
     {
-        return static_cast<wrapper_type const *>(this)->do_slicing(high, low);
+        return static_cast<wrapper_type const *>(this)->template do_slicing<high, low>();
     }
 
     template<size_t idx>
@@ -29,7 +29,7 @@ public:
        typename enable_if<idx <= W>::type* = 0
     ) const
     {
-        return static_cast<wrapper_type const *>(this)->do_get(idx);
+        return static_cast<wrapper_type const *>(this)->template do_get<idx>();
     }
 
 
@@ -54,4 +54,8 @@ public:
 
 #if defined(BITSET_BACKEND)
 #include "backend/bitset_impl.ipp"
+#endif
+
+#if defined(VIVADO_BACKEND)
+#include "backend/vivado_impl.ipp"
 #endif

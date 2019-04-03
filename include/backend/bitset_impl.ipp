@@ -26,7 +26,8 @@ public:
         return BitsetWrapper<high - low + 1, false>{ret};
     }
 
-    BitsetWrapper<1, false> do_get(size_t idx) const
+    template<size_t idx>
+    BitsetWrapper<1, false> do_get() const
     {
         bitset<1> ret;
         ret[0] = _storage[idx];
