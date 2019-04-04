@@ -5,6 +5,7 @@
 
 using namespace std;
 
+
 /***
  * CRTP Base class
  */
@@ -26,10 +27,18 @@ public:
 
     template<size_t idx>
     wrapper_helper<1, false> get(
-       typename enable_if<idx <= W>::type* = 0
+       typename enable_if<idx < W>::type* = 0
     ) const
     {
         return static_cast<wrapper_type const *>(this)->template do_get<idx>();
+    }
+
+    template<size_t idx>
+    bool isSet(
+       typename enable_if<idx < W>::type* = 0
+    ) const
+    {
+        return static_cast<wrapper_type const *>(this)->template do_isset<idx>();
     }
 
     operator wrapper_type()

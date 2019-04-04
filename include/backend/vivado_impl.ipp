@@ -4,13 +4,20 @@
 #include "ap_int.h"
 
 template <size_t W, bool is_signed>
-class VivadoWrapper : public hint_base<W, is_signed, VivadoWrapper>, private ap_int_base<static_cast<int>(W), is_signed>
+class VivadoWrapper{};
+
+template<size_t W>
+class VivadoWrapper<W, false> : public hint_base<W, false, VivadoWrapper>, private ap_uint<static_cast<int>(W)>
 {
 public:
-    using type = VivadoWrapper<W, true>;
-    typedef ap_uint<W> underlying_type;
+    typedef VivadoWrapper<W, true> type;
+    typedef ap_uint<static_cast<int>(W)> underlying_type;
+    template<size_t N>
+    using storage_type = ap_uint<static_cast<int>(N)>;
+    template<size_t N>
+    using wrapper_type = VivadoWrapper<W, false>;
 
-    VivadoWrapper(ap_int_base<static_cast<int>(W), is_signed> const & val):_storage{val}{}
+    VivadoWrapper(underlying_type const & val):underlying_type{val}{}
 
     //explicit VivadoWrapper(hint_base<W, false, VivadoWrapper> & value):VivadoWrapper(reinterpret_cast<>())
     //{}
@@ -19,14 +26,20 @@ public:
     inline VivadoWrapper<high - low + 1, false> do_slicing() const
     {
         #pragma HLS INLINE
-        return static_cast<ap_uint<static_cast<int>(high - low + 1)> >(_storage.range(high, low));
+        return storage_type<high-low+1>{this->range(high, low)};
     }
 
     template<size_t idx>
     inline VivadoWrapper<1, false> do_get() const
     {
         #pragma HLS INLINE
-        return static_cast<ap_uint<1> >((*this)[idx]);
+        return static_cast<wrapper_type<1>>((*this)[idx]);
+    }
+
+    template<size_t idx>
+    inline bool do_isset() const
+    {
+        return (static_cast<ap_uint<1> >((*this)[idx]) == 1);
     }
 
     template<size_t Wrhs, bool isSignedRhs>
