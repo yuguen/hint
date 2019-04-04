@@ -43,6 +43,7 @@ class hint_base : public ac_int<W, is_signed>
 {
 public:
 	using ac_int<W, is_signed>::ac_int;
+    hint_base(ac_int<W, is_signed> val):ac_int<W, is_signed>(val){}
 
 	// using ac_int<W, is_signed>::ac_int;
 	// hint_base<W, is_signed>():ac_int<W, is_signed>():ac_int(){}
@@ -53,9 +54,16 @@ public:
 
 
 	// high excluded, low included
+	// template<int size>
+	// hint_base<size, is_signed> slice(int low) const{
+	// 	return hint_base<size, is_signed>((*this).template slc<size>(low));
+	// }
+
 	template<int size>
 	hint_base<size, is_signed> slice(int low) const{
-		return hint_base<size, is_signed>((*this).template slc<size>(low));
+		ac_int<200, false> low_ac = low;
+		ac_int<size, is_signed> slc = (*this).template slc<size>(low_ac);
+		return hint_base<size, is_signed>(slc);
 	}
 
 	// high excluded, low included
