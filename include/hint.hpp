@@ -1,7 +1,7 @@
 #pragma once
 #include <cstddef>
 #include <type_traits>
-#include <iostream>
+//#include <iostream>
 
 using namespace std;
 
@@ -12,7 +12,7 @@ template <size_t W, bool is_signed, template<size_t, bool> class wrapper>
 class hint_base{
 public:
     using type =  hint_base<W, is_signed, wrapper >;
-    using wrapper_type = wrapper<W, is_signed>;
+    typedef  wrapper<W, is_signed> wrapper_type;
     template<size_t S, bool sign>
     using wrapper_helper = wrapper<S, sign>;
 
@@ -32,6 +32,11 @@ public:
         return static_cast<wrapper_type const *>(this)->template do_get<idx>();
     }
 
+    operator wrapper_type()
+    {
+        return *reinterpret_cast<wrapper_type*>(this);
+    }
+
 
     template<size_t Wrhs, bool isSignedRhs>
     wrapper_helper<W + Wrhs, is_signed>
@@ -40,16 +45,16 @@ public:
         return static_cast<wrapper_type const *>(this)->do_concatenate(val);
     }
 
-    void print(ostream & out) const
-    {
-        static_cast<wrapper_type const *>(this)->to_stream(out);
-    }
+    //void print(ostream & out) const
+    //{
+    //    static_cast<wrapper_type const *>(this)->to_stream(out);
+    //}
 
-    friend ostream & operator<<(ostream & out, type const & val)
-    {
-        val.print(out);
-        return out;
-    }
+    //friend ostream & operator<<(ostream & out, type const & val)
+    //{
+    //    val.print(out);
+    //    return out;
+    //}
 };
 
 #if defined(BITSET_BACKEND)

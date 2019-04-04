@@ -49,15 +49,15 @@ public:
         return ret;
     }
 
-    void to_stream(ostream & out) const {
-        for (size_t i = 1 ; i <= W ; ++i) {
-            if (_storage[W-i]) {
-                out << "1";
-            } else {
-                out << "0";
-            }
-        }
-    }
+//    void to_stream(ostream & out) const {
+//        for (size_t i = 1 ; i <= W ; ++i) {
+//            if (_storage[W-i]) {
+//                out << "1";
+//            } else {
+//                out << "0";
+//            }
+//        }
+//    }
 
 };
 
