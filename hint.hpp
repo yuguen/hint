@@ -65,8 +65,8 @@ public:
 
 	template<int size>
 	hint_base<size, is_signed> slice(int low) const{
-		ac_int<200, false> low_ac = low;
-		ac_int<size, is_signed> slc = (*this).template slc<size>(low_ac);
+		//ac_int<200, false> low_ac = low;
+		ac_int<size, is_signed> slc = (*this).template slc<size>(low);
 		return hint_base<size, is_signed>(slc);
 	}
 
@@ -77,8 +77,8 @@ public:
 		// (*this).range(high, low) = value;
 	}
 
-	hint_base<1, false> get(int i) const{
-		return hint_base<1, false>((*this).template slc<1>(i));
+	hint_base<1, false> get(int i) const{ 
+		return hint_base<1, false>(static_cast<hint_base<W, false> >((*this)).template slc<1>(i));
 	}
 
 	template <int Wrhs, bool is_signed_rhs>	
@@ -91,7 +91,7 @@ public:
 
 	template<typename T>
 	hint_base<1, false> operator [] (T i) const{
-		return hint_base<W, is_signed>((*this).template slc<1>(i));
+		return hint_base<W, false>((static_cast<hint_base<W, false> >((*this)).template slc<1>(i)));
 	}
 
 	// hint_base<W, is_signed> operator=(ac_int<W, is_signed> &val) {
