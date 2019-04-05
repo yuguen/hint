@@ -61,9 +61,39 @@ public:
         return get<idx>();
     }
 
+    inline wrapper<W+1, is_signed> addWithCarry(wrapper<W, is_signed> const & op2, wrapper<1, false> const & cin)
+    {
+        return static_cast<wrapper<W, is_signed> const *>(this)->perform_addc(
+            op2, cin
+        );
+    }
+
+    inline wrapper<W, is_signed> modularAdd(wrapper<W, is_signed> const & op2)
+    {
+        wrapper<1, false> cin{0};
+        wrapper<W+1, is_signed> res = addWithCarry(op2, cin);
+        return res->template do_slicing<W-1, 0>();
+    }
+
+    inline wrapper<W, is_signed>& operator=(hint_base<W, is_signed, wrapper> const& rhs)
+    {
+        auto p = static_cast<wrapper<W, is_signed>*>(this);
+        this->do_affect(rhs);
+        return *p;
+    }
+
     static inline wrapper<W, false> generateSequence(wrapper<1, false> const & val)
     {
         return wrapper<W, false>::do_generateSequence(val);
+    }
+
+    static inline wrapper<W, is_signed> mux(
+            wrapper<1, false> const & control,
+            wrapper<W, is_signed> const & opt1,
+            wrapper<W, is_signed> const & opt0
+        )
+    {
+        return wrapper<W, is_signed>::do_mux(control, opt1, opt0);
     }
 };
 

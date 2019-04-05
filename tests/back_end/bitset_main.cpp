@@ -8,6 +8,7 @@
 
 #include "hint.hpp"
 #include "tools/printing.hpp"
+#include "primitives/lzoc_shifter.hpp"
 
 using namespace  std;
 
@@ -36,15 +37,11 @@ WRAPPER<20, false> comp(WRAPPER<32, false> in)
 
 BOOST_AUTO_TEST_CASE(TMP)
 {
-    auto k = WRAPPER<32, false>::generateSequence(
-                WRAPPER<1, false>{1}
-                );
-
-    auto res = comp(k);
-    auto s = to_string(res);
+    WRAPPER<32, false> k{17};
+    string s = to_string(k);
     cerr << s << endl;
-    s = to_string(res[integral_constant<size_t, 4>{}]);
+    auto t = lzoc_shifter<5, 4>(k, WRAPPER<1, false>{1}, WRAPPER<1, false>{0});
+    s = to_string(t);
     cerr << s << endl;
-
     BOOST_REQUIRE_MESSAGE(false, "THe test failed !");
 }
