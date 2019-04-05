@@ -1,45 +1,54 @@
 #ifndef VIVADO_IMPL_IPP
 #define VIVADO_IMPL_IPP
 
+#include <type_traits>
+
 #include "ap_int.h"
 
 template <size_t W, bool is_signed>
 class VivadoWrapper{};
 
 template<size_t W>
-class VivadoWrapper<W, false> : public hint_base<W, false, VivadoWrapper>, private ap_uint<static_cast<int>(W)>
+class VivadoWrapper<W, false> : public hint_base<W, false, VivadoWrapper>
 {
+private:
+    ap_uint<static_cast<int>(W)> _storage;
 public:
     typedef VivadoWrapper<W, true> type;
-    typedef ap_uint<static_cast<int>(W)> underlying_type;
+    typedef ap_uint<static_cast<int>(W)> storage_type;
     template<size_t N>
-    using storage_type = ap_uint<static_cast<int>(N)>;
+    using storage_helper = ap_uint<static_cast<int>(N)>;
     template<size_t N>
-    using wrapper_type = VivadoWrapper<W, false>;
+    using wrapper_type = VivadoWrapper<N, false>;
 
-    VivadoWrapper(underlying_type const & val):underlying_type{val}{}
+    VivadoWrapper(storage_type const & val):_storage{val}{
+    }
 
-    //explicit VivadoWrapper(hint_base<W, false, VivadoWrapper> & value):VivadoWrapper(reinterpret_cast<>())
-    //{}
+    VivadoWrapper(int val):_storage{val}{
+    }
 
     template<size_t high, size_t low>
     inline VivadoWrapper<high - low + 1, false> do_slicing() const
     {
         #pragma HLS INLINE
-        return storage_type<high-low+1>{this->range(high, low)};
+        return VivadoWrapper<high - low + 1, false>{storage_helper<high-low+1>{_storage.range(high, low)}};
     }
 
     template<size_t idx>
     inline VivadoWrapper<1, false> do_get() const
     {
         #pragma HLS INLINE
-        return static_cast<wrapper_type<1>>((*this)[idx]);
+        return wrapper_type<1>{
+            static_cast<storage_helper<1> >(
+                    _storage[idx]
+            )
+        };
     }
 
     template<size_t idx>
     inline bool do_isset() const
     {
-        return (static_cast<ap_uint<1> >((*this)[idx]) == 1);
+        return (_storage[idx] == 1);
     }
 
     template<size_t Wrhs, bool isSignedRhs>
@@ -48,16 +57,28 @@ public:
         ) const
     {
         #pragma HLS INLINE
-        ap_uint<Wrhs + W> ret{this->concat(val)};
-        return  ret;
+        ap_uint<Wrhs + W> ret{_storage->concat(val)};
+        return  wrapper_type<Wrhs + W>{ret};
     }
 
-//    void to_stream(ostream & out) const
-//    {
-//        for (size_t i = 1 ; i <= W ; ++i) {
-//            out << static_cast<unsigned int>(_storage[W-i]);
-//        }
-//    }
+    VivadoWrapper<1, false> compare(VivadoWrapper<W, false> const & rhs)const
+    {
+        return static_cast<ap_uint<1> >(_storage == rhs._storage);
+    }
+
+    static inline VivadoWrapper<W, false> do_generateSequence(
+            VivadoWrapper<1, false> const & val
+            )
+    {
+        ap_int<1> sign = val._storage[0];
+        ap_int<W> ext = sign;
+        return VivadoWrapper<W, false>{
+            ap_uint<W>{ext}
+        };
+    }
+
+    template<size_t N, bool val>
+    friend class VivadoWrapper;
 };
 
 

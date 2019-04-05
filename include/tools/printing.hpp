@@ -20,7 +20,10 @@ struct printer{
 template <size_t W, bool is_signed, template<size_t, bool> class wrapper>
 struct printer<integral_constant<size_t, 0>, W, is_signed, wrapper>
 {
-    inline constexpr void operator()(stringstream&, hint_base<W, is_signed, wrapper> const &){}
+    inline constexpr void operator()(stringstream& s, hint_base<W, is_signed, wrapper> const & signal)
+    {
+        s << (signal.template isSet<0>() ? '1' : '0');
+    }
 };
 
 

@@ -14,19 +14,17 @@ class hint_base{
 public:
     using type =  hint_base<W, is_signed, wrapper >;
     typedef  wrapper<W, is_signed> wrapper_type;
-    template<size_t S, bool sign>
-    using wrapper_helper = wrapper<S, sign>;
 
     template<size_t high, size_t low>
-    wrapper_helper<high - low + 1, false> slice(
-        typename enable_if<high >= low>::type* = 0
+    wrapper<high - low + 1, false> slice(
+        typename enable_if<high >= low and high < W>::type* = 0
     ) const
     {
         return static_cast<wrapper_type const *>(this)->template do_slicing<high, low>();
     }
 
     template<size_t idx>
-    wrapper_helper<1, false> get(
+    wrapper<1, false> get(
        typename enable_if<idx < W>::type* = 0
     ) const
     {
@@ -48,23 +46,27 @@ public:
 
 
     template<size_t Wrhs, bool isSignedRhs>
-    wrapper_helper<W + Wrhs, is_signed>
-    concatenate(wrapper_helper<Wrhs, isSignedRhs> const & val) const
+    wrapper<W + Wrhs, is_signed>
+    concatenate(wrapper<Wrhs, isSignedRhs> const & val) const
     {
         return static_cast<wrapper_type const *>(this)->do_concatenate(val);
     }
 
-    //void print(ostream & out) const
-    //{
-    //    static_cast<wrapper_type const *>(this)->to_stream(out);
-    //}
+    wrapper<1, false> operator==(wrapper<W, is_signed> const & rhs) const {
+        return static_cast<wrapper_type const *>(this)->compare(rhs);
+    }
 
-    //friend ostream & operator<<(ostream & out, type const & val)
-    //{
-    //    val.print(out);
-    //    return out;
-    //}
+    template <size_t idx>
+    inline constexpr wrapper<1, false> operator[](integral_constant<size_t, idx>) const {
+        return get<idx>();
+    }
+
+    static inline wrapper<W, false> generateSequence(wrapper<1, false> const & val)
+    {
+        return wrapper<W, false>::do_generateSequence(val);
+    }
 };
+
 
 #if defined(BITSET_BACKEND)
 #include "backend/bitset_impl.ipp"
