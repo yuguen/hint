@@ -16,7 +16,11 @@ template <int W, bool is_signed=false>
 class hint_base : public ap_int_base<W, is_signed>
 {
 public:
-	using ap_int_base<W, is_signed>::ap_int_base;
+	// using ap_int_base<W, is_signed>::ap_int_base;
+	hint_base():ap_int_base<W, is_signed>(){}
+	
+	template <typename T>
+	hint_base(T val):ap_int_base<W, is_signed>(val){}
 
 	template<int size>
 	hint_base<size, is_signed> slice(int low) const{
@@ -106,7 +110,8 @@ public:
 	// {
 	//  	return hint_base<W, is_signed>(val);  
 	// };
-	
+
+#ifndef SYNTHESIS	
 	void print(){
 		if(is_signed){
 			fprintf(stderr, "Signed hint: ");
@@ -119,6 +124,7 @@ public:
 		}
 		fprintf(stderr, "\n");
 	}
+#endif
 
 };
 
