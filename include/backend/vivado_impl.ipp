@@ -115,9 +115,9 @@ public:
     {
         storage_helper<W> res;
         if(control._storage) {
-            res = opt0._storage;
-        } else {
             res = opt1._storage;
+        } else {
+            res = opt0._storage;
         }
         return wrapper_helper<W>{res};
     }

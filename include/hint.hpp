@@ -39,10 +39,12 @@ public:
         return static_cast<wrapper_type const *>(this)->template do_isset<idx>();
     }
 
-    operator wrapper_type()
+    operator wrapper_type&()
     {
         return *reinterpret_cast<wrapper_type*>(this);
     }
+
+
 
 
     template<size_t Wrhs, bool isSignedRhs>
