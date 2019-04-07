@@ -48,7 +48,7 @@ public:
 
 
     template<size_t Wrhs, bool isSignedRhs>
-    wrapper<W + Wrhs, is_signed>
+    wrapper<W + Wrhs, false>
     concatenate(wrapper<Wrhs, isSignedRhs> const & val) const
     {
         return static_cast<wrapper_type const *>(this)->do_concatenate(val);
@@ -56,11 +56,6 @@ public:
 
     wrapper<1, false> operator==(wrapper<W, is_signed> const & rhs) const {
         return static_cast<wrapper_type const *>(this)->compare(rhs);
-    }
-
-    template <size_t idx>
-    inline constexpr wrapper<1, false> operator[](integral_constant<size_t, idx>) const {
-        return get<idx>();
     }
 
     inline wrapper<W+1, is_signed> addWithCarry(wrapper<W, is_signed> const & op2, wrapper<1, false> const & cin)
