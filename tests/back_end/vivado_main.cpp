@@ -52,9 +52,9 @@ BOOST_AUTO_TEST_CASE(testBackend)
     WRAPPER<1, false> get_d2{cmp_slice_c3.get<1>()};
     WRAPPER<1, false> get_d3{cmp_slice_c3.get<2>()};
 
-    BOOST_REQUIRE_MESSAGE(get_d1.isSet<0>(), "The slice method failed! (d)");
-    BOOST_REQUIRE_MESSAGE(get_d2.isSet<0>(), "The slice method failed! (d)");
-    BOOST_REQUIRE_MESSAGE(not(get_d3.isSet<0>()), "The slice method failed! (d)");
+    BOOST_REQUIRE_MESSAGE(get_d1.isSet<0>(), "The get method failed! (d)");
+    BOOST_REQUIRE_MESSAGE(get_d2.isSet<0>(), "The get method failed! (d)");
+    BOOST_REQUIRE_MESSAGE(not(get_d3.isSet<0>()), "The get method failed! (d)");
 
     // concatenate method
     // unsigned
@@ -64,7 +64,7 @@ BOOST_AUTO_TEST_CASE(testBackend)
     WRAPPER<46, false> expected_e1_e2{0b1101111010111001001010010010000010011101110111};
     WRAPPER<1, false> cmp_e_unsigned{expected_e1_e2 == concat_e1_e2};
 
-    BOOST_REQUIRE_MESSAGE(cmp_e_unsigned.isSet<0>(), "The slice method failed! (e)");
+    BOOST_REQUIRE_MESSAGE(cmp_e_unsigned.isSet<0>(), "The concatenate method failed! (e)");
 
     // signed
     WRAPPER<29, true> e3{0b11011110101110010010100100100};
@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE(testBackend)
     WRAPPER<46, false> expected_e3_e4{0b1101111010111001001010010010000010011101110111};
     WRAPPER<1, false> cmp_e_signed{expected_e3_e4 == concat_e3_e4};
 
-    BOOST_REQUIRE_MESSAGE(cmp_e_signed.isSet<0>(), "The slice method failed! (e)");
+    BOOST_REQUIRE_MESSAGE(cmp_e_signed.isSet<0>(), "The concatenate method failed! (e)");
 
 
     // addWithCarry method
@@ -85,7 +85,7 @@ BOOST_AUTO_TEST_CASE(testBackend)
     WRAPPER<15, true> sum_f1_f2 = f1.addWithCarry(f2, carry_f1);
     WRAPPER<15, true> expected_sum_f1_f2{0b111111111111111};
     WRAPPER<1, false> cmp_sum_f1_f2{expected_sum_f1_f2 == sum_f1_f2};
-    BOOST_REQUIRE_MESSAGE(cmp_sum_f1_f2.isSet<0>(), "The slice method failed! (f)");
+    BOOST_REQUIRE_MESSAGE(cmp_sum_f1_f2.isSet<0>(), "The addWithCarry method failed! (f)");
 
     // unsigned
     WRAPPER<14, false> f3{0b10010010110100};
@@ -95,15 +95,41 @@ BOOST_AUTO_TEST_CASE(testBackend)
     WRAPPER<15, false> sum_f3_f4 = f3.addWithCarry(f4, carry_f3);
     WRAPPER<15, false> expected_sum_f3_f4{0b101100101010010};
     WRAPPER<1, false> cmp_sum_f3_f4{expected_sum_f3_f4 == sum_f3_f4};
-    BOOST_REQUIRE_MESSAGE(cmp_sum_f3_f4.isSet<0>(), "The slice method failed! (f)");
+    BOOST_REQUIRE_MESSAGE(cmp_sum_f3_f4.isSet<0>(), "The addWithCarry method failed! (f)");
 
+    // modularAdd method
+    // unsigned
+    WRAPPER<14, false> g1{0b10010010110100};
+    WRAPPER<14, false> g2{0b11010010011101};
 
-    // inline wrapper<W+1, is_signed> addWithCarry(wrapper<W, is_signed> const & op2, wrapper<1, false> const & cin)
-    // {
-    //     return static_cast<wrapper<W, is_signed> const *>(this)->perform_addc(
-    //         op2, cin
-    //     );
-    // }
+    WRAPPER<14, false> modular_sum_g1_g2{g1.modularAdd(g2)};
+    WRAPPER<14, false> expected_sum_g1_g2{0b01100101010001};
+
+    WRAPPER<1, false> cmp_sum_g1_g2{expected_sum_g1_g2 == modular_sum_g1_g2};
+    BOOST_REQUIRE_MESSAGE(cmp_sum_g1_g2.isSet<0>(), "The modularAdd method failed! (g)");
+
+    // // signed
+    // WRAPPER<14, true> g3{0b00110100101001};
+    // WRAPPER<14, true> g4{0b00111011001100};
+
+    // WRAPPER<14, true> modular_sum_g3_g4{g3.modularAdd(g4)};
+    // WRAPPER<14, true> expected_sum_g3_g4{0b1101111110101};
+
+    // WRAPPER<1, false> cmp_sum_g3_g4{expected_sum_g3_g4 == modular_sum_g3_g4};
+    // BOOST_REQUIRE_MESSAGE(cmp_sum_g3_g4.isSet<0>(), "The modularAdd method failed! (g)");
+
+    // generateSequence method
+    WRAPPER<14, false> h1{WRAPPER<14, false>::generateSequence(WRAPPER<1, false>(1))};
+    WRAPPER<14, false> expected_h1{0b11111111111111};
+    WRAPPER<1, false> cmp_h1{expected_h1 == h1};
+    BOOST_REQUIRE_MESSAGE(cmp_h1.isSet<0>(), "The generateSequence method failed! (h)");
+
+    // generateSequence method
+    WRAPPER<14, false> h2{WRAPPER<14, false>::generateSequence(WRAPPER<1, false>(0))};
+    WRAPPER<14, false> expected_h2{0b0};
+    WRAPPER<1, false> cmp_h2{expected_h2 == h2};
+    BOOST_REQUIRE_MESSAGE(cmp_h2.isSet<0>(), "The generateSequence method failed! (h)");
+
 
 
 }

@@ -58,18 +58,18 @@ public:
         return static_cast<wrapper_type const *>(this)->compare(rhs);
     }
 
-    inline wrapper<W+1, is_signed> addWithCarry(wrapper<W, is_signed> const & op2, wrapper<1, false> const & cin)
+    inline wrapper<W+1, is_signed> addWithCarry(wrapper<W, is_signed> const & op2, wrapper<1, false> const & cin) const
     {
         return static_cast<wrapper<W, is_signed> const *>(this)->perform_addc(
             op2, cin
         );
     }
 
-    inline wrapper<W, is_signed> modularAdd(wrapper<W, is_signed> const & op2)
+    inline wrapper<W, is_signed> modularAdd(wrapper<W, is_signed> const & op2) 
     {
         wrapper<1, false> cin{0};
         wrapper<W+1, is_signed> res = addWithCarry(op2, cin);
-        return res->template do_slicing<W-1, 0>();
+        return res.template do_slicing<W-1, 0>();
     }
 
     inline wrapper<W, is_signed>& operator=(hint_base<W, is_signed, wrapper> const& rhs)
@@ -78,6 +78,13 @@ public:
         this->do_affect(rhs);
         return *p;
     }
+
+    // inline bool to_bool(
+    //     typename enable_if< W==1 >::type* = 0
+    // ) const
+    // {
+    //     return (*this).isSet<0>();
+    // }
 
     static inline wrapper<W, false> generateSequence(wrapper<1, false> const & val)
     {
