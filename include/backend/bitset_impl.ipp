@@ -5,7 +5,7 @@
 
 using namespace std;
 
-template<size_t W, bool is_signed>
+template<unsigned int W, bool is_signed>
 class BitsetWrapper : public hint_base<W, is_signed, BitsetWrapper>
 {
 private:
@@ -16,17 +16,17 @@ public:
 
     BitsetWrapper(bitset<W> const & val) : _storage{val}{}
 
-    template<size_t high, size_t low>
+    template<unsigned int high, unsigned int low>
     BitsetWrapper<high - low + 1, false> do_slicing() const
     {
         bitset<high - low + 1> ret;
-        for(size_t i = 0 ; i <= high - low ; ++i) {
+        for(unsigned int i = 0 ; i <= high - low ; ++i) {
             ret[i] = _storage[i+low];
         }
         return BitsetWrapper<high - low + 1, false>{ret};
     }
 
-    template<size_t idx>
+    template<unsigned int idx>
     BitsetWrapper<1, false> do_get() const
     {
         bitset<1> ret;
@@ -34,23 +34,23 @@ public:
         return ret;
     }
 
-    template<size_t Wrhs, bool isSignedRhs>
+    template<unsigned int Wrhs, bool isSignedRhs>
     BitsetWrapper<Wrhs + W, is_signed> do_concatenate(
             BitsetWrapper<Wrhs, isSignedRhs> const & val
         ) const
     {
         bitset<Wrhs + W> ret;
-        for (size_t i = 0 ; i < Wrhs; ++i) {
+        for (unsigned int i = 0 ; i < Wrhs; ++i) {
             ret[i] = val[i];
         }
-        for (size_t i = 0 ; i < W ; ++i) {
+        for (unsigned int i = 0 ; i < W ; ++i) {
             ret[i+Wrhs] = _storage[i];
         }
         return ret;
     }
 
 //    void to_stream(ostream & out) const {
-//        for (size_t i = 1 ; i <= W ; ++i) {
+//        for (unsigned int i = 1 ; i <= W ; ++i) {
 //            if (_storage[W-i]) {
 //                out << "1";
 //            } else {

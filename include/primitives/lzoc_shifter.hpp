@@ -6,14 +6,14 @@
 #include "hint.hpp"
 #include "tools/static_math.hpp"
 
-template<size_t S>
+template<unsigned int S>
 struct LZOCStageInfo
 {
     static constexpr bool NeedsRecursion = (S>0);
     static constexpr bool IsFinalStage = (S==0);
 };
 
-template<size_t N, size_t S, bool is_signed, template<size_t , bool> class Wrapper>
+template<unsigned int N, unsigned int S, bool is_signed, template<unsigned int , bool> class Wrapper>
 //N : Power of 2 of the size of the whole LZOC,
 //S power of two of the size of the stage
 inline Wrapper<S + 1 + (1 << N), false> lzoc_shifter_stage(
@@ -39,7 +39,7 @@ inline Wrapper<S + 1 + (1 << N), false> lzoc_shifter_stage(
     return cmp.concatenate(lower_stage);
 }
 
-template<size_t N, int S, bool is_signed, template<size_t , bool> class Wrapper>
+template<unsigned int N, int S, bool is_signed, template<unsigned int , bool> class Wrapper>
 inline Wrapper<S + 1 + (1 << N), false> lzoc_shifter_stage(
         Wrapper<1<<N, is_signed> const & input,
         Wrapper<1, false> const & leading,
@@ -58,7 +58,7 @@ inline Wrapper<S + 1 + (1 << N), false> lzoc_shifter_stage(
             );
 }
 
-template<size_t N, int S, bool is_signed, template<size_t , bool> class Wrapper>
+template<unsigned int N, int S, bool is_signed, template<unsigned int , bool> class Wrapper>
 Wrapper<N + (1<<N), false> lzoc_shifter(
         Wrapper<1<<N, is_signed> const & input,
         Wrapper<1, false> const & leading,
@@ -68,14 +68,14 @@ Wrapper<N + (1<<N), false> lzoc_shifter(
     return lzoc_shifter_stage<N, N-1>(input, leading, fill_bit);
 }
 
-template<size_t N>
+template<unsigned int N>
 struct GenericLZOCStageInfo
 {
     static constexpr bool is_a_power_of_2 = ((Static_Val<N>::_2pow) == N);
     static constexpr bool is_one = (N==1);
 };
 
-template<size_t N, int S, bool is_signed, template<size_t , bool> class Wrapper>
+template<unsigned int N, int S, bool is_signed, template<unsigned int , bool> class Wrapper>
 Wrapper<Static_Val<S>::_rlog2 + N, false> generic_lzoc_shifter_stage(
         Wrapper<N, is_signed> const & input,
         Wrapper<1, false> const & leading,
@@ -92,7 +92,7 @@ Wrapper<Static_Val<S>::_rlog2 + N, false> generic_lzoc_shifter_stage(
     }
 }
 
-template<size_t N, int S, bool is_signed, template<size_t , bool> class Wrapper>
+template<unsigned int N, int S, bool is_signed, template<unsigned int , bool> class Wrapper>
 Wrapper<Static_Val<S>::_rlog2 + N, true> generic_lzoc_shifter_stage(
         Wrapper<N, is_signed>  const & input,
         Wrapper<1, false> const & leading,
@@ -130,7 +130,7 @@ Wrapper<Static_Val<S>::_rlog2 + N, true> generic_lzoc_shifter_stage(
     return final_lzoc.concatenate(final_shift);
 }
 
-template<size_t N, int S, bool is_signed, template<size_t , bool> class Wrapper>
+template<unsigned int N, int S, bool is_signed, template<unsigned int , bool> class Wrapper>
 Wrapper<Static_Val<S>::_rlog2 + N, false> generic_lzoc_shifter_stage(
         Wrapper<N, is_signed> input,
         Wrapper<1, false> leading,
@@ -152,7 +152,7 @@ Wrapper<Static_Val<S>::_rlog2 + N, false> generic_lzoc_shifter_stage(
 }
 
 
-template<size_t N, bool is_signed, template<size_t , bool> class Wrapper>
+template<unsigned int N, bool is_signed, template<unsigned int , bool> class Wrapper>
 inline Wrapper<Static_Val<N>::_rlog2 + N, false> generic_lzoc_shifter(
         Wrapper<N, is_signed> input,
         Wrapper<1, false> leading,
@@ -164,7 +164,7 @@ inline Wrapper<Static_Val<N>::_rlog2 + N, false> generic_lzoc_shifter(
     return lzoc_shift;
 }
 
-template<size_t N, bool is_signed, template<size_t , bool> class Wrapper>
+template<unsigned int N, bool is_signed, template<unsigned int , bool> class Wrapper>
 inline Wrapper<Static_Val<N>::_rlog2 + N, true> generic_lzoc_shifter(
         Wrapper<N, is_signed> input,
         Wrapper<1, true> leading,

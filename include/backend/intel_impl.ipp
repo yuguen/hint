@@ -10,7 +10,7 @@
 #endif
 
 
-template <size_t W, bool is_signed>
+template <unsigned int W, bool is_signed>
 class IntelWrapper : public hint_base<W, is_signed, IntelWrapper>
 {
 private:
@@ -18,12 +18,12 @@ private:
 public:
     typedef IntelWrapper<W, is_signed> type;
     typedef ac_int<W, is_signed> storage_type;
-    template<size_t N, bool sign>
+    template<unsigned int N, bool sign>
     using storage_helper = ac_int<N, sign>;
-    template<size_t N, bool sign>
-    using wrapper_helper = IntelWrapper<N, is_signed>;
-    template<size_t N, bool sign>
-    using wrapper_type = IntelWrapper<N, is_signed>;
+    template<unsigned int N, bool sign>
+    using wrapper_helper = IntelWrapper<N, sign>;
+    template<unsigned int N, bool sign>
+    using wrapper_type = IntelWrapper<N, sign>;
 
 
     IntelWrapper(storage_type const & val):_storage{val}{
@@ -31,14 +31,14 @@ public:
 
 
     // low can only be of type int or unsigned int using ac_int
-    template<size_t high, unsigned int low>
+    template<unsigned int high, unsigned int low>
     inline IntelWrapper<high - low + 1, false> do_slicing() const
     {
         return IntelWrapper<high - low + 1, false>{storage_helper<high-low+1, false>{_storage.template slc<high-low+1>(low)}};
 
     }
 
-    template<size_t idx>
+    template<unsigned int idx>
     inline IntelWrapper<1, false> do_get() const
     {
         return wrapper_type<1, false>{
@@ -54,22 +54,30 @@ public:
         return (_storage.template slc<1>(idx) == 1);
     }
 
-    template<size_t Wrhs, bool isSignedRhs>
+    template<unsigned int Wrhs, bool isSignedRhs>
     inline IntelWrapper<Wrhs + W, false> do_concatenate(
             IntelWrapper<Wrhs, isSignedRhs> const & rhs
         ) const
     {
         ac_int<W+Wrhs, false> concatenation;
-        concatenation.template set_slc(0, rhs);
-        concatenation.template set_slc(Wrhs, (*this));        
+        concatenation.template set_slc(0, rhs._storage);
+        concatenation.template set_slc(Wrhs, (*this)._storage);        
         ac_int<Wrhs + W, false> ret{concatenation};
         return  wrapper_type<Wrhs + W, false>{ret};
     }
 
-    IntelWrapper<1, false> compare(IntelWrapper<W, false> const & rhs)const
+    IntelWrapper<1, false> compare(IntelWrapper<W, is_signed> const & rhs)const
     {
         return static_cast<ac_int<1, false> >(_storage == rhs._storage);
     }
+
+
+    inline IntelWrapper<W, not is_signed> invert_sign() const
+    {
+        typename IntelWrapper<W, not is_signed>::type val{_storage};
+        return IntelWrapper<W, not is_signed>{val};
+    }
+
 
     static inline IntelWrapper<W, false> do_generateSequence(
             IntelWrapper<1, false> const & val
@@ -85,7 +93,7 @@ public:
     wrapper_helper<W+1, is_signed> perform_addc(
             wrapper_helper<W, is_signed> const & op2,
             wrapper_helper<1, false> const & cin
-        )
+        ) const
     {
         return wrapper_helper<W+1, is_signed>{
             static_cast<storage_helper<W+1, is_signed> >(_storage + op2._storage + cin._storage)
@@ -107,7 +115,7 @@ public:
         return wrapper_helper<W, is_signed>{res};
     }
 
-    template<size_t N, bool val>
+    template<unsigned int N, bool val>
     friend class IntelWrapper;
 };
 

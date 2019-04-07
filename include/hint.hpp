@@ -9,13 +9,13 @@ using namespace std;
 /***
  * CRTP Base class
  */
-template <size_t W, bool is_signed, template<size_t, bool> class wrapper>
+template <unsigned int W, bool is_signed, template<unsigned int, bool> class wrapper>
 class hint_base{
 public:
     using type =  hint_base<W, is_signed, wrapper >;
     typedef  wrapper<W, is_signed> wrapper_type;
 
-    template<size_t high, size_t low>
+    template<unsigned int high, unsigned int low>
     wrapper<high - low + 1, false> slice(
         typename enable_if<high >= low and high < W>::type* = 0
     ) const
@@ -23,7 +23,7 @@ public:
         return static_cast<wrapper_type const *>(this)->template do_slicing<high, low>();
     }
 
-    template<size_t idx>
+    template<unsigned int idx>
     wrapper<1, false> get(
        typename enable_if<idx < W>::type* = 0
     ) const
@@ -31,7 +31,7 @@ public:
         return static_cast<wrapper_type const *>(this)->template do_get<idx>();
     }
 
-    template<size_t idx>
+    template<unsigned int idx>
     bool isSet(
        typename enable_if<idx < W>::type* = 0
     ) const
@@ -47,7 +47,7 @@ public:
 
 
 
-    template<size_t Wrhs, bool isSignedRhs>
+    template<unsigned int Wrhs, bool isSignedRhs>
     wrapper<W + Wrhs, false>
     concatenate(wrapper<Wrhs, isSignedRhs> const & val) const
     {

@@ -5,23 +5,23 @@
 
 #include "ap_int.h"
 
-template<size_t W, bool is_signed>
+template<unsigned int W, bool is_signed>
 struct VivadoBaseType{};
 
-template<size_t W>
+template<unsigned int W>
 struct VivadoBaseType<W, true>
 {
     typedef ap_int<W> type;
 };
 
-template<size_t W>
+template<unsigned int W>
 struct VivadoBaseType<W, false>
 {
     typedef ap_uint<W> type;
 };
 
 
-template <size_t W, bool is_signed>
+template <unsigned int W, bool is_signed>
 class VivadoWrapper : public hint_base<W, is_signed, VivadoWrapper>
 {
 private:
@@ -29,26 +29,26 @@ private:
 public:
     typedef VivadoWrapper<W, true> type;
     typedef typename VivadoBaseType<W, is_signed>::type storage_type;
-    template<size_t N>
+    template<unsigned int N>
     using storage_helper = typename VivadoBaseType<N, is_signed>::type;
-    template<size_t N>
+    template<unsigned int N>
     using us_storage_helper = typename VivadoBaseType<N, false>::type;
-    template<size_t N>
+    template<unsigned int N>
     using wrapper_helper = VivadoWrapper<N, is_signed>;
-    template<size_t N>
+    template<unsigned int N>
     using us_wrapper_helper = VivadoWrapper<N, false>;
 
     VivadoWrapper(storage_type const & val):_storage{val}{
     }
 
-    template<size_t high, unsigned int low>
+    template<unsigned int high, unsigned int low>
     inline VivadoWrapper<high - low + 1, false> do_slicing() const
     {
         #pragma HLS INLINE
         return us_wrapper_helper<high - low + 1>{us_storage_helper<high-low+1>{_storage.range(high, low)}};
     }
 
-    template<size_t idx>
+    template<unsigned int idx>
     inline VivadoWrapper<1, false> do_get() const
     {
         #pragma HLS INLINE
@@ -66,7 +66,7 @@ public:
         return (_storage[idx] == 1);
     }
 
-    template<size_t Wrhs, bool isSignedRhs>
+    template<unsigned int Wrhs, bool isSignedRhs>
     inline VivadoWrapper<Wrhs + W, false> do_concatenate(
             VivadoWrapper<Wrhs, isSignedRhs> const & val
         ) const
@@ -128,7 +128,7 @@ public:
         return wrapper_helper<W>{res};
     }
 
-    template<size_t N, bool val>
+    template<unsigned int N, bool val>
     friend class VivadoWrapper;
 };
 

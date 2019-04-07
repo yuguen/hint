@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE(testBackend)
     BOOST_REQUIRE_MESSAGE(slice_a.isSet<1>(), "The slice method failed! (a)");
     BOOST_REQUIRE_MESSAGE(not(slice_a.isSet<2>()), "The slice method failed! (a)");
 
-/*
+
     // Slice that gets all the bits of the input
     WRAPPER<2, false> b{0b01};
     WRAPPER<2, false> slice_b = b.template slice<1, 0>();
@@ -131,7 +131,7 @@ BOOST_AUTO_TEST_CASE(testBackend)
     WRAPPER<1, false> cmp_h2{expected_h2 == h2};
     BOOST_REQUIRE_MESSAGE(cmp_h2.isSet<0>(), "The generateSequence method failed! (h)");
 
-*/
+
 }
 
 
