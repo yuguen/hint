@@ -100,7 +100,7 @@ public:
     wrapper_helper<W+1> perform_addc(
             wrapper_helper<W> const & op2,
             us_wrapper_helper<1> const & cin
-        )
+        ) const
     {
         return wrapper_helper<W+1>{
             static_cast<storage_helper<W+1> >(_storage + op2._storage + cin._storage)

@@ -63,7 +63,7 @@ public:
         return get<idx>();
     }
 
-    inline wrapper<W+1, is_signed> addWithCarry(wrapper<W, is_signed> const & op2, wrapper<1, false> const & cin)
+    inline wrapper<W+1, is_signed> addWithCarry(wrapper<W, is_signed> const & op2, wrapper<1, false> const & cin) const
     {
         return static_cast<wrapper<W, is_signed> const *>(this)->perform_addc(
             op2, cin
