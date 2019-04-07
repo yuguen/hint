@@ -41,7 +41,7 @@ public:
     VivadoWrapper(storage_type const & val):_storage{val}{
     }
 
-    template<size_t high, size_t low>
+    template<size_t high, unsigned int low>
     inline VivadoWrapper<high - low + 1, false> do_slicing() const
     {
         #pragma HLS INLINE
@@ -60,7 +60,7 @@ public:
         };
     }
 
-    template<size_t idx>
+    template<unsigned int idx>
     inline bool do_isset() const
     {
         return (_storage[idx] == 1);

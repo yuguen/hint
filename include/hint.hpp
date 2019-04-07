@@ -116,3 +116,7 @@ public:
 #if defined(VIVADO_BACKEND)
 #include "backend/vivado_impl.ipp"
 #endif
+
+#if defined(INTEL_BACKEND)
+#include "backend/intel_impl.ipp"
+#endif
