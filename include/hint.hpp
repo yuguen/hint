@@ -65,12 +65,6 @@ public:
         );
     }
 
-    inline wrapper<W, is_signed> modularAdd(wrapper<W, is_signed> const & op2) 
-    {
-        wrapper<1, false> cin{0};
-        wrapper<W+1, is_signed> res = addWithCarry(op2, cin);
-        return res.template do_slicing<W-1, 0>();
-    }
 
     inline wrapper<W, is_signed>& operator=(hint_base<W, is_signed, wrapper> const& rhs)
     {
@@ -79,12 +73,25 @@ public:
         return *p;
     }
 
-    // inline bool to_bool(
-    //     typename enable_if< W==1 >::type* = 0
-    // ) const
-    // {
-    //     return (*this).isSet<0>();
-    // }
+    template<bool newSign>
+    inline wrapper<W, newSign> reinterpret_sign(typename enable_if<newSign == is_signed>::type* = 0) const
+    {
+        return (*this);
+    }
+
+    template<bool newSign>
+    inline wrapper<W, newSign> reinterpret_sign(typename enable_if<newSign != is_signed>::type* = 0) const
+    {
+        return static_cast<wrapper<W, is_signed>const *>(this)->invert_sign();
+    }
+
+    inline wrapper<W, is_signed> modularAdd(wrapper<W, is_signed> const & op2) const
+    {
+        wrapper<1, false> cin{0};
+        wrapper<W+1, is_signed> res = addWithCarry(op2, cin);
+        wrapper<W, false> sliced{res.template do_slicing<W-1, 0>()}; 
+        return sliced.template reinterpret_sign<is_signed>();
+    }
 
     static inline wrapper<W, false> generateSequence(wrapper<1, false> const & val)
     {

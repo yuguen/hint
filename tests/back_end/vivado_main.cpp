@@ -105,18 +105,23 @@ BOOST_AUTO_TEST_CASE(testBackend)
     WRAPPER<14, false> modular_sum_g1_g2{g1.modularAdd(g2)};
     WRAPPER<14, false> expected_sum_g1_g2{0b01100101010001};
 
+    cout << to_string(modular_sum_g1_g2) << endl;
+
+
     WRAPPER<1, false> cmp_sum_g1_g2{expected_sum_g1_g2 == modular_sum_g1_g2};
     BOOST_REQUIRE_MESSAGE(cmp_sum_g1_g2.isSet<0>(), "The modularAdd method failed! (g)");
 
-    // // signed
-    // WRAPPER<14, true> g3{0b00110100101001};
-    // WRAPPER<14, true> g4{0b00111011001100};
+    // signed
+    WRAPPER<14, true> g3{0b00110100101001};
+    WRAPPER<14, true> g4{0b00111011001100};
 
-    // WRAPPER<14, true> modular_sum_g3_g4{g3.modularAdd(g4)};
-    // WRAPPER<14, true> expected_sum_g3_g4{0b1101111110101};
+    WRAPPER<14, true> modular_sum_g3_g4{g3.modularAdd(g4)};
+    WRAPPER<14, true> expected_sum_g3_g4{0b1101111110101};
 
-    // WRAPPER<1, false> cmp_sum_g3_g4{expected_sum_g3_g4 == modular_sum_g3_g4};
-    // BOOST_REQUIRE_MESSAGE(cmp_sum_g3_g4.isSet<0>(), "The modularAdd method failed! (g)");
+    cout << to_string(modular_sum_g3_g4) << endl;
+
+    WRAPPER<1, false> cmp_sum_g3_g4{expected_sum_g3_g4 == modular_sum_g3_g4};
+    BOOST_REQUIRE_MESSAGE(cmp_sum_g3_g4.isSet<0>(), "The modularAdd method failed! (g)");
 
     // generateSequence method
     WRAPPER<14, false> h1{WRAPPER<14, false>::generateSequence(WRAPPER<1, false>(1))};

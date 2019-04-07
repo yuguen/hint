@@ -86,6 +86,12 @@ public:
         _storage = val._storage;
     }
 
+    inline VivadoWrapper<W, not is_signed> invert_sign() const
+    {
+        typename VivadoBaseType<W, not is_signed>::type val{_storage};
+        return VivadoWrapper<W, not is_signed>{val};
+    }
+
     static inline VivadoWrapper<W, false> do_generateSequence(
             VivadoWrapper<1, false> const & val
         )
