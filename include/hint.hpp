@@ -84,6 +84,19 @@ public:
         return *p;
     }
 
+
+    template<bool newSign>
+    inline wrapper<W, newSign> reinterpret_sign(typename enable_if<newSign == is_signed>::type* = 0) const
+    {
+        return *this;
+    }
+
+    template<bool newSign>
+    inline wrapper<W, newSign> reinterpret_sign(typename enable_if<newSign != is_signed>::type* = 0) const
+    {
+        return static_cast<wrapper<W, is_signed>const *>(this)->invert_sign();
+    }
+
     static inline wrapper<W, false> generateSequence(wrapper<1, false> const & val)
     {
         return wrapper<W, false>::do_generateSequence(val);
