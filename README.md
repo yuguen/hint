@@ -3,14 +3,14 @@
 Use one integer library, run it with any supported HLS tool.
 
 # Usage
-Include ```hint.hpp``` in your project.
-Create custom sized integer with the ```hint``` data-type:
+To build the unit tests, go to your build folder and type;
 
 ```
-hint<W, true> var; // signed integer on W bits
-hint<W, false> var; // unsigned integer on W bits
-
-var.get(i); // returns the ith bit of var as a hint<1, false>  
-var.from_to<Hi, Lo>(); // returns the slice of var from bit index Lo to bit index Hi-1 as a hint<Hi-Lo+1, false>  
-
+cmake <path to CMake_Lists.txt> -DBUILD_UNIT_TEST=ON 
+	# for testing the Vivado backend
+	-DVIVADO_BACKEND=ON -DVIVADO_INCLUDES=<path to Vivado include dir>
+	# for testing the Intel backend
+	-DINTEL_BACKEND=ON -DINTEL_INCLUDES=<path to IntelFPGA/hls/ include dir>
+	-B .
+make
 ```
