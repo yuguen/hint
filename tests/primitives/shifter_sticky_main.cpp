@@ -11,7 +11,7 @@
 using namespace  std;
 
 
-#if defined(VIVADO_BACKEND)
+#if defined(INTEL_BACKEND)
 BOOST_AUTO_TEST_CASE(testShifterVivado)
 {
     IntelWrapper<32, false> k{17};
@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE(testShifterVivado)
 }
 #endif
 
-#if defined(INTEL_BACKEND)
+#if defined(VIVADO_BACKEND)
 BOOST_AUTO_TEST_CASE(testShifterIntel)
 {
     VivadoWrapper<32, false> k{17};
