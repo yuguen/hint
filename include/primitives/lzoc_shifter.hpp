@@ -121,7 +121,9 @@ Wrapper<Static_Val<S>::_rlog2 + N, true> generic_lzoc_shifter_stage(
     Wrapper<Static_Val<S>::_rlog2, false> lzoc_cmp = Wrapper<Static_Val<S>::_rlog2, false>::generateSequence(Wrapper<1, false>{1});
 
 
-    ap_uint<Static_Val<S>::_rlog2> final_lzoc;
+    // DT10 : presumably?
+    //ap_uint<Static_Val<S>::_rlog2> final_lzoc;
+    Wrapper<Static_Val<S>::_rlog2,false> final_lzoc;
     if (lzoc == lzoc_cmp)
         final_lzoc = lzoc_if_rest;
     else
@@ -145,7 +147,9 @@ Wrapper<Static_Val<S>::_rlog2 + N, false> generic_lzoc_shifter_stage(
 
     Wrapper<1, true> cmp = (high == high_cmp);
 
-    ap_uint<N> next_stage_input = (cmp) ? low.concatenate(padding) : input;
+    // DT10: presumably?
+    //ap_uint<N> next_stage_input = (cmp) ? low.concatenate(padding) : input;
+    Wrapper<N, false> next_stage_input = (cmp) ? low.concatenate(padding) : input;
 
     auto lower_stage = generic_lzoc_shifter_stage<N, (S>>1) >(next_stage_input, leading, fill_bit);
     return cmp.concatenate(lower_stage);

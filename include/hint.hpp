@@ -109,6 +109,7 @@ public:
 };
 
 
+// TODO: Can't this always be enabled, as all HLS tools and compilers should support it?
 #if defined(BITSET_BACKEND)
 #include "backend/bitset_impl.ipp"
 #endif
@@ -119,4 +120,16 @@ public:
 
 #if defined(INTEL_BACKEND)
 #include "backend/intel_impl.ipp"
+#endif
+
+#if defined(MASKED_WORD_BACKEND)
+#include "backend/masked_word_impl.ipp"
+#endif
+
+#if defined(WORD_ARRAY_BACKEND)
+#include "backend/word_array_impl.ipp"
+#endif
+
+#if defined(BOOST_CPP_INT_BACKEND)
+#include "backend/boost_cpp_int_impl.hpp"
 #endif
