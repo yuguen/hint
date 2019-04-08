@@ -44,11 +44,11 @@ if(BUILD_UNIT_TEST)
 	find_package(Boost 1.55 REQUIRED COMPONENTS unit_test_framework)
 	enable_testing()
 
-	add_executable(testVivadoBackend_exe tests/back_end/vivado_main.cpp)
+	add_executable(testVivadoBackend_exe tests/backend/vivado_main.cpp)
 	target_link_libraries(testVivadoBackend_exe ${LIBNAME} ${Boost_LIBRARIES}) 
 	add_test(testVivadoBackend testVivadoBackend_exe)
 	
-	add_executable(testIntelBackend_exe tests/back_end/intel_main.cpp)
+	add_executable(testIntelBackend_exe tests/backend/intel_main.cpp)
 	target_link_libraries(testIntelBackend_exe ${LIBNAME} ${Boost_LIBRARIES}) 
 	add_test(testIntelBackend testIntelBackend_exe)
 
