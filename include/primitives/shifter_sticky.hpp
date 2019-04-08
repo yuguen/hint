@@ -33,7 +33,7 @@ inline Wrapper<IS, false> shifter_sticky_stage(
         Wrapper<1, false> sticky_in = input.template get<0>();
 
         // Incorrect sizes !
-        Wrapper<IS - (1 << (S-1)), false> low = input.template slice<IS - 1 - (1 << (S-1)), 1>();
+        Wrapper<IS - (1 << (S-1)), false> low = input.template slice<IS - 1 - (1 << (S-1)), 1>().concatenate(fill_bit);
         Wrapper<(1 << (S-1)), false> high = input.template slice<IS - 1 , IS - (1 << (S-1))>();
         Wrapper<IS, false> next_stage_input;
         if (stageNeedsShift.template isSet<0>()) {
