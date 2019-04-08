@@ -26,8 +26,8 @@ public:
     using wrapper_type = IntelWrapper<N, sign>;
 
 
-    IntelWrapper(storage_type const & val):_storage{val}{
-    }
+    IntelWrapper():_storage{0}{}
+    IntelWrapper(storage_type const & val):_storage{val}{}
 
 
     // low can only be of type int or unsigned int using ac_int
@@ -78,6 +78,11 @@ public:
         return IntelWrapper<W, not is_signed>{val};
     }
 
+    inline void do_affect(IntelWrapper<W, is_signed> const & val)
+    {
+        _storage = val._storage;
+    }
+
 
     static inline IntelWrapper<W, false> do_generateSequence(
             IntelWrapper<1, false> const & val
@@ -113,6 +118,11 @@ public:
             res = opt1._storage;
         }
         return wrapper_helper<W, is_signed>{res};
+    }
+
+    inline wrapper_helper<1, false> do_or_reduce()
+    {
+        return wrapper_helper<1, false>{_storage.or_reduce()};
     }
 
     template<unsigned int N, bool val>

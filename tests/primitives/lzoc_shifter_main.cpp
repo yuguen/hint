@@ -15,7 +15,8 @@ using namespace  std;
 
 BOOST_AUTO_TEST_CASE(testLzocShifter)
 {
-    WRAPPER<32, false> k{17};
+
+	WRAPPER<32, false> k{17};
     string s = to_string(k);
     cerr << s << endl;
     auto t = lzoc_shifter<5, 4>(k, WRAPPER<1, false>{0}, WRAPPER<1, false>{0});

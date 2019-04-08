@@ -69,7 +69,7 @@ public:
     inline wrapper<W, is_signed>& operator=(hint_base<W, is_signed, wrapper> const& rhs)
     {
         auto p = static_cast<wrapper<W, is_signed>*>(this);
-        this->do_affect(rhs);
+        p->do_affect(*static_cast<wrapper<W, is_signed> const *>(&rhs));
         return *p;
     }
 
@@ -106,6 +106,13 @@ public:
     {
         return wrapper<W, is_signed>::do_mux(control, opt1, opt0);
     }
+
+    inline wrapper<1, false> or_reduce()
+    {
+        auto p = static_cast<wrapper<W, is_signed>*>(this);
+        return p->do_or_reduce();
+    }
+
 };
 
 

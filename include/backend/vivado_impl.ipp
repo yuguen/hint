@@ -38,6 +38,9 @@ public:
     template<unsigned int N>
     using us_wrapper_helper = VivadoWrapper<N, false>;
 
+    VivadoWrapper():_storage{0}{}
+
+
     VivadoWrapper(storage_type const & val):_storage{val}{
     }
 
@@ -126,6 +129,11 @@ public:
             res = opt0._storage;
         }
         return wrapper_helper<W>{res};
+    }
+
+    inline us_wrapper_helper<1> do_or_reduce()
+    {
+        return us_wrapper_helper<1>{_storage.or_reduce()};
     }
 
     template<unsigned int N, bool val>
