@@ -89,6 +89,11 @@ public:
         _storage = val._storage;
     }
 
+    inline storage_type unravel() const
+    {
+        return _storage;
+    }
+
     inline VivadoWrapper<W, not is_signed> invert_sign() const
     {
         typename VivadoBaseType<W, not is_signed>::type val{_storage};
