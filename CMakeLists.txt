@@ -61,4 +61,7 @@ if(BUILD_UNIT_TEST)
 		add_test(testLzocShifter testLzocShifter_exe)
 	endif()
 
+        add_executable(testPrimitives_exe tests/primitives/test_lzoc.cpp)
+        target_link_libraries(testPrimitives_exe ${LIBNAME} ${BOOST_LIBRARIES})
+        add_test(testPrimitives testPrimitives_exe)
 endif()
