@@ -31,13 +31,12 @@ inline Wrapper<IS, false> shifter_sticky_stage(
         Wrapper<S-1, false> countnext = count.template slice<S-2, 0>();
 
         Wrapper<1, false> sticky_in = input.template get<0>();
-
-        Wrapper<IS - (1 << (S-1)), false> low = input.template slice<IS - 1 - (1 << (S-1)), 1>().concatenate(fill_bit);
+        Wrapper<IS - 1 - (1 << (S-1)), false> low = input.template slice<IS - 1 - (1 << (S-1)), 1>();
         Wrapper<(1 << (S-1)), false> high = input.template slice<IS - 1 , IS - (1 << (S-1))>();
         Wrapper<IS, false> next_stage_input;
         if (stageNeedsShift.template isSet<0>()) {
-                Wrapper<1, false> cur_sticky = Wrapper<1, false>{sticky_in.template isSet<0>() or high.reduceOR()};
-                next_stage_input = Wrapper<1, false>{0}.concatenate(low.concatenate(padding).concatenate(cur_sticky));
+                Wrapper<1, false> cur_sticky = Wrapper<1, false>{sticky_in.template isSet<0>() or high.or_reduce().template isSet<0>()};
+                next_stage_input = low.concatenate(padding).concatenate(cur_sticky);
         } else {
                 next_stage_input = input;
         }
@@ -56,8 +55,8 @@ inline Wrapper<IS, false> shifter_sticky_stage(
         Wrapper<IS, false> result;
         if (count.template isSet<0>()) {
                 Wrapper<IS - 2, false> low = input.template slice<IS - 2, 1>();
-                Wrapper<1, false> sticky_out = input.template isSet<0>() or input.template isSet<IS-1>();
-                result = Wrapper<1, false>{0}.concatenate(low.concatenate(fill_bit).concatenate(sticky_out));
+                Wrapper<1, false> sticky_out = Wrapper<1, false>{input.template isSet<0>() or input.template isSet<IS-1>()};
+                result = low.concatenate(fill_bit).concatenate(sticky_out);
         } else {
                 result = input;
         }
@@ -73,14 +72,13 @@ inline Wrapper<IS, false> shifter_sticky_stage(
     )
 {
     constexpr unsigned int nb_null_shift = S - Static_Val<IS-1>::_log2;
-    // Incorrect sizes !
     Wrapper<nb_null_shift, false> shift_weights_will_zero = count.template slice<S - 1, S - nb_null_shift>();
     Wrapper<S-nb_null_shift, false> next_count = count.template slice<S-1-nb_null_shift, 0>();
 
-    Wrapper<1, false> stageNeedsShift = shift_weights_will_zero.reduceOR();
+    Wrapper<1, false> stageNeedsShift = shift_weights_will_zero.or_reduce();
     Wrapper<IS, false> ret;
     if (stageNeedsShift) {
-        Wrapper<1, false> sticky = input.reduceOR();
+        Wrapper<1, false> sticky = input.or_reduce();
         Wrapper<IS-1, false> high = Wrapper<IS-1, false>::generateSequence(fill_bit);
         ret = high.concatenate(sticky);
     } else {
