@@ -8,7 +8,7 @@
 
 #include "hint.hpp"
 #include "tools/printing.hpp"
-#include "primitives/lzoc_shifter.hpp"
+// #include "primitives/lzoc_shifter.hpp"
 
 using namespace  std;
 
