@@ -27,17 +27,17 @@ BOOST_AUTO_TEST_CASE(testLzocShifterAndShifterVivado)
 		shifted_with_sticky = shifter_sticky<false>(currentValue, VivadoWrapper<1, false>{1}, VivadoWrapper<1, false>{1});
 		// cerr << to_string(shifted_with_sticky) << endl;
 		currentValue = shifted_with_sticky.slice<SIZE, 1>();
-	    // cerr << to_string(currentValue) << endl;
-	    computed_lzoc_shift = generic_lzoc_shifter(currentValue, VivadoWrapper<1, false>{0}, VivadoWrapper<1, false>{0});
+		// cerr << to_string(currentValue) << endl;
+		computed_lzoc_shift = generic_lzoc_shifter(currentValue, VivadoWrapper<1, false>{0}, VivadoWrapper<1, false>{0});
 		// cerr << to_string(computed_lzoc_shift) << endl;
 		expeted_lzoc = VivadoWrapper<Static_Val<SIZE>::_rlog2, false>{SIZE-i-1};
 		// cerr << to_string(expeted_lzoc) << endl;
 		expeted_shift = reverse(currentValue);
-	    // cerr << to_string(expeted_shift) << endl;
-	    expected_lzoc_shift = expeted_lzoc.concatenate(expeted_shift);
-	    // cerr << to_string(expected_lzoc_shift) << endl;
-	    cmp = VivadoWrapper<1, false>{expected_lzoc_shift == computed_lzoc_shift};
-	    BOOST_REQUIRE_MESSAGE(cmp.isSet<0>(), "The combined test of the shifter_sticky and the lzoc_shifter failed !");
+		// cerr << to_string(expeted_shift) << endl;
+		expected_lzoc_shift = expeted_lzoc.concatenate(expeted_shift);
+		// cerr << to_string(expected_lzoc_shift) << endl;
+		cmp = VivadoWrapper<1, false>{expected_lzoc_shift == computed_lzoc_shift};
+		BOOST_REQUIRE_MESSAGE(cmp.isSet<0>(), "The combined test of the shifter_sticky and the lzoc_shifter failed !");
 	}
 }
 #endif
@@ -56,17 +56,17 @@ BOOST_AUTO_TEST_CASE(testLzocShifterAndShifterIntel)
 		shifted_with_sticky = shifter_sticky<false>(currentValue, IntelWrapper<1, false>{1}, IntelWrapper<1, false>{1});
 		// cerr << to_string(shifted_with_sticky) << endl;
 		currentValue = shifted_with_sticky.slice<SIZE, 1>();
-	    // cerr << to_string(currentValue) << endl;
-	    computed_lzoc_shift = generic_lzoc_shifter(currentValue, IntelWrapper<1, false>{0}, IntelWrapper<1, false>{0});
+		// cerr << to_string(currentValue) << endl;
+		computed_lzoc_shift = generic_lzoc_shifter(currentValue, IntelWrapper<1, false>{0}, IntelWrapper<1, false>{0});
 		// cerr << to_string(computed_lzoc_shift) << endl;
 		expeted_lzoc = IntelWrapper<Static_Val<SIZE>::_rlog2, false>{SIZE-i-1};
 		// cerr << to_string(expeted_lzoc) << endl;
 		expeted_shift = reverse(currentValue);
-	    // cerr << to_string(expeted_shift) << endl;
-	    expected_lzoc_shift = expeted_lzoc.concatenate(expeted_shift);
-	    // cerr << to_string(expected_lzoc_shift) << endl;
-	    cmp = IntelWrapper<1, false>{expected_lzoc_shift == computed_lzoc_shift};
-	    BOOST_REQUIRE_MESSAGE(cmp.isSet<0>(), "The combined test of the shifter_sticky and the lzoc_shifter failed !");
+		// cerr << to_string(expeted_shift) << endl;
+		expected_lzoc_shift = expeted_lzoc.concatenate(expeted_shift);
+		// cerr << to_string(expected_lzoc_shift) << endl;
+		cmp = IntelWrapper<1, false>{expected_lzoc_shift == computed_lzoc_shift};
+		BOOST_REQUIRE_MESSAGE(cmp.isSet<0>(), "The combined test of the shifter_sticky and the lzoc_shifter failed !");
 	}
 }
 #endif
