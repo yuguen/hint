@@ -44,11 +44,8 @@ public:
         return *reinterpret_cast<wrapper_type*>(this);
     }
 
-
-
-
     template<unsigned int Wrhs, bool isSignedRhs>
-    wrapper<W + Wrhs, false>
+    wrapper<W + Wrhs, is_signed>
     concatenate(wrapper<Wrhs, isSignedRhs> const & val) const
     {
         return static_cast<wrapper_type const *>(this)->do_concatenate(val);

@@ -70,13 +70,12 @@ public:
     }
 
     template<unsigned int Wrhs, bool isSignedRhs>
-    inline VivadoWrapper<Wrhs + W, false> do_concatenate(
+    VivadoWrapper<Wrhs + W, false> do_concatenate(
             VivadoWrapper<Wrhs, isSignedRhs> const & val
         ) const
     {
-        #pragma HLS INLINE
-        us_storage_helper<Wrhs + W> ret{_storage.concat(val._storage)};
-        return  us_wrapper_helper<Wrhs + W>{ret};
+        ap_uint<Wrhs + W> ret {_storage.concat(val._storage)};
+        return  ret;
     }
 
     VivadoWrapper<1, false> compare(VivadoWrapper<W, is_signed> const & rhs)const
