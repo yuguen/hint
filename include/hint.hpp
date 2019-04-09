@@ -45,7 +45,7 @@ public:
     }
 
     template<unsigned int Wrhs, bool isSignedRhs>
-    wrapper<W + Wrhs, is_signed>
+    wrapper<W + Wrhs, false>
     concatenate(wrapper<Wrhs, isSignedRhs> const & val) const
     {
         return static_cast<wrapper_type const *>(this)->do_concatenate(val);
