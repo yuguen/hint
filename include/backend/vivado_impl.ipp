@@ -45,14 +45,14 @@ public:
     }
 
     template<unsigned int high, unsigned int low>
-    inline VivadoWrapper<high - low + 1, false> do_slicing() const
+    VivadoWrapper<high - low + 1, false> do_slicing() const
     {
         #pragma HLS INLINE
         return us_wrapper_helper<high - low + 1>{us_storage_helper<high-low+1>{_storage.range(high, low)}};
     }
 
     template<unsigned int idx>
-    inline VivadoWrapper<1, false> do_get() const
+    VivadoWrapper<1, false> do_get() const
     {
         #pragma HLS INLINE
         return us_wrapper_helper<1>{
@@ -64,7 +64,7 @@ public:
     }
 
     template<unsigned int idx>
-    inline bool do_isset() const
+    bool do_isset() const
     {
         return (_storage[idx] == 1);
     }
@@ -83,23 +83,23 @@ public:
         return us_wrapper_helper<1>{static_cast<us_storage_helper<1> >(_storage == rhs._storage)};
     }
 
-    inline void do_affect(wrapper_helper<W> const & val)
+    void do_affect(wrapper_helper<W> const & val)
     {
         _storage = val._storage;
     }
 
-    inline storage_type unravel() const
+    storage_type unravel() const
     {
         return _storage;
     }
 
-    inline VivadoWrapper<W, not is_signed> invert_sign() const
+    VivadoWrapper<W, not is_signed> invert_sign() const
     {
         typename VivadoBaseType<W, not is_signed>::type val{_storage};
         return VivadoWrapper<W, not is_signed>{val};
     }
 
-    static inline VivadoWrapper<W, false> do_generateSequence(
+    static VivadoWrapper<W, false> do_generateSequence(
             VivadoWrapper<1, false> const & val
         )
     {
@@ -120,7 +120,7 @@ public:
         };
     }
 
-    static inline wrapper_helper<W> do_mux(
+    static wrapper_helper<W> do_mux(
             us_wrapper_helper<1> const & control,
             wrapper_helper<W> const & opt1,
             wrapper_helper<W> const & opt0
@@ -135,7 +135,7 @@ public:
         return wrapper_helper<W>{res};
     }
 
-    inline us_wrapper_helper<1> do_or_reduce()
+    us_wrapper_helper<1> do_or_reduce()
     {
         return us_wrapper_helper<1>{_storage.or_reduce()};
     }

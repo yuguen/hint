@@ -55,7 +55,7 @@ public:
         return static_cast<wrapper_type const *>(this)->compare(rhs);
     }
 
-    inline wrapper<W+1, is_signed> addWithCarry(wrapper<W, is_signed> const & op2, wrapper<1, false> const & cin) const
+    wrapper<W+1, is_signed> addWithCarry(wrapper<W, is_signed> const & op2, wrapper<1, false> const & cin) const
     {
         return static_cast<wrapper<W, is_signed> const *>(this)->perform_addc(
             op2, cin
@@ -63,7 +63,7 @@ public:
     }
 
 
-    inline wrapper<W, is_signed>& operator=(hint_base<W, is_signed, wrapper> const& rhs)
+    wrapper<W, is_signed>& operator=(hint_base<W, is_signed, wrapper> const& rhs)
     {
         auto p = static_cast<wrapper<W, is_signed>*>(this);
         p->do_affect(*static_cast<wrapper<W, is_signed> const *>(&rhs));
@@ -71,18 +71,18 @@ public:
     }
 
     template<bool newSign>
-    inline wrapper<W, newSign> reinterpret_sign(typename enable_if<newSign == is_signed>::type* = 0) const
+    wrapper<W, newSign> reinterpret_sign(typename enable_if<newSign == is_signed>::type* = 0) const
     {
         return *reinterpret_cast<wrapper<W, is_signed> const *>(this);
     }
 
     template<bool newSign>
-    inline wrapper<W, newSign> reinterpret_sign(typename enable_if<newSign != is_signed>::type* = 0) const
+    wrapper<W, newSign> reinterpret_sign(typename enable_if<newSign != is_signed>::type* = 0) const
     {
         return static_cast<wrapper<W, is_signed>const *>(this)->invert_sign();
     }
 
-    inline wrapper<W, is_signed> modularAdd(wrapper<W, is_signed> const & op2) const
+    wrapper<W, is_signed> modularAdd(wrapper<W, is_signed> const & op2) const
     {
         wrapper<1, false> cin{0};
         wrapper<W+1, is_signed> res = addWithCarry(op2, cin);
@@ -90,12 +90,12 @@ public:
         return sliced.template reinterpret_sign<is_signed>();
     }
 
-    static inline wrapper<W, false> generateSequence(wrapper<1, false> const & val)
+    static wrapper<W, false> generateSequence(wrapper<1, false> const & val)
     {
         return wrapper<W, false>::do_generateSequence(val);
     }
 
-    static inline wrapper<W, is_signed> mux(
+    static wrapper<W, is_signed> mux(
             wrapper<1, false> const & control,
             wrapper<W, is_signed> const & opt1,
             wrapper<W, is_signed> const & opt0
@@ -104,7 +104,7 @@ public:
         return wrapper<W, is_signed>::do_mux(control, opt1, opt0);
     }
 
-    inline wrapper<1, false> or_reduce()
+    wrapper<1, false> or_reduce()
     {
         auto p = static_cast<wrapper<W, is_signed>*>(this);
         return p->do_or_reduce();
