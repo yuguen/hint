@@ -47,6 +47,11 @@ public:
             )
         };
     }
+    
+    storage_type unravel() const
+    {
+        return _storage;
+    }
 
     template<unsigned int idx>
     inline bool do_isset() const
