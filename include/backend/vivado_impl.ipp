@@ -47,14 +47,12 @@ public:
     template<unsigned int high, unsigned int low>
     VivadoWrapper<high - low + 1, false> do_slicing() const
     {
-        #pragma HLS INLINE
         return us_wrapper_helper<high - low + 1>{us_storage_helper<high-low+1>{_storage.range(high, low)}};
     }
 
     template<unsigned int idx>
     VivadoWrapper<1, false> do_get() const
     {
-        #pragma HLS INLINE
         return us_wrapper_helper<1>{
             us_storage_helper<1>{
             storage_helper<1>{
