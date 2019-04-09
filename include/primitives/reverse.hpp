@@ -4,7 +4,7 @@
 //In case we need both the variable and its reversed value
 //(vivado reverse change the bit order of the value on which its called)
 template <unsigned int N, template<unsigned int , bool> class Wrapper>
-inline Wrapper<N, false> reverse(
+Wrapper<N, false> reverse(
         Wrapper<N, false> input,
         typename std::enable_if<(N>1)>::type* = 0
     )
@@ -19,7 +19,7 @@ inline Wrapper<N, false> reverse(
 }
 
 template <unsigned int N, template<unsigned int , bool> class Wrapper>
-inline Wrapper<N, false> reverse(
+Wrapper<N, false> reverse(
         Wrapper<N, false> input,
         typename std::enable_if<(N==1)>::type* = 0
     )
