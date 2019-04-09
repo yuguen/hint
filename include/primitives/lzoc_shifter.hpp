@@ -37,7 +37,7 @@ inline Wrapper<S + 1 + (1 << N), false> lzoc_shifter_stage(
     return cmp.concatenate(lower_stage);
 }
 
-template<unsigned int N, int S, bool is_signed, template<unsigned int , bool> class Wrapper>
+template<unsigned int N, unsigned int S, bool is_signed, template<unsigned int , bool> class Wrapper>
 inline Wrapper<S + 1 + (1 << N), false> lzoc_shifter_stage(
         Wrapper<1<<N, is_signed> const & input,
         Wrapper<1, false> const & leading,
@@ -55,7 +55,7 @@ inline Wrapper<S + 1 + (1 << N), false> lzoc_shifter_stage(
             );
 }
 
-template<unsigned int N, int S, bool is_signed, template<unsigned int , bool> class Wrapper>
+template<unsigned int N, unsigned int S, bool is_signed, template<unsigned int , bool> class Wrapper>
 inline Wrapper<N + (1<<N), false> lzoc_shifter(
         Wrapper<1<<N, is_signed> const & input,
         Wrapper<1, false> const & leading,
@@ -78,7 +78,7 @@ inline Wrapper<Static_Val<S>::_rlog2 + N, false> generic_lzoc_shifter_stage(
         Wrapper<1, false> const & fill_bit = 0,
         typename std::enable_if<GenericLZOCStageInfo<S>::is_a_power_of_2 and GenericLZOCStageInfo<S>::is_one>::type*  = 0)
 {
-    if (input.template get<N - 1>() == leading) {
+    if ((input.template get<N - 1>() == leading).template isSet<0>()) {
         Wrapper<N - 1, false> low = input.template slice<N - 2, 0>();
         Wrapper<N, false> res = low.concatenate(fill_bit);
         return Wrapper<1, false>{1}.concatenate(res);
@@ -88,7 +88,7 @@ inline Wrapper<Static_Val<S>::_rlog2 + N, false> generic_lzoc_shifter_stage(
 }
 
 template<unsigned int N, int S, bool is_signed, template<unsigned int , bool> class Wrapper>
-inline Wrapper<Static_Val<S>::_rlog2 + N, true> generic_lzoc_shifter_stage(
+inline Wrapper<Static_Val<S>::_rlog2 + N, false> generic_lzoc_shifter_stage(
         Wrapper<N, is_signed>  const & input,
         Wrapper<1, false> const & leading,
         Wrapper<1, false> const & fill_bit = 0,
@@ -107,17 +107,22 @@ inline Wrapper<Static_Val<S>::_rlog2 + N, true> generic_lzoc_shifter_stage(
 
     Wrapper<Static_Val<rest_of_S>::_rlog2, false> lzoc_rest = lzoc_shift_rest.template slice<Static_Val<rest_of_S>::_rlog2 + N-1, N>();
     Wrapper<N, false> shift_rest = lzoc_shift_rest.template slice<N-1, 0>();
-
-    Wrapper<N, false> final_shift = (lzoc==Wrapper<Static_Val<S>::_rlog2, false>::generateSequence(Wrapper<1, true>{1})) ? shift_rest : shift;
+    Wrapper<Static_Val<S>::_rlog2, false> log2_S_ones = Wrapper<Static_Val<S>::_rlog2, false>::generateSequence(Wrapper<1, false>{1});
+    Wrapper<1, false> cmp = Wrapper<1, false>{lzoc == log2_S_ones};
+    bool cmp_bool = cmp.template isSet<0>();
+    Wrapper<N, false> final_shift = (cmp_bool) ? shift_rest : shift;
     //TODO lzoc_rest.size <= _rlog2 : concatener des zéros
-    Wrapper<Static_Val<S>::_rlog2 - 1, false> sval{S};
-    Wrapper<Static_Val<S>::_rlog2, false> lzoc_if_rest = sval.modular_add(lzoc_rest);
+    Wrapper<Static_Val<S>::_rlog2, false> sval{S};
+    Wrapper<Static_Val<S>::_rlog2- Static_Val<rest_of_S>::_rlog2, false> lzoc_rest_padding_zeros{0}; 
+    Wrapper<Static_Val<S>::_rlog2, false> lzoc_if_rest = sval.modularAdd(lzoc_rest_padding_zeros.concatenate(lzoc_rest));
 
     Wrapper<Static_Val<S>::_rlog2, false> lzoc_cmp = Wrapper<Static_Val<S>::_rlog2, false>::generateSequence(Wrapper<1, false>{1});
 
 
-    ap_uint<Static_Val<S>::_rlog2> final_lzoc;
-    if (lzoc == lzoc_cmp)
+    Wrapper<Static_Val<S>::_rlog2, false> final_lzoc;
+    Wrapper<1, false> cmp2 = lzoc == lzoc_cmp;
+
+    if (cmp2.template isSet<0>())
         final_lzoc = lzoc_if_rest;
     else
         final_lzoc = lzoc;
@@ -137,9 +142,9 @@ inline Wrapper<Static_Val<S>::_rlog2 + N, false> generic_lzoc_shifter_stage(
     Wrapper<S, false> high = input.template slice<N-1, N-S>();
     Wrapper<S, false> high_cmp =  Wrapper<S, false>::generateSequence(leading);
 
-    Wrapper<1, true> cmp = (high == high_cmp);
+    Wrapper<1, false> cmp = (high == high_cmp);
 
-    ap_uint<N> next_stage_input = (cmp) ? low.concatenate(padding) : input;
+    Wrapper<N, false> next_stage_input = (cmp.template isSet<0>()) ? low.concatenate(padding) : input;
 
     auto lower_stage = generic_lzoc_shifter_stage<N, (S>>1) >(next_stage_input, leading, fill_bit);
     return cmp.concatenate(lower_stage);
@@ -154,21 +159,21 @@ inline Wrapper<Static_Val<N>::_rlog2 + N, false> generic_lzoc_shifter(
         typename std::enable_if<not(GenericLZOCStageInfo<N>::is_a_power_of_2)>::type* = 0
         )
 {
-    Wrapper<(Static_Val<N>::_rlog2 + N), true> lzoc_shift =  generic_lzoc_shifter_stage<N, N>(input, leading, fill_bit);
+    Wrapper<(Static_Val<N>::_rlog2 + N), false> lzoc_shift =  generic_lzoc_shifter_stage<N, N>(input, leading, fill_bit);
     return lzoc_shift;
 }
 
 template<unsigned int N, bool is_signed, template<unsigned int , bool> class Wrapper>
-inline Wrapper<Static_Val<N>::_rlog2 + N, true> generic_lzoc_shifter(
+inline Wrapper<Static_Val<N>::_rlog2 + N, false> generic_lzoc_shifter(
         Wrapper<N, is_signed> input,
-        Wrapper<1, true> leading,
-        Wrapper<1, true> fill_bit = 0,
+        Wrapper<1, false> leading,
+        Wrapper<1, false> fill_bit = 0,
         typename std::enable_if<GenericLZOCStageInfo<N>::is_a_power_of_2>::type* = 0
         )
 {
     static constexpr int log2N = Static_Val<N>::_log2;
 
-    Wrapper<(log2N + (1<<log2N)), true> lzoc_shift =  lzoc_shifter<log2N>(input, leading, fill_bit);
-    return lzoc_shift;
+    Wrapper<(log2N + (1<<log2N)), false> lzoc_shift =  lzoc_shifter<log2N, log2N, is_signed, Wrapper>(input, leading, fill_bit);
+    return Wrapper<1,false>{0}.concatenate(lzoc_shift);
 }
 #endif // LZOC_SHIFTER_HPP

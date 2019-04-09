@@ -87,7 +87,7 @@ Wrapper<IS, false> shifter_sticky_stage(
     return ret;
 }
 
-template<unsigned int IS, unsigned int S, bool isRightShift, bool is_signed, template<unsigned int , bool> class Wrapper>
+template< bool isRightShift, unsigned int IS, unsigned int S, bool is_signed, template<unsigned int , bool> class Wrapper>
 Wrapper<IS+1, false> shifter_sticky(
                 Wrapper<IS, is_signed> input,
                 Wrapper<S, false> count,
