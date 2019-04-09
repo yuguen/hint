@@ -1,5 +1,5 @@
-#ifndef SHIFTER_HPP
-#define SHIFTER_HPP
+#ifndef SHIFTER_STICKY_HPP
+#define SHIFTER_STICKY_HPP
 
 #include <iostream>
 #include <type_traits>
@@ -110,4 +110,4 @@ Wrapper<IS+1, false> shifter_sticky(
 }
 
 
-#endif // SHIFTER_HPP
+#endif // SHIFTER_STICKY_HPP
