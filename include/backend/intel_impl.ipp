@@ -130,6 +130,18 @@ public:
         return wrapper_helper<1, false>{_storage.or_reduce()};
     }
 
+    template<bool sign>
+    inline wrapper_helper<W, is_signed> do_and(wrapper_helper<W, sign> const & rhs)
+    {
+        return wrapper_helper<W, is_signed>{_storage & rhs._storage};
+    }
+    
+    template<bool sign>
+    inline wrapper_helper<W, is_signed> do_or(wrapper_helper<W, sign> const & rhs)
+    {
+        return wrapper_helper<W, is_signed>{_storage | rhs._storage};
+    }
+
     template<unsigned int N, bool val>
     friend class IntelWrapper;
 };

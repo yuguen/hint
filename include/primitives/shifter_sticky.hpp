@@ -15,11 +15,11 @@ struct ShifterStageInfo
 	static constexpr bool IsFinalStage = (S==1);
 };
 
-template<unsigned int IS, unsigned int S, template<unsigned int, bool> class Wrapper>
+template<unsigned int IS, unsigned int S, bool is_signed, template<unsigned int, bool> class Wrapper>
 //IS : Input Size (including sticky bit),
 //S : size of shift counter
 Wrapper<IS, false> shifter_sticky_stage(
-                Wrapper<IS, false> input,
+                Wrapper<IS, is_signed> input,
                 Wrapper<S, false> count,
                 Wrapper<1, false> fill_bit = Wrapper<1, false>{0},
                 typename std::enable_if<ShifterStageInfo<S>::NeedsRecursion>::type* = 0,
@@ -43,9 +43,9 @@ Wrapper<IS, false> shifter_sticky_stage(
         return shifter_sticky_stage<IS, S-1, Wrapper>(next_stage_input, countnext, fill_bit);
 }
 
-template<unsigned int IS, unsigned int S, template<unsigned int , bool> class Wrapper>
+template<unsigned int IS, unsigned int S, bool is_signed, template<unsigned int , bool> class Wrapper>
 Wrapper<IS, false> shifter_sticky_stage(
-                Wrapper<IS, false> input,
+                Wrapper<IS, is_signed> input,
                 Wrapper<S, false> count,
                 Wrapper<1, false> fill_bit = Wrapper<1, false>{0},
                 typename std::enable_if<ShifterStageInfo<S>::IsFinalStage>::type* = 0,
@@ -96,7 +96,7 @@ Wrapper<IS+1, false> shifter_sticky(
 {
         Wrapper<IS, false> fin_input{isRightShift ? reverse(input) : input};
         Wrapper<IS + 1, false> init_sticky = fin_input.concatenate(Wrapper<1, false>{0});
-        Wrapper<IS + 1, false> shiftstick = shifter_sticky_stage<IS+1, S, Wrapper>(init_sticky, count, fill_bit);
+        Wrapper<IS + 1, false> shiftstick = shifter_sticky_stage<IS+1, S, is_signed, Wrapper>(init_sticky, count, fill_bit);
         Wrapper<IS + 1, false> ret;
         if (isRightShift) {
             Wrapper<IS, false> high = shiftstick.template slice<IS, 1>();

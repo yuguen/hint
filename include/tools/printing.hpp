@@ -1,7 +1,7 @@
 #ifndef PRINTING_HPP
 #define PRINTING_HPP
 
-#include <iostream>
+#include <sstream>
 #include <string>
 #include <type_traits>
 

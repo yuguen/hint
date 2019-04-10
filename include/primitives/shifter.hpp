@@ -15,39 +15,38 @@ struct ShifterStageInfo
         static constexpr bool IsFinalStage = (S==1);
 };
 
-template<unsigned int IS, unsigned int S, template<unsigned int, bool> class Wrapper>
+template<unsigned int IS, unsigned int S, bool is_signed, template<unsigned int, bool> class Wrapper>
 //IS : Input Size (including sticky bit),
 //S : size of shift counter
 Wrapper<IS, false> shifter_stage(
-                Wrapper<IS, false> input,
+                Wrapper<IS, is_signed> input,
                 Wrapper<S, false> count,
                 Wrapper<1, false> fill_bit,
                 typename std::enable_if<ShifterStageInfo<S>::NeedsRecursion>::type* = 0,
-                typename std::enable_if<((IS) >= (1 << (S-1)))>::type * = 0
+                typename std::enable_if<((IS-1) >= (1 << (S-1)))>::type * = 0
         )
 {
         Wrapper<1<<(S-1), false> padding =  Wrapper<1<<(S-1), false>::generateSequence(fill_bit);
         Wrapper<1, false> stageNeedsShift = count.template get<S-1>();
         Wrapper<S-1, false> countnext = count.template slice<S-2, 0>();
 
-        Wrapper<1, false> sticky_in = input.template get<0>();
-        Wrapper<IS - (1 << (S-1)), false> low = input.template slice<IS - 1 - (1 << (S-1)), 0>();
+        Wrapper<IS - (1 << (S-1)), false> low = input.template slice<(IS - 1) - (1 << (S-1)), 0>();
         Wrapper<IS, false> next_stage_input;
         if (stageNeedsShift.template isSet<0>()) {
                 next_stage_input = low.concatenate(padding);
         } else {
                 next_stage_input = input;
         }
-        return shifter_stage<IS, S-1, Wrapper>(next_stage_input, countnext, fill_bit);
+        return shifter_stage<IS, S-1, is_signed, Wrapper>(next_stage_input, countnext, fill_bit);
 }
 
-template<unsigned int IS, unsigned int S, template<unsigned int , bool> class Wrapper>
+template<unsigned int IS, unsigned int S, bool is_signed, template<unsigned int , bool> class Wrapper>
 Wrapper<IS, false> shifter_stage(
-                Wrapper<IS, false> input,
+                Wrapper<IS, is_signed> input,
                 Wrapper<S, false> count,
                 Wrapper<1, false> fill_bit,
                 typename std::enable_if<ShifterStageInfo<S>::IsFinalStage>::type* = 0,
-                typename std::enable_if<((IS) >= (1 << (S-1)))>::type * = 0
+                typename std::enable_if<((IS-1) >= (1 << (S-1)))>::type * = 0
         )
 {
         Wrapper<IS, false> result;
@@ -65,7 +64,7 @@ Wrapper<IS, false> shifter_stage(
         Wrapper<IS, is_signed> input,
         Wrapper<S, false> count,
         Wrapper<1, false> fill_bit,
-        typename std::enable_if<((IS) < (1 << (S-1)))>::type * = 0
+        typename std::enable_if<((IS-1) < (1 << (S-1)))>::type * = 0
     )
 {
     constexpr unsigned int nb_null_shift = S - Static_Val<IS>::_log2;
@@ -73,10 +72,10 @@ Wrapper<IS, false> shifter_stage(
     Wrapper<S-nb_null_shift, false> next_count = count.template slice<S-1-nb_null_shift, 0>();
     Wrapper<1, false> stageNeedsShift = shift_weights_will_zero.or_reduce();
     Wrapper<IS, false> ret;
-    if (stageNeedsShift) {
+    if (stageNeedsShift.template isSet<0>()) {
         ret = Wrapper<IS, false>::generateSequence(fill_bit);
     } else {
-        ret = shifter_stage<IS, S-nb_null_shift, Wrapper>(input, next_count, fill_bit);
+        ret = shifter_stage<IS, S-nb_null_shift, is_signed, Wrapper>(input, next_count, fill_bit);
     }
     return ret;
 }
@@ -89,7 +88,7 @@ Wrapper<IS, false> shifter(
     )
 {
         Wrapper<IS, false> fin_input{isRightShift ? reverse(input) : input};
-        Wrapper<IS, false> shiftstick = shifter_stage<IS, S, Wrapper>(fin_input, count, fill_bit);
+        Wrapper<IS, false> shiftstick = shifter_stage<IS, S, is_signed, Wrapper>(fin_input, count, fill_bit);
         Wrapper<IS, false> ret = isRightShift ? reverse(shiftstick) : shiftstick;
         return ret;
 }

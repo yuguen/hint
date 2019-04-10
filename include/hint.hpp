@@ -110,6 +110,21 @@ public:
         return p->do_or_reduce();
     }
 
+    template<bool sign>
+    wrapper<W, is_signed> And(wrapper<W, sign> rhs)
+    {
+        auto p = static_cast<wrapper<W, is_signed>*>(this);
+        return p->do_and(rhs);
+    }
+
+    template<bool sign>
+    wrapper<W, is_signed> Or(wrapper<W, sign> rhs)
+    {
+        auto p = static_cast<wrapper<W, is_signed>*>(this);
+        return p->do_or(rhs);
+    }
+
+
 };
 
 

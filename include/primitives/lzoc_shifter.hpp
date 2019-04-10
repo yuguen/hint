@@ -110,7 +110,13 @@ inline Wrapper<Static_Val<S>::_rlog2 + N, false> generic_lzoc_shifter_stage(
     Wrapper<Static_Val<S>::_rlog2, false> log2_S_ones = Wrapper<Static_Val<S>::_rlog2, false>::generateSequence(Wrapper<1, false>{1});
     Wrapper<1, false> cmp = Wrapper<1, false>{lzoc == log2_S_ones};
     bool cmp_bool = cmp.template isSet<0>();
-    Wrapper<N, false> final_shift = (cmp_bool) ? shift_rest : shift;
+    Wrapper<N, false> final_shift;
+    if(cmp_bool){
+        final_shift = shift_rest; 
+    } 
+    else{
+        final_shift = shift;
+    }
     //TODO lzoc_rest.size <= _rlog2 : concatener des zéros
     Wrapper<Static_Val<S>::_rlog2, false> sval{S};
     Wrapper<Static_Val<S>::_rlog2- Static_Val<rest_of_S>::_rlog2, false> lzoc_rest_padding_zeros{0}; 
@@ -144,7 +150,13 @@ inline Wrapper<Static_Val<S>::_rlog2 + N, false> generic_lzoc_shifter_stage(
 
     Wrapper<1, false> cmp = (high == high_cmp);
 
-    Wrapper<N, false> next_stage_input = (cmp.template isSet<0>()) ? low.concatenate(padding) : input;
+    Wrapper<N, false> next_stage_input;
+    if(cmp.template isSet<0>()){
+        next_stage_input = low.concatenate(padding);
+    }
+    else{
+        next_stage_input = input;   
+    } 
 
     auto lower_stage = generic_lzoc_shifter_stage<N, (S>>1) >(next_stage_input, leading, fill_bit);
     return cmp.concatenate(lower_stage);
