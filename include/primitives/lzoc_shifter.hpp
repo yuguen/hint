@@ -3,6 +3,82 @@
 #include <iostream>
 #include <type_traits>
 
+
+
+#include "hint.hpp"
+#include "tools/static_math.hpp"
+#include "tools/printing.hpp"
+#include "primitives/shifter.hpp"
+#include "primitives/reverse.hpp"
+#include <iostream>
+
+using namespace std;
+
+// template<int N>
+// constexpr bool isOneBelow2Pow()
+// {
+//     return (((1 << Static_Val<N>::_clog2 ) - 1) == N);
+// }
+
+template<unsigned int N, unsigned int S, bool is_signed, template<unsigned int , bool> class Wrapper>
+Wrapper<Static_Val<S>::_clog2+N, false> getOneBelow2PowLZOC_shift(
+            Wrapper<N, is_signed> const & input,
+            Wrapper<1, false> const & leading,
+            Wrapper<1, false> const & fill_bit = 0,
+            typename enable_if<isOneBelow2Pow<S>() and (S>=2)>::type* = 0
+        )
+{
+    // cerr << "Ge 2 S: " << S << endl;
+    // cerr << "input: " << to_string(input) << endl; 
+    constexpr int upper_half = (1 <<Static_Val<S>::_flog2);
+    // cerr << "upper_half: " << upper_half << endl; 
+
+    auto upper = input.template slice<N-1, N-upper_half>();
+    auto comp_seq = Wrapper<upper_half, false>::generateSequence(leading);
+    auto comp = (upper == comp_seq);
+    auto upper_input = input;
+    auto low = input.template slice<N-upper_half-1, 0>().concatenate(Wrapper<upper_half, false>::generateSequence(fill_bit));
+    auto next_stage_input = Wrapper<N, false>::mux(comp, low, upper_input);
+    // cerr << "next stage input: " << to_string(next_stage_input) << endl; 
+
+    auto ret = comp.concatenate(getOneBelow2PowLZOC_shift<N, upper_half-1>(next_stage_input, leading, fill_bit));
+    return ret;
+
+}
+
+template<unsigned int N, unsigned int S, bool is_signed, template<unsigned int , bool> class Wrapper>
+Wrapper<1+N, false> getOneBelow2PowLZOC_shift(
+        Wrapper<N, is_signed> const & input,
+        Wrapper<1, false> const & leading,
+        Wrapper<1, false> const & fill_bit = 0,
+        typename enable_if<(S==1)>::type* = 0
+    )
+{
+    // cerr << "Eq 1 S: " << S << endl;
+    bool top_is_leading = (input.template get<N-1>() == leading).template isSet<0>();
+    Wrapper<Static_Val<S>::_rlog2+N, false> case_is_leading = Wrapper<1, false>{1}.concatenate(input.template slice <N-2, 0>().concatenate(fill_bit));
+    Wrapper<Static_Val<S>::_rlog2+N, false> case_not_is_leading = Wrapper<1, false>{0}.concatenate(input);
+    // cerr << "input: " << to_string(input) << endl;
+    // cerr << "top_is_leading: " << top_is_leading << endl;
+
+    return (top_is_leading) ? case_is_leading : case_not_is_leading;
+}
+
+template<unsigned int N, bool is_signed, template<unsigned int , bool> class Wrapper>
+Wrapper<Static_Val<N>::_clog2+N, false> LZOC_shift(
+            Wrapper<N, is_signed> const & input,
+            Wrapper<1, false> const & leading,
+            Wrapper<1, false> const & fill_bit = 0,
+            typename enable_if<isOneBelow2Pow<N>() and (N > 1)>::type* = 0
+        )
+{
+    // cerr << "Call lzoc shift on size " << N << endl;
+    return getOneBelow2PowLZOC_shift<N, N>(input, leading, fill_bit);
+}
+
+
+
+/*
 #include "hint.hpp"
 #include "tools/static_math.hpp"
 
@@ -188,4 +264,5 @@ inline Wrapper<Static_Val<N>::_rlog2 + N, false> generic_lzoc_shifter(
     Wrapper<(log2N + (1<<log2N)), false> lzoc_shift =  lzoc_shifter<log2N, log2N, is_signed, Wrapper>(input, leading, fill_bit);
     return Wrapper<1,false>{0}.concatenate(lzoc_shift);
 }
+*/
 #endif // LZOC_SHIFTER_HPP

@@ -138,6 +138,17 @@ public:
         return us_wrapper_helper<1>{_storage.or_reduce()};
     }
 
+    us_wrapper_helper<1> do_and_reduce()
+    {
+        return us_wrapper_helper<1>{_storage.and_reduce()};
+    }
+
+    wrapper_helper<W> do_and(wrapper_helper<W> const & rhs) const
+    {
+        auto val = storage_helper<W>{rhs._storage and _storage};
+        return wrapper_helper<W>{val};
+    }
+
     template<unsigned int N, bool val>
     friend class VivadoWrapper;
 };

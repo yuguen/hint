@@ -118,9 +118,9 @@ public:
     {
         storage_helper<W, is_signed> res;
         if(control._storage) {
-            res = opt0._storage;
-        } else {
             res = opt1._storage;
+        } else {
+            res = opt0._storage;
         }
         return wrapper_helper<W, is_signed>{res};
     }
@@ -128,6 +128,11 @@ public:
     inline wrapper_helper<1, false> do_or_reduce()
     {
         return wrapper_helper<1, false>{_storage.or_reduce()};
+    }
+
+    inline wrapper_helper<1, false> do_and_reduce()
+    {
+        return wrapper_helper<1, false>{_storage.and_reduce()};
     }
 
     template<bool sign>
