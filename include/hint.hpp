@@ -73,7 +73,7 @@ public:
     template<bool newSign>
     wrapper<W, newSign> reinterpret_sign(typename enable_if<newSign == is_signed>::type* = 0) const
     {
-        return *reinterpret_cast<wrapper<W, is_signed> const *>(this);
+        return static_cast<wrapper<W, is_signed> const *>(this)->get_copy();
     }
 
     template<bool newSign>
