@@ -9,7 +9,7 @@
 #include "primitives/reverse.hpp"
 
 template<unsigned int S>
-struct ShifterStageInfo
+struct ShifterStickyStageInfo
 {
 	static constexpr bool NeedsRecursion = (S>1);
 	static constexpr bool IsFinalStage = (S==1);
@@ -22,7 +22,7 @@ Wrapper<IS, false> shifter_sticky_stage(
                 Wrapper<IS, is_signed> input,
                 Wrapper<S, false> count,
                 Wrapper<1, false> fill_bit = Wrapper<1, false>{0},
-                typename std::enable_if<ShifterStageInfo<S>::NeedsRecursion>::type* = 0,
+                typename std::enable_if<ShifterStickyStageInfo<S>::NeedsRecursion>::type* = 0,
                 typename std::enable_if<((IS-1) >= (1 << (S-1)))>::type * = 0
         )
 {
@@ -48,7 +48,7 @@ Wrapper<IS, false> shifter_sticky_stage(
                 Wrapper<IS, is_signed> input,
                 Wrapper<S, false> count,
                 Wrapper<1, false> fill_bit = Wrapper<1, false>{0},
-                typename std::enable_if<ShifterStageInfo<S>::IsFinalStage>::type* = 0,
+                typename std::enable_if<ShifterStickyStageInfo<S>::IsFinalStage>::type* = 0,
                 typename std::enable_if<((IS-1) >= (1 << (S-1)))>::type * = 0
         )
 {

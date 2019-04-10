@@ -7,7 +7,7 @@
 #include "tools/static_math.hpp"
 
 template<unsigned int S>
-struct LZOCStageInfo
+struct LZOCShifterStageInfo
 {
     static constexpr bool NeedsRecursion = (S>0);
     static constexpr bool IsFinalStage = (S==0);
@@ -20,7 +20,7 @@ inline Wrapper<S + 1 + (1 << N), false> lzoc_shifter_stage(
         Wrapper<(1<<N), is_signed> const & input,
         Wrapper<1, false> const & leading,
         Wrapper<1, false> const & fill_bit = 0,
-        typename std::enable_if<LZOCStageInfo<S>::NeedsRecursion>::type* = 0
+        typename std::enable_if<LZOCShifterStageInfo<S>::NeedsRecursion>::type* = 0
     )
 {
     auto padding = Wrapper<(1<<S), false>::generateSequence(fill_bit);
@@ -42,7 +42,7 @@ inline Wrapper<S + 1 + (1 << N), false> lzoc_shifter_stage(
         Wrapper<1<<N, is_signed> const & input,
         Wrapper<1, false> const & leading,
         Wrapper<1, false> const & fill_bit = 0,
-        typename std::enable_if<LZOCStageInfo<S>::IsFinalStage>::type* = 0
+        typename std::enable_if<LZOCShifterStageInfo<S>::IsFinalStage>::type* = 0
     )
 {
     Wrapper<1, false> cmp = (input.template get<((1<<N) - 1)>() == leading);
@@ -65,7 +65,7 @@ inline Wrapper<N + (1<<N), false> lzoc_shifter(
 }
 
 template<unsigned int N>
-struct GenericLZOCStageInfo
+struct GenericLZOCShifterStageInfo
 {
     static constexpr bool is_a_power_of_2 = ((Static_Val<N>::_2pow) == N);
     static constexpr bool is_one = (N==1);
@@ -76,7 +76,7 @@ inline Wrapper<Static_Val<S>::_rlog2 + N, false> generic_lzoc_shifter_stage(
         Wrapper<N, is_signed> const & input,
         Wrapper<1, false> const & leading,
         Wrapper<1, false> const & fill_bit = 0,
-        typename std::enable_if<GenericLZOCStageInfo<S>::is_a_power_of_2 and GenericLZOCStageInfo<S>::is_one>::type*  = 0)
+        typename std::enable_if<GenericLZOCShifterStageInfo<S>::is_a_power_of_2 and GenericLZOCShifterStageInfo<S>::is_one>::type*  = 0)
 {
     if ((input.template get<N - 1>() == leading).template isSet<0>()) {
         Wrapper<N - 1, false> low = input.template slice<N - 2, 0>();
@@ -92,7 +92,7 @@ inline Wrapper<Static_Val<S>::_rlog2 + N, false> generic_lzoc_shifter_stage(
         Wrapper<N, is_signed>  const & input,
         Wrapper<1, false> const & leading,
         Wrapper<1, false> const & fill_bit = 0,
-        typename std::enable_if<not(GenericLZOCStageInfo<S>::is_a_power_of_2)>::type* = 0)
+        typename std::enable_if<not(GenericLZOCShifterStageInfo<S>::is_a_power_of_2)>::type* = 0)
 {
     static constexpr int log2S = Static_Val<S>::_rlog2-1;
     static constexpr int power_of_2_in_S = 1<<log2S;
@@ -141,7 +141,7 @@ inline Wrapper<Static_Val<S>::_rlog2 + N, false> generic_lzoc_shifter_stage(
         Wrapper<N, is_signed> input,
         Wrapper<1, false> leading,
         Wrapper<1, false> fill_bit = 0,
-        typename std::enable_if<GenericLZOCStageInfo<S>::is_a_power_of_2  and not(GenericLZOCStageInfo<S>::is_one)>::type* = 0)
+        typename std::enable_if<GenericLZOCShifterStageInfo<S>::is_a_power_of_2  and not(GenericLZOCShifterStageInfo<S>::is_one)>::type* = 0)
 {
     Wrapper<S, false> padding = Wrapper<S, false>::generateSequence(fill_bit);
     Wrapper<N-S, false> low = input.template slice<N - S - 1, 0>();
@@ -168,7 +168,7 @@ inline Wrapper<Static_Val<N>::_rlog2 + N, false> generic_lzoc_shifter(
         Wrapper<N, is_signed> input,
         Wrapper<1, false> leading,
         Wrapper<1, false> fill_bit = 0,
-        typename std::enable_if<not(GenericLZOCStageInfo<N>::is_a_power_of_2)>::type* = 0
+        typename std::enable_if<not(GenericLZOCShifterStageInfo<N>::is_a_power_of_2)>::type* = 0
         )
 {
     Wrapper<(Static_Val<N>::_rlog2 + N), false> lzoc_shift =  generic_lzoc_shifter_stage<N, N>(input, leading, fill_bit);
@@ -180,7 +180,7 @@ inline Wrapper<Static_Val<N>::_rlog2 + N, false> generic_lzoc_shifter(
         Wrapper<N, is_signed> input,
         Wrapper<1, false> leading,
         Wrapper<1, false> fill_bit = 0,
-        typename std::enable_if<GenericLZOCStageInfo<N>::is_a_power_of_2>::type* = 0
+        typename std::enable_if<GenericLZOCShifterStageInfo<N>::is_a_power_of_2>::type* = 0
         )
 {
     static constexpr int log2N = Static_Val<N>::_log2;
