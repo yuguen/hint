@@ -52,7 +52,7 @@ Wrapper<IS, false> shifter_stage(
 {
         Wrapper<IS, false> result;
         if (count.template isSet<0>()) {
-                Wrapper<IS - 1, false> low = input.template slice<IS - 1, 0>();
+                Wrapper<IS - 1, false> low = input.template slice<IS - 2, 0>();
                 result = low.concatenate(fill_bit);
         } else {
                 result = input;
@@ -89,8 +89,8 @@ Wrapper<IS, false> shifter(
     )
 {
         Wrapper<IS, false> fin_input{isRightShift ? reverse(input) : input};
-        Wrapper<IS + 1, false> shiftstick = shifter_stage<IS, S, Wrapper>(fin_input, count, fill_bit);
-        Wrapper<IS + 1, false> ret = isRightShift ? reverse(shiftstick) : shiftstick;
+        Wrapper<IS, false> shiftstick = shifter_stage<IS, S, Wrapper>(fin_input, count, fill_bit);
+        Wrapper<IS, false> ret = isRightShift ? reverse(shiftstick) : shiftstick;
         return ret;
 }
 
