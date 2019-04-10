@@ -28,6 +28,11 @@ constexpr int r2pow(int N)
          return 1 << log2(N);
 }
 
+constexpr int floorLog2(int N)
+{
+    return (N<= 1) ? 0 : 1 + floorLog2(N>>1);
+}
+
 
 
 template<int N>
@@ -38,6 +43,8 @@ class Static_Val
                 static constexpr int _r2pow = r2pow(N);
                 static constexpr int _log2 = ceilLog2(N);
                 static constexpr int _2pow = ceil2Power(N);
+                static constexpr int _flog2 = floorLog2(N);
+                static constexpr int _clog2 = ceilLog2(N);
 };
 
 #endif

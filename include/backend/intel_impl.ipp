@@ -130,6 +130,11 @@ public:
         return wrapper_helper<1, false>{_storage.or_reduce()};
     }
 
+    inline wrapper_helper<1, false> do_and_reduce()
+    {
+        return wrapper_helper<1, false>{_storage.and_reduce()};
+    }
+
     template<bool sign>
     inline wrapper_helper<W, is_signed> do_and(wrapper_helper<W, sign> const & rhs)
     {

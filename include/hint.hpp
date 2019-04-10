@@ -110,21 +110,46 @@ public:
         return p->do_or_reduce();
     }
 
-    template<bool sign>
-    wrapper<W, is_signed> And(wrapper<W, sign> rhs)
+    wrapper<1, false> and_reduce()
     {
         auto p = static_cast<wrapper<W, is_signed>*>(this);
+        return p->do_and_reduce();
+    }
+
+    template<unsigned int newSize, int padval>
+    wrapper<newSize, false> leftpad(
+            typename enable_if<(newSize>W)>::type* = 0
+        ) const
+    {
+        auto seq = wrapper<newSize - W, false>::generateSequence(
+                    wrapper<1, false>{padval}
+                );
+        auto ref = static_cast<wrapper<W, is_signed> const &>(*this);
+        return seq.concatenate(ref);
+    }
+
+    template<unsigned int newSize, int padval>
+    wrapper<newSize, false> leftpad(
+            typename enable_if<newSize == W>::type* = 0
+        ) const
+    {
+        auto p = static_cast<wrapper_type const &>(*this);
+        return p.template reinterpret_sign<false>();
+    }
+
+    template<bool sign>
+    wrapper<W, is_signed> And(wrapper<W, sign> rhs) const
+    {
+        auto p = static_cast<wrapper<W, is_signed> const *>(this);
         return p->do_and(rhs);
     }
 
     template<bool sign>
     wrapper<W, is_signed> Or(wrapper<W, sign> rhs)
     {
-        auto p = static_cast<wrapper<W, is_signed>*>(this);
+        auto p = static_cast<wrapper<W, is_signed> const *>(this);
         return p->do_or(rhs);
     }
-
-
 };
 
 

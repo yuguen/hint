@@ -12,7 +12,7 @@
 
 using namespace  std;
 
-#define SIZE 149
+#define SIZE 22
 
 #if defined(VIVADO_BACKEND)
 BOOST_AUTO_TEST_CASE(testLzocShifterAndShifterVivado)
@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE(testLzocShifterAndShifterVivado)
     VivadoWrapper<Static_Val<SIZE>::_rlog2, false> expected_lzoc;
     VivadoWrapper<SIZE, false> expected_shift;
 	VivadoWrapper<1, false> cmp;
-	for(int i=0; i<SIZE; i++){
+    for(int i=0; i<SIZE; i++){
 		shifted_with_sticky = shifter_sticky<false>(currentValue, VivadoWrapper<1, false>{1}, VivadoWrapper<1, false>{1});
 		// cerr << to_string(shifted_with_sticky) << endl;
 		currentValue = shifted_with_sticky.slice<SIZE, 1>();
@@ -54,12 +54,12 @@ BOOST_AUTO_TEST_CASE(testLzocVivado)
         cerr << to_string(shifted_with_sticky) << endl;
         currentValue = shifted_with_sticky.slice<SIZE, 1>();
         cerr << to_string(currentValue) << endl;
-        computed_lzoc = generic_lzoc(currentValue, VivadoWrapper<1, false>{0});
+        computed_lzoc = lzoc(currentValue, VivadoWrapper<1, false>{0});
         cerr << to_string(computed_lzoc) << endl;
         expected_lzoc = VivadoWrapper<Static_Val<SIZE>::_rlog2, false>{SIZE-i-1};
         cerr << to_string(expected_lzoc) << endl;
         cmp = VivadoWrapper<1, false>{expected_lzoc == computed_lzoc};
-        BOOST_REQUIRE_MESSAGE(cmp.isSet<0>(), "The combined test of the shifter_sticky and the lzoc_shifter failed !");
+        BOOST_REQUIRE_MESSAGE(cmp.isSet<0>(), "Test of lzoc falied !!! i = "<< i);
     }
 }
 
