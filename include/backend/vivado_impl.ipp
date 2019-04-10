@@ -67,11 +67,6 @@ public:
         return (_storage[idx] == 1);
     }
 
-    VivadoWrapper<W, is_signed> get_copy() const
-    {
-        return VivadoWrapper<W, is_signed>{_storage};
-    }
-
     template<unsigned int Wrhs, bool isSignedRhs>
     VivadoWrapper<Wrhs + W, false> do_concatenate(
             VivadoWrapper<Wrhs, isSignedRhs> const & val
