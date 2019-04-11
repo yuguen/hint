@@ -124,7 +124,7 @@ Wrapper<Static_Val<N+1>::_clog2, false> lzoc (
     )
 {
     // cerr << "Call lzoc on size one" << endl;
-    auto res =  getAlmost2PowLZC(input, leading);
+    auto res =  getAlmost2PowLZOC(input, leading);
     // cerr << "Res : " << res << endl;
     return res;
 }
