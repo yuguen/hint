@@ -53,7 +53,7 @@ Wrapper<IS, false> shifter_sticky_stage(
         )
 {
         auto low = input.template slice<IS - 2, 1>();
-        auto sticky_out = input.template get<0>() or input.template get<IS-1>();
+        auto sticky_out = input.template get<0>().Or(input.template get<IS-1>());
         auto result = Wrapper<IS, false>::mux(
                     count.template get<0>(),
                     low.concatenate(fill_bit).concatenate(sticky_out),
