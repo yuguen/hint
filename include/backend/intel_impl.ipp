@@ -136,13 +136,13 @@ public:
     }
 
     template<bool sign>
-    inline wrapper_helper<W, is_signed> do_and(wrapper_helper<W, sign> const & rhs)
+    inline wrapper_helper<W, is_signed> do_and(wrapper_helper<W, sign> const & rhs) const
     {
         return wrapper_helper<W, is_signed>{_storage & rhs._storage};
     }
     
     template<bool sign>
-    inline wrapper_helper<W, is_signed> do_or(wrapper_helper<W, sign> const & rhs)
+    inline wrapper_helper<W, is_signed> do_or(wrapper_helper<W, sign> const & rhs) const
     {
         return wrapper_helper<W, is_signed>{_storage | rhs._storage};
     }

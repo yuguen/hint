@@ -12,16 +12,16 @@
 
 using namespace  std;
 
-#define SIZE 31
+#define SIZE 42
 
 #if defined(VIVADO_BACKEND)
 BOOST_AUTO_TEST_CASE(testLzocShifterAndShifterVivado)
 {
 	VivadoWrapper<SIZE, false> currentValue{0};
 	VivadoWrapper<SIZE+1, false> shifted_with_sticky;
-	VivadoWrapper<Static_Val<SIZE>::_clog2 + SIZE, false> computed_lzoc_shift;
-	VivadoWrapper<Static_Val<SIZE>::_clog2 + SIZE, false> expected_lzoc_shift;
-    VivadoWrapper<Static_Val<SIZE>::_clog2, false> expected_lzoc;
+	VivadoWrapper<Static_Val<SIZE+1>::_clog2 + SIZE, false> computed_lzoc_shift;
+	VivadoWrapper<Static_Val<SIZE+1>::_clog2 + SIZE, false> expected_lzoc_shift;
+    VivadoWrapper<Static_Val<SIZE+1>::_clog2, false> expected_lzoc;
     VivadoWrapper<SIZE, false> expected_shift;
 	VivadoWrapper<1, false> cmp;
     for(int i=0; i<SIZE; i++){
@@ -29,9 +29,9 @@ BOOST_AUTO_TEST_CASE(testLzocShifterAndShifterVivado)
 		// cerr << to_string(shifted_with_sticky) << endl;
 		currentValue = shifted_with_sticky.slice<SIZE, 1>();
 		// cerr << to_string(currentValue) << endl;
-		computed_lzoc_shift = LZOC_shift(currentValue, VivadoWrapper<1, false>{0}, VivadoWrapper<1, false>{0});
+		computed_lzoc_shift = LZOC_shift<SIZE, SIZE>(currentValue, VivadoWrapper<1, false>{0}, VivadoWrapper<1, false>{0});
 		// cerr << to_string(computed_lzoc_shift) << endl;
-        expected_lzoc = VivadoWrapper<Static_Val<SIZE>::_clog2, false>{SIZE-i-1};
+        expected_lzoc = VivadoWrapper<Static_Val<SIZE+1>::_clog2, false>{SIZE-i-1};
 		// cerr << to_string(expected_lzoc) << endl;
         expected_shift = reverse(currentValue);
 		// cerr << to_string(expected_shift) << endl;
@@ -73,9 +73,9 @@ BOOST_AUTO_TEST_CASE(testLzocShifterAndShifterIntel)
 {
 	IntelWrapper<SIZE, false> currentValue{0};
 	IntelWrapper<SIZE+1, false> shifted_with_sticky;
-	IntelWrapper<Static_Val<SIZE>::_clog2 + SIZE, false> computed_lzoc_shift;
-	IntelWrapper<Static_Val<SIZE>::_clog2 + SIZE, false> expected_lzoc_shift;
-	IntelWrapper<Static_Val<SIZE>::_clog2, false> expected_lzoc; 
+	IntelWrapper<Static_Val<SIZE+1>::_clog2 + SIZE, false> computed_lzoc_shift;
+	IntelWrapper<Static_Val<SIZE+1>::_clog2 + SIZE, false> expected_lzoc_shift;
+	IntelWrapper<Static_Val<SIZE+1>::_clog2, false> expected_lzoc; 
 	IntelWrapper<SIZE, false> expected_shift; 
 	IntelWrapper<1, false> cmp;
 	for(int i=0; i<SIZE; i++){
@@ -83,9 +83,9 @@ BOOST_AUTO_TEST_CASE(testLzocShifterAndShifterIntel)
 		// cerr << to_string(shifted_with_sticky) << endl;
 		currentValue = shifted_with_sticky.slice<SIZE, 1>();
 		// cerr << to_string(currentValue) << endl;
-		computed_lzoc_shift = LZOC_shift(currentValue, IntelWrapper<1, false>{0}, IntelWrapper<1, false>{0});
+		computed_lzoc_shift = LZOC_shift<SIZE, SIZE>(currentValue, IntelWrapper<1, false>{0}, IntelWrapper<1, false>{0});
 		// cerr << to_string(computed_lzoc_shift) << endl;
-		expected_lzoc = IntelWrapper<Static_Val<SIZE>::_clog2, false>{SIZE-i-1};
+		expected_lzoc = IntelWrapper<Static_Val<SIZE+1>::_clog2, false>{SIZE-i-1};
 		// cerr << to_string(expected_lzoc) << endl;
 		expected_shift = reverse(currentValue);
 		// cerr << to_string(expected_shift) << endl;
