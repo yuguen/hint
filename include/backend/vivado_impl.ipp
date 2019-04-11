@@ -157,6 +157,12 @@ public:
         return wrapper_helper<W>{val};
     }
 
+    wrapper_helper<W> do_or(wrapper_helper<W> const & rhs) const
+    {
+        auto val = storage_helper<W>{rhs._storage or _storage};
+        return wrapper_helper<W>{val};
+    }
+
     template<unsigned int N, bool val>
     friend class VivadoWrapper;
 };
