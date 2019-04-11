@@ -91,10 +91,11 @@ public:
         return _storage;
     }
 
-    VivadoWrapper<W, not is_signed> invert_sign() const
+    us_wrapper_helper<W> convert_unsigned() const
     {
-        typename VivadoBaseType<W, not is_signed>::type val{_storage};
-        return VivadoWrapper<W, not is_signed>{val};
+        us_storage_helper<W> val{_storage};
+        us_wrapper_helper<W> ret{val};
+        return ret;
     }
 
     static VivadoWrapper<W, false> do_generateSequence(

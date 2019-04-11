@@ -62,7 +62,6 @@ public:
         );
     }
 
-
     wrapper<W, is_signed>& operator=(hint_base<W, is_signed, wrapper> const& rhs)
     {
         auto p = static_cast<wrapper<W, is_signed>*>(this);
@@ -70,24 +69,17 @@ public:
         return *p;
     }
 
-    template<bool newSign>
-    wrapper<W, newSign> reinterpret_sign(typename enable_if<newSign == is_signed>::type* = 0) const
+    wrapper<W, false> as_unsigned() const
     {
-        return *reinterpret_cast<wrapper<W, is_signed> const *>(this);
+        return static_cast<wrapper<W, is_signed> const *>(this)->convert_unsigned();
     }
 
-    template<bool newSign>
-    wrapper<W, newSign> reinterpret_sign(typename enable_if<newSign != is_signed>::type* = 0) const
-    {
-        return static_cast<wrapper<W, is_signed>const *>(this)->invert_sign();
-    }
-
-    wrapper<W, is_signed> modularAdd(wrapper<W, is_signed> const & op2) const
+    wrapper<W, false> modularAdd(wrapper<W, is_signed> const & op2) const
     {
         wrapper<1, false> cin{0};
         wrapper<W+1, is_signed> res = addWithCarry(op2, cin);
         wrapper<W, false> sliced{res.template do_slicing<W-1, 0>()}; 
-        return sliced.template reinterpret_sign<is_signed>();
+        return sliced;
     }
 
     static wrapper<W, false> generateSequence(wrapper<1, false> const & val)
@@ -125,7 +117,8 @@ public:
                     wrapper<1, false>{padval}
                 );
         auto ref = static_cast<wrapper<W, is_signed> const &>(*this);
-        return seq.concatenate(ref);
+        auto ret = seq.concatenate(ref);
+        return ret;
     }
 
     template<unsigned int newSize, int padval>
@@ -134,7 +127,8 @@ public:
         ) const
     {
         auto p = static_cast<wrapper_type const &>(*this);
-        return p.template reinterpret_sign<false>();
+        auto ret = p.as_unsigned();
+        return ret;
     }
 
     template<bool sign>

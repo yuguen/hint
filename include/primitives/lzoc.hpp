@@ -34,7 +34,7 @@ Wrapper<1, false> getAlmost2PowLZOC(
         Wrapper<1, false> const & leading
     )
 {
-    auto us_val = input.template reinterpret_sign<false>();
+    auto us_val = input.as_unsigned();
     return (input == leading);
 }
 

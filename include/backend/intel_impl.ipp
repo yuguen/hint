@@ -76,11 +76,11 @@ public:
         return static_cast<ac_int<1, false> >(_storage == rhs._storage);
     }
 
-
-    inline IntelWrapper<W, not is_signed> invert_sign() const
+    IntelWrapper<W, false> convert_unsigned() const
     {
-        typename IntelWrapper<W, not is_signed>::type val{_storage};
-        return IntelWrapper<W, not is_signed>{val};
+        ac_int<W, false> val{_storage};
+        IntelWrapper<W, false> ret{val};
+        return ret;
     }
 
     inline void do_affect(IntelWrapper<W, is_signed> const & val)
