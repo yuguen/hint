@@ -23,7 +23,7 @@ Wrapper<IS, false> shifter_stage(
                 Wrapper<S, false> count,
                 Wrapper<1, false> fill_bit,
                 typename std::enable_if<ShifterStageInfo<S>::NeedsRecursion>::type* = 0,
-                typename std::enable_if<((IS-1) >= (1 << (S-1)))>::type * = 0
+                typename std::enable_if<(IS >= (1 << (S-1)))>::type * = 0
         )
 {
         Wrapper<1<<(S-1), false> padding =  Wrapper<1<<(S-1), false>::generateSequence(fill_bit);
@@ -46,7 +46,7 @@ Wrapper<IS, false> shifter_stage(
                 Wrapper<S, false> count,
                 Wrapper<1, false> fill_bit,
                 typename std::enable_if<ShifterStageInfo<S>::IsFinalStage>::type* = 0,
-                typename std::enable_if<((IS-1) >= (1 << (S-1)))>::type * = 0
+                typename std::enable_if<(IS >= (1 << (S-1)))>::type * = 0
         )
 {
         Wrapper<IS, false> result;
@@ -64,7 +64,7 @@ Wrapper<IS, false> shifter_stage(
         Wrapper<IS, is_signed> input,
         Wrapper<S, false> count,
         Wrapper<1, false> fill_bit,
-        typename std::enable_if<((IS-1) < (1 << (S-1)))>::type * = 0
+        typename std::enable_if<(IS < (1 << (S-1)))>::type * = 0
     )
 {
     constexpr unsigned int nb_null_shift = S - Static_Val<IS>::_log2;
