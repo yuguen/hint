@@ -12,7 +12,7 @@
 
 using namespace  std;
 
-#define SIZE 28
+#define SIZE 57
 
 #if defined(VIVADO_BACKEND)
 BOOST_AUTO_TEST_CASE(testLzocShifterAndShifterVivado)
@@ -64,8 +64,6 @@ BOOST_AUTO_TEST_CASE(testLzocVivado)
     // fprintf(stderr, "The tests passed\n");
 }
 
-
-
 #endif
 
 #if defined(INTEL_BACKEND)
@@ -95,7 +93,6 @@ BOOST_AUTO_TEST_CASE(testLzocShifterAndShifterIntel)
 		BOOST_REQUIRE_MESSAGE(cmp.isSet<0>(), "Intel The combined test of the shifter_sticky and the lzoc_shifter failed !");
 	}
 }
-
 BOOST_AUTO_TEST_CASE(testLzocIntel)
 {
     IntelWrapper<SIZE, false> currentValue{0};
@@ -117,5 +114,4 @@ BOOST_AUTO_TEST_CASE(testLzocIntel)
     }
     // fprintf(stderr, "The tests passed\n");
 }
-
 #endif

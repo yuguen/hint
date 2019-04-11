@@ -69,12 +69,24 @@ Wrapper<Static_Val<S+1>::_clog2 + N, false> LZOC_shift(
             Wrapper<N, is_signed> const & input,
             Wrapper<1, false> const & leading,
             Wrapper<1, false> const & fill_bit = 0,
-            typename enable_if<Static_Val<S>::_isOneBelow2Pow and (S > 1)>::type* = 0
+            typename enable_if<(Static_Val<S>::_isOneBelow2Pow and (S > 1)) or (S==1)>::type* = 0
         )
 {
     // cerr << "Call lzoc shift on size " << N << endl;
     return getOneBelow2PowLZOC_shift<N, S>(input, leading, fill_bit);
 }
+
+/*template<unsigned int N, unsigned int S, bool is_signed, template<unsigned int , bool> class Wrapper>
+Wrapper<Static_Val<S+1>::_clog2 + N, false> LZOC_shift(
+            Wrapper<N, is_signed> const & input,
+            Wrapper<1, false> const & leading,
+            Wrapper<1, false> const & fill_bit = 0,
+            typename enable_if<(S == 1)>::type* = 0
+        )
+{
+    // cerr << "Call lzoc shift on size " << N << endl;
+    return getOneBelow2PowLZOC_shift<N, S>(input, leading, fill_bit);
+}*/
 
 template<unsigned int N, unsigned int S, bool is_signed, template<unsigned int , bool> class Wrapper>
 Wrapper<Static_Val<S+1>::_clog2 + N, false> LZOC_shift (
@@ -148,7 +160,7 @@ Wrapper<Static_Val<S+1>::_clog2 + N, false> LZOC_shift (
 
     auto low = input.template slice<N-upper_size - 2, 0>().concatenate(Wrapper<upper_size+1, false>::generateSequence(fill_bit));
     auto lzoc_shift_low = LZOC_shift<N, S-(upper_size+1)>(low, leading, fill_bit);
-    auto lzoc_low = lzoc_shift_low.template slice<Static_Val<S-(upper_size+1)>::_clog2 + N -1, N>();
+    auto lzoc_low = lzoc_shift_low.template slice<Static_Val<S-(upper_size+1)+1>::_clog2 + N-1, N>();
     auto shift_low = lzoc_shift_low.template slice<N-1, 0>();
     auto ext_lowcount = lzoc_low.template leftpad<Static_Val<upper_size>::_clog2>();
 
