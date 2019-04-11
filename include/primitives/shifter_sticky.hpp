@@ -18,7 +18,7 @@ struct ShifterStickyStageInfo
 template<unsigned int IS, unsigned int S, bool is_signed, template<unsigned int, bool> class Wrapper>
 //IS : Input Size (including sticky bit),
 //S : size of shift counter
-inline Wrapper<IS, false> shifter_sticky_stage(
+Wrapper<IS, false> shifter_sticky_stage(
                 Wrapper<IS, is_signed> input,
                 Wrapper<S, false> count,
                 Wrapper<1, false> fill_bit = Wrapper<1, false>{0},
@@ -44,7 +44,7 @@ inline Wrapper<IS, false> shifter_sticky_stage(
 }
 
 template<unsigned int IS, unsigned int S, bool is_signed, template<unsigned int , bool> class Wrapper>
-inline Wrapper<IS, false> shifter_sticky_stage(
+Wrapper<IS, false> shifter_sticky_stage(
                 Wrapper<IS, is_signed> input,
                 Wrapper<S, false> count,
                 Wrapper<1, false> fill_bit = Wrapper<1, false>{0},
@@ -64,7 +64,7 @@ inline Wrapper<IS, false> shifter_sticky_stage(
 }
 
 template<unsigned int IS, unsigned int S, bool is_signed, template<unsigned int, bool> class Wrapper>
-inline Wrapper<IS, false> shifter_sticky_stage(
+Wrapper<IS, false> shifter_sticky_stage(
         Wrapper<IS, is_signed> input,
         Wrapper<S, false> count,
         Wrapper<1, false> fill_bit = Wrapper<1, false>{0},
@@ -88,7 +88,7 @@ inline Wrapper<IS, false> shifter_sticky_stage(
 }
 
 template< bool isRightShift, unsigned int IS, unsigned int S, bool is_signed, template<unsigned int , bool> class Wrapper>
-inline Wrapper<IS+1, false> shifter_sticky(
+Wrapper<IS+1, false> shifter_sticky(
                 Wrapper<IS, is_signed> input,
                 Wrapper<S, false> count,
                 Wrapper<1, false> fill_bit = Wrapper<1, false>{0}
