@@ -101,12 +101,20 @@ public:
             IntelWrapper<1, false> const & val
             )
     {
-        ac_int<2, true> sign = -val._storage;
-        ac_int<W> ext = sign;
+        ac_int<W, false> ext;
+        ac_int<W, false> zeros{0};
+        if(val._storage == 0){
+            ext = zeros;
+        }
+        else{
+            ext = ~zeros;
+        }
+        
         return IntelWrapper<W, false>{
-            ac_int<W, false>{ext}
+            ext
         };
     }
+
 
     wrapper_helper<W+1, is_signed> perform_addc(
             wrapper_helper<W, is_signed> const & op2,

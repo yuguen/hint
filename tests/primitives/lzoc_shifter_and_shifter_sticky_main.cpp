@@ -105,7 +105,7 @@ BOOST_AUTO_TEST_CASE(testLzocIntel)
         // cerr << to_string(shifted_with_sticky) << endl;
         currentValue = reverse(shifted_with_sticky.slice<SIZE, 1>());
         // cerr << to_string(currentValue) << endl;
-        computed_lzoc = lzoc(currentValue, IntelWrapper<1, false>{0});
+        computed_lzoc = lzoc_wrapper(currentValue, IntelWrapper<1, false>{0});
         // cerr << to_string(computed_lzoc) << endl;
         expected_lzoc = IntelWrapper<Static_Val<SIZE+1>::_clog2, false>{SIZE-i-1};
         // cerr << to_string(expected_lzoc) << endl;
