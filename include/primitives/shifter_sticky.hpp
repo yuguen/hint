@@ -78,7 +78,6 @@ Wrapper<IS+1, false> shifter_sticky_stage(
         typename std::enable_if<((IS) < (1 << (S-1)))>::type * = 0
     )
 {
-#pragma warning "You have a shift with a shifter size bigger than the shifted word"
     constexpr unsigned int nb_null_shift = S - Static_Val<IS-1>::_log2;
     auto shift_weights_will_zero = count.template slice<S - 1, S - nb_null_shift>();
     auto next_count = count.template slice<S-nb_null_shift-1, 0>();
