@@ -45,6 +45,7 @@ class Static_Val
                 static constexpr int _2pow = ceil2Power(N);
                 static constexpr int _flog2 = floorLog2(N);
                 static constexpr int _clog2 = ceilLog2(N);
+				static constexpr int _storage = ceilLog2(N+1);
 };
 
 #endif
