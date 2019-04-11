@@ -151,7 +151,7 @@ Wrapper<Static_Val<S+1>::_clog2 + N, false> LZOC_shift (
     auto lzoc_shift_low = LZOC_shift<N, S-(upper_size+1)>(low, leading, fill_bit);
     auto lzoc_low = lzoc_shift_low.template slice<Static_Val<S-(upper_size+1)>::_clog2 + N -1, N>();
     auto shift_low = lzoc_shift_low.template slice<N-1, 0>();
-    auto ext_lowcount = lzoc_low.template leftpad<Static_Val<upper_size>::_clog2, 0>();
+    auto ext_lowcount = lzoc_low.template leftpad<Static_Val<upper_size>::_clog2>();
 
    // cerr << "lzoc shift low " << to_string(lzoc_shift_low) << endl;
    // cerr << "lzoc low " << to_string(lzoc_low) << endl;

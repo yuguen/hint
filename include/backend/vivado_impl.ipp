@@ -98,6 +98,13 @@ public:
         return ret;
     }
 
+    template<unsigned int newSize>
+    us_wrapper_helper<newSize> leftpad() const {
+        us_storage_helper<W> curVal{_storage};
+        us_storage_helper<newSize> newVal{curVal};
+        return us_wrapper_helper<newSize>{newVal};
+    }
+
     static VivadoWrapper<W, false> do_generateSequence(
             VivadoWrapper<1, false> const & val
         )

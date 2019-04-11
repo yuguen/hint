@@ -101,7 +101,7 @@ Wrapper<Static_Val<N+1>::_clog2, false> lzoc (
 
     auto low = input.template slice<N-upper_size - 2, 0>();
     auto lzoclow = lzoc(low, leading);
-    auto ext_lowcount = lzoclow.template leftpad<Static_Val<N>::_flog2, 0>();
+    auto ext_lowcount = lzoclow.template leftpad<Static_Val<N>::_flog2>();
 
     auto lsb = Wrapper<Static_Val<N>::_flog2, false>::mux(
                 msb,

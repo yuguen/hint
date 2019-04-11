@@ -83,6 +83,14 @@ public:
         return ret;
     }
 
+    template<unsigned int newSize>
+    IntelWrapper<newSize, false> leftpad() const {
+        ac_int<W, false> curVal{_storage};
+        ac_int<newSize, false> newVal{curVal};
+        return IntelWrapper<newSize, false>{newVal};
+    }
+
+
     inline void do_affect(IntelWrapper<W, is_signed> const & val)
     {
         _storage = val._storage;

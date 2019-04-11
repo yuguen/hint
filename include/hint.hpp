@@ -108,27 +108,13 @@ public:
         return p->do_and_reduce();
     }
 
-    template<unsigned int newSize, int padval>
+    template<unsigned int newSize>
     wrapper<newSize, false> leftpad(
-            typename enable_if<(newSize>W)>::type* = 0
-        ) const
+            typename enable_if<(newSize >= W)>::type* = 0
+            ) const
     {
-        auto seq = wrapper<newSize - W, false>::generateSequence(
-                    wrapper<1, false>{padval}
-                );
-        auto ref = static_cast<wrapper<W, is_signed> const &>(*this);
-        auto ret = seq.concatenate(ref);
-        return ret;
-    }
-
-    template<unsigned int newSize, int padval>
-    wrapper<newSize, false> leftpad(
-            typename enable_if<newSize == W>::type* = 0
-        ) const
-    {
-        auto p = static_cast<wrapper_type const &>(*this);
-        auto ret = p.as_unsigned();
-        return ret;
+       auto p = static_cast<wrapper<W, is_signed>*>(this);
+       return p->template do_left_pad<newSize>();
     }
 
     template<bool sign>
