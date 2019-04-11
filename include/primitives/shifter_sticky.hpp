@@ -52,14 +52,13 @@ Wrapper<IS, false> shifter_sticky_stage(
                 typename std::enable_if<((IS-1) >= (1 << (S-1)))>::type * = 0
         )
 {
-        Wrapper<IS, false> result;
-        if (count.template isSet<0>()) {
-                Wrapper<IS - 2, false> low = input.template slice<IS - 2, 1>();
-                Wrapper<1, false> sticky_out = Wrapper<1, false>{input.template isSet<0>() or input.template isSet<IS-1>()};
-                result = low.concatenate(fill_bit).concatenate(sticky_out);
-        } else {
-                result = input;
-        }
+        auto low = input.template slice<IS - 2, 1>();
+        auto sticky_out = input.template get<0>() or input.template get<IS-1>();
+        auto result = Wrapper<IS, false>::mux(
+                    count.template get<0>(),
+                    low.concatenate(fill_bit).concatenate(sticky_out),
+                    input
+                  );
         return result;
 }
 
@@ -71,6 +70,7 @@ Wrapper<IS, false> shifter_sticky_stage(
         typename std::enable_if<((IS-1) < (1 << (S-1)))>::type * = 0
     )
 {
+#pragma warning "Énorme"
     constexpr unsigned int nb_null_shift = S - Static_Val<IS-1>::_log2;
     Wrapper<nb_null_shift, false> shift_weights_will_zero = count.template slice<S - 1, S - nb_null_shift>();
     Wrapper<S-nb_null_shift, false> next_count = count.template slice<S-1-nb_null_shift, 0>();
