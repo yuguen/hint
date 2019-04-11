@@ -40,7 +40,7 @@ Wrapper<IS, false> shifter_sticky_stage(
         } else {
                 next_stage_input = input;
         }
-        return shifter_sticky_stage<IS, S-1, Wrapper>(next_stage_input, countnext, fill_bit);
+        return shifter_sticky_stage<IS, S-1, is_signed, Wrapper>(next_stage_input, countnext, fill_bit);
 }
 
 template<unsigned int IS, unsigned int S, bool is_signed, template<unsigned int , bool> class Wrapper>
@@ -82,7 +82,7 @@ Wrapper<IS, false> shifter_sticky_stage(
         Wrapper<IS-1, false> high = Wrapper<IS-1, false>::generateSequence(fill_bit);
         ret = high.concatenate(sticky);
     } else {
-        ret = shifter_sticky_stage<IS, S-nb_null_shift, Wrapper>(input, next_count, fill_bit);
+        ret = shifter_sticky_stage<IS, S-nb_null_shift, is_signed, Wrapper>(input, next_count, fill_bit);
     }
     return ret;
 }

@@ -7,7 +7,7 @@
 
 #include "hint.hpp"
 #include "tools/static_math.hpp"
-#include "tools/printing.hpp"
+// #include "tools/printing.hpp"
 #include "primitives/shifter.hpp"
 #include "primitives/reverse.hpp"
 #include <iostream>
@@ -133,7 +133,7 @@ Wrapper<Static_Val<S+1>::_clog2 + N, false> LZOC_shift (
 
    // cerr << "Call lzoc shift " << N << " S " << S << endl;
    //  cerr << "Call with input " << to_string(input) << endl;
-    constexpr int upper_size = (1 << Static_Val<S>::_flog2) - 1;
+    constexpr int upper_size = (1 << (Static_Val<S>::_flog2)) - 1;
     auto lzoc_shift_up = getOneBelow2PowLZOC_shift<N, upper_size>(input, leading, fill_bit);
     auto lzoc_up = lzoc_shift_up.template slice<N + Static_Val<upper_size>::_clog2 -1,N>();
     auto shift_up = lzoc_shift_up.template slice<N-1,0>();

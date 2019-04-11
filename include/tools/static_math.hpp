@@ -36,6 +36,19 @@ constexpr int floorLog2(int N)
 
 
 template<int N>
+constexpr bool is2Pow()
+{
+    return (1 << ceilLog2(N)) == N;
+}
+
+
+template<int N>
+constexpr bool isOneBelow2Pow()
+{
+    return (((1 << ceilLog2(N) ) - 1) == N);
+}
+
+template<int N>
 class Static_Val
 {
         public:
@@ -45,21 +58,11 @@ class Static_Val
                 static constexpr int _2pow = ceil2Power(N);
                 static constexpr int _flog2 = floorLog2(N);
                 static constexpr int _clog2 = ceilLog2(N);
-				static constexpr int _storage = ceilLog2(N+1);
+                static constexpr int _storage = ceilLog2(N+1);
+                static constexpr bool _is2Pow = is2Pow<N>();
+                static constexpr bool _isOneBelow2Pow = isOneBelow2Pow<N>();
 };
 
-template<int N>
-constexpr bool is2Pow()
-{
-    return (1 << Static_Val<N>::_clog2) == N;
-}
-
-
-template<int N>
-constexpr bool isOneBelow2Pow()
-{
-    return (((1 << Static_Val<N>::_clog2 ) - 1) == N);
-}
 
 
 #endif

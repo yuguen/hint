@@ -46,8 +46,8 @@ BOOST_AUTO_TEST_CASE(testLzocVivado)
 {
     VivadoWrapper<SIZE, false> currentValue{0};
     VivadoWrapper<SIZE+1, false> shifted_with_sticky;
-    VivadoWrapper<Static_Val<SIZE>::_rlog2, false> computed_lzoc;
-    VivadoWrapper<Static_Val<SIZE>::_rlog2, false> expected_lzoc;
+    VivadoWrapper<Static_Val<SIZE+1>::_clog2, false> computed_lzoc;
+    VivadoWrapper<Static_Val<SIZE+1>::_clog2, false> expected_lzoc;
     VivadoWrapper<1, false> cmp;
     for(int i=0; i<SIZE; i++){
         shifted_with_sticky = shifter_sticky<false>(currentValue, VivadoWrapper<1, false>{1}, VivadoWrapper<1, false>{1});
@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE(testLzocVivado)
         // cerr << to_string(currentValue) << endl;
         computed_lzoc = lzoc(currentValue, VivadoWrapper<1, false>{0});
         // cerr << to_string(computed_lzoc) << endl;
-        expected_lzoc = VivadoWrapper<Static_Val<SIZE>::_rlog2, false>{SIZE-i-1};
+        expected_lzoc = VivadoWrapper<Static_Val<SIZE+1>::_clog2, false>{SIZE-i-1};
         // cerr << to_string(expected_lzoc) << endl;
         cmp = VivadoWrapper<1, false>{expected_lzoc == computed_lzoc};
         BOOST_REQUIRE_MESSAGE(cmp.isSet<0>(), "Test of lzoc falied !!! i = "<< i);
@@ -100,8 +100,8 @@ BOOST_AUTO_TEST_CASE(testLzocIntel)
 {
     IntelWrapper<SIZE, false> currentValue{0};
     IntelWrapper<SIZE+1, false> shifted_with_sticky;
-    IntelWrapper<Static_Val<SIZE>::_rlog2, false> computed_lzoc;
-    IntelWrapper<Static_Val<SIZE>::_rlog2, false> expected_lzoc;
+    IntelWrapper<Static_Val<SIZE+1>::_clog2, false> computed_lzoc;
+    IntelWrapper<Static_Val<SIZE+1>::_clog2, false> expected_lzoc;
     IntelWrapper<1, false> cmp;
     for(int i=0; i<SIZE; i++){
         shifted_with_sticky = shifter_sticky<false>(currentValue, IntelWrapper<1, false>{1}, IntelWrapper<1, false>{1});
@@ -110,7 +110,7 @@ BOOST_AUTO_TEST_CASE(testLzocIntel)
         // cerr << to_string(currentValue) << endl;
         computed_lzoc = lzoc(currentValue, IntelWrapper<1, false>{0});
         // cerr << to_string(computed_lzoc) << endl;
-        expected_lzoc = IntelWrapper<Static_Val<SIZE>::_rlog2, false>{SIZE-i-1};
+        expected_lzoc = IntelWrapper<Static_Val<SIZE+1>::_clog2, false>{SIZE-i-1};
         // cerr << to_string(expected_lzoc) << endl;
         cmp = IntelWrapper<1, false>{expected_lzoc == computed_lzoc};
         BOOST_REQUIRE_MESSAGE(cmp.isSet<0>(), "Test of lzoc falied !!! i = "<< i);
