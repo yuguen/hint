@@ -34,7 +34,7 @@ Wrapper<IS+1, false> shifter_sticky_stage(
 
     auto next_sticky = Wrapper<1, false>::mux(
                 needs_shift,
-                sticky_in.bitwise_or(low.or_reduce()),
+                sticky_in.bitwise_or(low.or_reduction()),
                 sticky_in
          );
     auto next_res = Wrapper<IS, false>::mux(
@@ -81,9 +81,9 @@ Wrapper<IS+1, false> shifter_sticky_stage(
     constexpr unsigned int nb_null_shift = S - Static_Val<IS-1>::_log2;
     auto shift_weights_will_zero = count.template slice<S - 1, S - nb_null_shift>();
     auto next_count = count.template slice<S-nb_null_shift-1, 0>();
-    auto stageNeedsShift = shift_weights_will_zero.or_reduce();
+    auto stageNeedsShift = shift_weights_will_zero.or_reduction();
 
-    auto sticky = input.or_reduce();
+    auto sticky = input.or_reduction();
 
     auto ret = Wrapper<IS, false>::mux(
                 stageNeedsShift,

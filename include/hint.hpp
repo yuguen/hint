@@ -96,7 +96,7 @@ public:
         return wrapper<W, is_signed>::do_mux(control, opt1, opt0);
     }
 
-    wrapper<1, false> or_reduce()
+    wrapper<1, false> or_reduction()
     {
         auto p = static_cast<wrapper<W, is_signed>*>(this);
         return p->do_or_reduce();

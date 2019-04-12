@@ -70,7 +70,7 @@ Wrapper<IS, false> shifter_stage(
     constexpr unsigned int nb_null_shift = S - Static_Val<IS>::_log2;
     Wrapper<nb_null_shift, false> shift_weights_will_zero = count.template slice<S - 1, S - nb_null_shift>();
     Wrapper<S-nb_null_shift, false> next_count = count.template slice<S-1-nb_null_shift, 0>();
-    Wrapper<1, false> stageNeedsShift = shift_weights_will_zero.or_reduce();
+    Wrapper<1, false> stageNeedsShift = shift_weights_will_zero.or_reduction();
     Wrapper<IS, false> ret;
     if (stageNeedsShift.template isSet<0>()) {
         ret = Wrapper<IS, false>::generateSequence(fill_bit);
