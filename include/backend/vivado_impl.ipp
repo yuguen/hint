@@ -176,6 +176,16 @@ public:
         return us_storage_helper<1>{this_ap.and_reduce()};
     }
 
+    us_wrapper_helper<W> reverse() const
+    {
+        auto& this_ap = static_cast<storage_type const &>(*this);
+        us_storage_helper<W> out;
+        for(unsigned int i = 0 ; i < W ; ++i) {
+            out[i] = this_ap[W - i - 1];
+        }
+        return out;
+    }
+
     storage_type const & unravel() const
     {
         return static_cast<storage_type const &>(*this);

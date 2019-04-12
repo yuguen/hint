@@ -117,7 +117,7 @@ public:
     {
         auto& to_fill = static_cast<storage_type const &>(val);
         us_storage_helper<W> zero{0};
-        us_storage_helper<W> ret = (to_fill) ? us_storage_helper<W>{~zero} : zero;
+        us_storage_helper<W> ret = (to_fill==1) ? us_storage_helper<W>{~zero} : zero;
         return ret;
     }
 
@@ -171,6 +171,16 @@ public:
     storage_type const & unravel() const
     {
         return static_cast<storage_type const &>(*this);
+    }
+
+    us_wrapper_helper<W> reverse() const
+    {
+        auto& this_ac = static_cast<storage_type const &>(*this);
+        us_storage_helper<W> out;
+        for(unsigned int i = 0 ; i < W ; ++i) {
+            out[i] = this_ac[W - i - 1];
+        }
+        return out;
     }
 
 
