@@ -8,7 +8,7 @@ using namespace std;
 
 /***
  * CRTP Base class
- */
+ Not understood by the tools... :'-(
 template <unsigned int W, bool is_signed, template<unsigned int, bool> class wrapper>
 class hint_base{
 public:
@@ -129,12 +129,10 @@ public:
         return p->do_or(rhs);
     }
 };
-
-
 #if defined(BITSET_BACKEND)
 #include "backend/bitset_impl.ipp"
 #endif
-
+*/
 #if defined(VIVADO_BACKEND)
 #include "backend/vivado_impl.ipp"
 #endif

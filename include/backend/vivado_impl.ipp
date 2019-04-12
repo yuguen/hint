@@ -23,9 +23,6 @@ struct VivadoBaseType<W, false>
 };
 
 template <unsigned int W, bool is_signed>
-class VivadoWrapper;
-
-template <unsigned int W, bool is_signed>
 class VivadoWrapper : private VivadoBaseType<W, is_signed>::type
 {
 public:
@@ -51,13 +48,7 @@ public:
         typename enable_if<high >= low and high < W>::type* = 0
     ) const
     {
-        return us_wrapper_helper<high - low + 1>{us_storage_helper<high-low+1>{storage_type::range(high, low)}};
-    }
-
-    template<unsigned int high, unsigned int low>
-    VivadoWrapper<high - low + 1, false> do_slicing() const
-    {
-        return us_wrapper_helper<high - low + 1>{us_storage_helper<high-low+1>{storage_type::range(high, low)}};
+        return us_storage_helper<high-low+1>{storage_type::range(high, low)};
     }
 
     template<unsigned int idx>
@@ -65,11 +56,10 @@ public:
        typename enable_if<idx < W>::type* = 0
     ) const
     {
-        return us_wrapper_helper<1>{
-            us_storage_helper<1>{
+        return us_storage_helper<1>{
             storage_helper<1>{
-                    storage_type::operator[](idx)
-            }}
+                storage_type::operator[](idx)
+            }
         };
     }
 
@@ -85,14 +75,14 @@ public:
     {
         auto& this_ap = static_cast<storage_type const &>(*this);
         auto& rhs_ap = static_cast<storage_type const &>(*this);
-        return us_storage_helper<1>{this_ap & rhs};
+        return us_storage_helper<W>{this_ap & rhs};
     }
 
     VivadoWrapper<W, false> bitwise_or(VivadoWrapper<W, is_signed> rhs) const
     {
         auto& this_ap = static_cast<storage_type const &>(*this);
         auto& rhs_ap = static_cast<storage_type const &>(*this);
-        return us_storage_helper<1>{this_ap | rhs};
+        return us_storage_helper<W>{this_ap | rhs};
     }
 
     template<unsigned int newSize>
@@ -124,12 +114,6 @@ public:
         auto& rhs_ap = static_cast<storage_type const &>(rhs);
         this_ap = rhs_ap;
         return *this;
-    }
-
-    template<bool newSign>
-    VivadoWrapper<W, newSign> do_reinterpret_sign() const {
-        typename VivadoBaseType<W, newSign>::type val{*this};
-        return VivadoWrapper<W, newSign>{val};
     }
 
     static VivadoWrapper<W, false> generateSequence(VivadoWrapper<1, false> const & val)
@@ -197,10 +181,10 @@ public:
         return static_cast<storage_type const &>(*this);
     }
 
-
     template<unsigned int N, bool val>
     friend class VivadoWrapper;
 };
+
 
 
 #endif
