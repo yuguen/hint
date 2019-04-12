@@ -5,6 +5,8 @@
 
 #include "ap_int.h"
 
+using namespace std;
+
 template<unsigned int W, bool is_signed>
 struct VivadoBaseType{};
 
@@ -24,11 +26,7 @@ template <unsigned int W, bool is_signed>
 class VivadoWrapper;
 
 template <unsigned int W, bool is_signed>
-using vivado_hint = hint_base<W, is_signed, VivadoWrapper>;
-
-
-template <unsigned int W, bool is_signed>
-class VivadoWrapper : public vivado_hint<W, is_signed>, private VivadoBaseType<W, is_signed>::type
+class VivadoWrapper : private VivadoBaseType<W, is_signed>::type
 {
 public:
     typedef VivadoWrapper<W, true> type;
@@ -41,12 +39,19 @@ public:
     using wrapper_helper = VivadoWrapper<N, is_signed>;
     template<unsigned int N>
     using us_wrapper_helper = VivadoWrapper<N, false>;
-    typedef  vivado_hint<W, is_signed> hint_type;
 
     VivadoWrapper():storage_type{0}{}
 
 
     VivadoWrapper(storage_type const & val):storage_type{val}{
+    }
+
+    template<unsigned int high, unsigned int low>
+    VivadoWrapper<high - low + 1, false> slice(
+        typename enable_if<high >= low and high < W>::type* = 0
+    ) const
+    {
+        return us_wrapper_helper<high - low + 1>{us_storage_helper<high-low+1>{storage_type::range(high, low)}};
     }
 
     template<unsigned int high, unsigned int low>
@@ -56,7 +61,9 @@ public:
     }
 
     template<unsigned int idx>
-    VivadoWrapper<1, false> do_get() const
+    VivadoWrapper<1, false> get(
+       typename enable_if<idx < W>::type* = 0
+    ) const
     {
         return us_wrapper_helper<1>{
             us_storage_helper<1>{
@@ -67,66 +74,56 @@ public:
     }
 
     template<unsigned int idx>
-    VivadoWrapper<1, false> get() const
-    {
-        return hint_type::template get<idx>();
-    }
-
-    template<unsigned int idx>
-    bool do_isset() const
+    bool isSet(
+       typename enable_if<idx < W>::type* = 0
+    ) const
     {
         return (storage_type::operator[](idx) == 1);
     }
 
-    us_wrapper_helper<W> do_and(wrapper_helper<W> const & rhs) const
+    VivadoWrapper<W, false> bitwise_and(VivadoWrapper<W, is_signed> rhs) const
     {
-        us_storage_helper<W> val {static_cast<storage_type const &>(*this)};
-        us_storage_helper<W> rhs_us{static_cast<storage_type const &>(rhs)};
-        return us_wrapper_helper<W>{
-            val.And(rhs_us)
-        };
+        auto& this_ap = static_cast<storage_type const &>(*this);
+        auto& rhs_ap = static_cast<storage_type const &>(*this);
+        return us_storage_helper<1>{this_ap & rhs};
     }
 
-    us_wrapper_helper<W> do_or(wrapper_helper<W> const & rhs) const
+    VivadoWrapper<W, false> bitwise_or(VivadoWrapper<W, is_signed> rhs) const
     {
-        us_storage_helper<W> val {static_cast<storage_type const &>(*this)};
-        us_storage_helper<W> rhs_us{static_cast<storage_type const &>(rhs)};
-        return us_wrapper_helper<W>{
-            val.Or(rhs_us)
-        };
+        auto& this_ap = static_cast<storage_type const &>(*this);
+        auto& rhs_ap = static_cast<storage_type const &>(*this);
+        return us_storage_helper<1>{this_ap | rhs};
     }
 
     template<unsigned int newSize>
-    us_wrapper_helper<newSize> do_leftpad() const
+    VivadoWrapper<newSize, false> leftpad(
+            typename enable_if<(newSize >= W)>::type* = 0
+            ) const
     {
-        return us_wrapper_helper<newSize>{
-            us_storage_helper<newSize>{
-                us_storage_helper<W>{
-                    static_cast<storage_type const &>(*this)
-                }
-            }
-        };
+        auto& this_ap = static_cast<storage_type const &>(*this);
+        us_storage_helper<W> unsigned_this = this_ap;
+        us_storage_helper<newSize> ret = unsigned_this;
+        return ret;
     }
 
-
-
     template<unsigned int Wrhs, bool isSignedRhs>
-    VivadoWrapper<Wrhs + W, false> do_concatenate(
-            VivadoWrapper<Wrhs, isSignedRhs> const & val
-        ) const
+    VivadoWrapper<W + Wrhs, false>
+    concatenate(VivadoWrapper<Wrhs, isSignedRhs> const & val) const
     {
         us_wrapper_helper<Wrhs + W> ret {storage_type::concat(val)};
         return  ret;
     }
 
-    VivadoWrapper<1, false> compare(VivadoWrapper<W, is_signed> const & rhs)const
-    {
-        return us_wrapper_helper<1>{static_cast<us_storage_helper<1> >(storage_type::operator==(rhs))};
+    VivadoWrapper<1, false> operator==(VivadoWrapper<W, is_signed> const & rhs) const {
+        return us_storage_helper<1>{(static_cast<storage_type const &>(*this) == static_cast<storage_type const &>(rhs))};
     }
 
-    void do_affect(wrapper_helper<W> const & val)
+    VivadoWrapper<W, is_signed>& operator=(VivadoWrapper const & rhs)
     {
-        storage_type::operator=(val);
+        auto& this_ap = static_cast<storage_type&>(*this);
+        auto& rhs_ap = static_cast<storage_type const &>(rhs);
+        this_ap = rhs_ap;
+        return *this;
     }
 
     template<bool newSign>
@@ -135,36 +132,37 @@ public:
         return VivadoWrapper<W, newSign>{val};
     }
 
-    static VivadoWrapper<W, false> do_generateSequence(
-            VivadoWrapper<1, false> const & val
-        )
+    static VivadoWrapper<W, false> generateSequence(VivadoWrapper<1, false> const & val)
     {
-        ap_int<1> sign {static_cast<storage_type const &>(val)};
-        ap_int<W> ext {sign};
-        return VivadoWrapper<W, false>{
-            ap_uint<W>{ext}
-        };
+        ap_int<1> sign = static_cast<storage_type const &>(val);
+        ap_int<W> ext = sign;
+        us_storage_helper<W> ret = ext;
+        return ret;
     }
 
-    wrapper_helper<W+1> perform_addc(
-            wrapper_helper<W> const & op2,
-            us_wrapper_helper<1> const & cin
+    VivadoWrapper<W+1, is_signed> addWithCarry(
+            VivadoWrapper<W, is_signed> const & op2,
+            VivadoWrapper<1, false> const & cin
         ) const
     {
-        return wrapper_helper<W+1>{
-            static_cast<storage_helper<W+1> >(*this + op2 + cin)
-        };
+        auto& op1_ap = static_cast<storage_type const &>(*this);
+        auto& op2_ap = static_cast<storage_type const &>(op2);
+        auto& cin_ap = static_cast<us_storage_helper<1> const &>(cin);
+        auto res = op1_ap + op2_ap + cin_ap;
+        return storage_helper<W+1>{res};
     }
 
-    VivadoWrapper<1, false> operator==(VivadoWrapper<W, is_signed> const & rhs) const {
-        return hint_type::operator==(rhs);
+    VivadoWrapper<W, false> modularAdd(VivadoWrapper<W, is_signed> const & op2) const
+    {
+        auto& this_ap = static_cast<storage_type const &>(*this);
+        auto& op_2 = static_cast<storage_type const &>(op2);
+        return us_storage_helper<W>{this_ap + op_2};
     }
 
-
-    static wrapper_helper<W> do_mux(
-            us_wrapper_helper<1> const & control,
-            wrapper_helper<W> const & opt1,
-            wrapper_helper<W> const & opt0
+    static VivadoWrapper<W, is_signed> mux(
+            VivadoWrapper<1, false> const & control,
+            VivadoWrapper<W, is_signed> const & opt1,
+            VivadoWrapper<W, is_signed> const & opt0
         )
     {
         storage_helper<W> res;
@@ -173,28 +171,30 @@ public:
         } else {
             res = opt0;
         }
-        return wrapper_helper<W>{res};
+        return res;
     }
 
-    us_wrapper_helper<W> convert_unsigned() const
+    us_wrapper_helper<W> as_unsigned() const
     {
-        us_storage_helper<W> usval{reinterpret_cast<storage_type const &>(*this)};
-        return us_wrapper_helper<W>{usval};
+        auto& this_ap = static_cast<storage_type const &>(*this);
+        return us_storage_helper<W>{this_ap};
     }
 
-    us_wrapper_helper<1> do_or_reduce()
+    us_wrapper_helper<1> or_reduction() const
     {
-        return us_wrapper_helper<1>{storage_type::or_reduce()};
+        auto& this_ap = static_cast<storage_type const &>(*this);
+        return us_storage_helper<1>{this_ap.or_reduce()};
     }
 
-    us_wrapper_helper<1> do_and_reduce()
+    us_wrapper_helper<1> and_reduction() const
     {
-        return us_wrapper_helper<1>{storage_type::and_reduce()};
+        auto& this_ap = static_cast<storage_type const &>(*this);
+        return us_storage_helper<1>{this_ap.and_reduce()};
     }
 
     storage_type const & unravel() const
     {
-        return static_cast<storage_type const &>(*this);;
+        return static_cast<storage_type const &>(*this);
     }
 
 

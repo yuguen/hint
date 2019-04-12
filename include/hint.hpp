@@ -85,7 +85,7 @@ public:
     static wrapper<W, false> generateSequence(wrapper<1, false> const & val)
     {
         return wrapper<W, false>::do_generateSequence(val);
-    }
+    }//DONE
 
     static wrapper<W, is_signed> mux(
             wrapper<1, false> const & control,
