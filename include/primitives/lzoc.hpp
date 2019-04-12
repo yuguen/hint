@@ -10,9 +10,9 @@
 
 using namespace std;
 
-template<unsigned int N, bool is_signed, template<unsigned int , bool> class Wrapper>
+template<unsigned int N, template<unsigned int , bool> class Wrapper>
 Wrapper<Static_Val<N+1>::_clog2, false> getAlmost2PowLZOC(
-            Wrapper<N, is_signed> const & input,
+            Wrapper<N, false> const & input,
             Wrapper<1, false> const & leading,
             typename enable_if<Static_Val<N>::_isOneBelow2Pow and (N>1)>::type* = 0
         )
@@ -28,20 +28,20 @@ Wrapper<Static_Val<N+1>::_clog2, false> getAlmost2PowLZOC(
     return ret;
 }
 
-template <bool is_signed, template<unsigned int , bool> class Wrapper>
+template <template<unsigned int , bool> class Wrapper>
 Wrapper<1, false> getAlmost2PowLZOC(
-        Wrapper<1, is_signed> const & input,
+        Wrapper<1, false> const & input,
         Wrapper<1, false> const & leading
     )
 {
-    auto us_val = input.as_unsigned();
+    auto us_val = input;
     return (input == leading);
 }
 
 
-template<unsigned int N, bool is_signed, template<unsigned int , bool> class Wrapper>
+template<unsigned int N, template<unsigned int , bool> class Wrapper>
 Wrapper<Static_Val<N+1>::_clog2, false> lzoc(
-        Wrapper<N, is_signed> const & input,
+        Wrapper<N, false> const & input,
         Wrapper<1, false> const & leading,
         typename enable_if<(N > 1)>::type* = 0,
         typename enable_if<Static_Val<N>::_isOneBelow2Pow>::type* = 0
@@ -50,9 +50,9 @@ Wrapper<Static_Val<N+1>::_clog2, false> lzoc(
     return  getAlmost2PowLZOC(input, leading);
 }
 
-template<unsigned int N, bool is_signed, template<unsigned int , bool> class Wrapper>
+template<unsigned int N, template<unsigned int , bool> class Wrapper>
 Wrapper<Static_Val<N+1>::_clog2 , false> lzoc (
-        Wrapper<N, is_signed> const & input,
+        Wrapper<N, false> const & input,
     Wrapper<1, false> const & leading,
     typename enable_if<(N > 1)>::type* = 0,
     typename enable_if<Static_Val<N>::_is2Pow>::type* = 0
@@ -79,9 +79,9 @@ Wrapper<Static_Val<N+1>::_clog2 , false> lzoc (
     return result;
 }
 
-template<unsigned int N, bool is_signed, template<unsigned int , bool> class Wrapper>
+template<unsigned int N, template<unsigned int , bool> class Wrapper>
 Wrapper<Static_Val<N+1>::_clog2, false> lzoc (
-        Wrapper<N, is_signed> const & input,
+        Wrapper<N, false> const & input,
     Wrapper<1, false> const & leading,
     typename enable_if<(not Static_Val<N>::_is2Pow)>::type* = 0,
     typename enable_if<(not Static_Val<N>::_isOneBelow2Pow)>::type* = 0,
@@ -114,11 +114,11 @@ Wrapper<Static_Val<N+1>::_clog2, false> lzoc (
     return result;
 }
 
-template<unsigned int N, bool is_signed, template<unsigned int , bool> class Wrapper>
+template<unsigned int N, template<unsigned int , bool> class Wrapper>
 // template<bool is_signed, template<unsigned int , bool> class Wrapper>
 // Wrapper<1, false> lzoc(
 Wrapper<Static_Val<N+1>::_clog2, false> lzoc (
-        Wrapper<N, is_signed> const & input,
+        Wrapper<N, false> const & input,
     Wrapper<1, false> const & leading,
     typename enable_if<(N == 1)>::type* = 0
     )
@@ -136,7 +136,7 @@ Wrapper<Static_Val<N+1>::_clog2, false> lzoc_wrapper (
 )
 {
 
-    return lzoc(input, leading);
+    return lzoc(input.as_unsigned(), leading);
     
 }
 
