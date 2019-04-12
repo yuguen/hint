@@ -57,7 +57,7 @@ Wrapper<Static_Val<S>::_storage +N, false> getOneBelow2PowLZOC_shift(
         Wrapper<N, false> const & input,
         Wrapper<1, false> const & leading,
         Wrapper<1, false> const & fill_bit = 0,
-        typename enable_if<(S==1)>::type* = 0
+        typename enable_if<(S==1) and (N >= 2)>::type* = 0
     )
 {
     // cerr << "Eq 1 S: " << S << endl;
@@ -69,6 +69,22 @@ Wrapper<Static_Val<S>::_storage +N, false> getOneBelow2PowLZOC_shift(
                 input
             );
     auto ret = top_is_leading.concatenate(shifted);
+    return ret;
+}
+
+template<unsigned int N, unsigned int S, template<unsigned int , bool> class Wrapper>
+Wrapper<Static_Val<S>::_storage +N, false> getOneBelow2PowLZOC_shift(
+        Wrapper<N, false> const & input,
+        Wrapper<1, false> const & leading,
+        Wrapper<1, false> const & fill_bit = 0,
+        typename enable_if<(S==1) and (N == 1)>::type* = 0
+    )
+{
+    // cerr << "Eq 1 S: " << S << endl;
+    auto top_is_leading = (input.template get<0>() == leading);
+    auto ret = top_is_leading.concatenate(
+                Wrapper<1, false>::mux(top_is_leading, fill_bit, input.template get<0>())
+            );
     return ret;
 }
 

@@ -12,7 +12,7 @@
 
 using namespace  std;
 
-#define SIZE 26
+#define SIZE 2100
 
 #if defined(VIVADO_BACKEND)
 BOOST_AUTO_TEST_CASE(testLzocShifterAndShifterVivado)
