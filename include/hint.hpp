@@ -102,7 +102,7 @@ public:
         return p->do_or_reduce();
     }
 
-    wrapper<1, false> and_reduce()
+    wrapper<1, false> and_reduction()
     {
         auto p = static_cast<wrapper<W, is_signed>*>(this);
         return p->do_and_reduce();
@@ -113,19 +113,17 @@ public:
             typename enable_if<(newSize >= W)>::type* = 0
             ) const
     {
-       auto p = static_cast<wrapper<W, is_signed>*>(this);
-       return p->template do_left_pad<newSize>();
+       auto p = static_cast<wrapper<W, is_signed> const*>(this);
+       return p->template do_leftpad<newSize>();
     }
 
-    template<bool sign>
-    wrapper<W, is_signed> And(wrapper<W, sign> rhs) const
+    wrapper<W, false> bitwise_and(wrapper<W, is_signed> rhs) const
     {
         auto p = static_cast<wrapper<W, is_signed> const *>(this);
         return p->do_and(rhs);
     }
 
-    template<bool sign>
-    wrapper<W, is_signed> Or(wrapper<W, sign> rhs)
+    wrapper<W, false> bitwise_or(wrapper<W, is_signed> rhs)
     {
         auto p = static_cast<wrapper<W, is_signed> const *>(this);
         return p->do_or(rhs);

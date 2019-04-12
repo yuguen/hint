@@ -97,7 +97,7 @@ Wrapper<Static_Val<S>::_storage + N, false> LZOC_shift_stage (
     auto lzoc_up = lzoc_shift_up.template slice<Static_Val<S>::_clog2+N-1, N>();
     auto shift_up = lzoc_shift_up.template slice<N-1, 0>();
 
-    auto is_full_one = lzoc_shift_up.and_reduce();
+    auto is_full_one = lzoc_shift_up.and_reduction();
     auto last_bit_is_leading = input.template get<N-1>() == leading;
 
     auto onezeroseq = Wrapper<1, false>{1}.concatenate(
@@ -107,7 +107,7 @@ Wrapper<Static_Val<S>::_storage + N, false> LZOC_shift_stage (
 
     auto uncomplete = Wrapper<1, false>{0}.concatenate(lzoc_up);
 
-    auto cond = is_full_one.And(last_bit_is_leading);
+    auto cond = is_full_one.bitwise_and(last_bit_is_leading);
     auto lzoc = Wrapper<Static_Val<S>::_storage, false>::mux(cond, onezeroseq, uncomplete);
     auto shift = Wrapper<N, false>::mux(
                 cond,
@@ -134,10 +134,10 @@ Wrapper<Static_Val<S>::_storage + N, false> LZOC_shift_stage (
    // cerr << "lzoc shift up " << to_string(lzoc_shift_up) << endl;
    // cerr << "lzoc up " << to_string(lzoc_up) << endl;
    // cerr << "shift up " << to_string(shift_up) << endl;
-    auto is_full_one = lzoc_up.and_reduce();
+    auto is_full_one = lzoc_up.and_reduction();
     auto last_bit_is_leading = lzoc_shift_up.template get<N-1>() == leading;
    // cerr << "last_bit_is_leading " << to_string(last_bit_is_leading) << endl;
-    auto msb = is_full_one.And(last_bit_is_leading);
+    auto msb = is_full_one.bitwise_and(last_bit_is_leading);
 
     //If all was zero, we only need to count on the lowest bits
     constexpr unsigned int low_shift_size = N - (upper_size+1);

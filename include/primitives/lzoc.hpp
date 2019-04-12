@@ -62,7 +62,7 @@ Wrapper<Static_Val<N+1>::_clog2 , false> lzoc (
 //    cerr << "Call lzoc on 2pow " << endl;
     auto upper = input.template slice<N-1, 1>();
     auto lzocup = getAlmost2PowLZOC(upper, leading);
-    auto is_full_one = lzocup.and_reduce();
+    auto is_full_one = lzocup.and_reduction();
     auto last_bit_ok = input.template get<0>() == leading;
     auto onezeroseq = Wrapper<1, false>{1}.concatenate(
                 Wrapper<Static_Val<N>::_clog2, false>::generateSequence(
@@ -71,7 +71,7 @@ Wrapper<Static_Val<N+1>::_clog2 , false> lzoc (
     auto uncomplete = Wrapper<1, false>{0}.concatenate(lzocup);
 
     auto result = Wrapper<Static_Val<N+1>::_clog2, false>::mux(
-                is_full_one.And(last_bit_ok),
+                is_full_one.bitwise_and(last_bit_ok),
                 onezeroseq,
                 uncomplete
         );
@@ -94,10 +94,10 @@ Wrapper<Static_Val<N+1>::_clog2, false> lzoc (
     auto upper = input.template slice<N-1, N-upper_size>();
     auto lzocup = getAlmost2PowLZOC(upper, leading);
 
-    auto is_full_one = lzocup.and_reduce();
+    auto is_full_one = lzocup.and_reduction();
     auto last_bit_ok = input.template get<N-upper_size-1>() == leading;
 
-    auto msb = is_full_one.And(last_bit_ok);
+    auto msb = is_full_one.bitwise_and(last_bit_ok);
 
     auto low = input.template slice<N-upper_size - 2, 0>();
     auto lzoclow = lzoc(low, leading);

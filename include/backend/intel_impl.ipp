@@ -84,12 +84,11 @@ public:
     }
 
     template<unsigned int newSize>
-    IntelWrapper<newSize, false> leftpad() const {
+    IntelWrapper<newSize, false> do_leftpad() const {
         ac_int<W, false> curVal{_storage};
         ac_int<newSize, false> newVal{curVal};
         return IntelWrapper<newSize, false>{newVal};
     }
-
 
     inline void do_affect(IntelWrapper<W, is_signed> const & val)
     {
@@ -151,16 +150,14 @@ public:
         return wrapper_helper<1, false>{_storage.and_reduce()};
     }
 
-    template<bool sign>
-    inline wrapper_helper<W, is_signed> do_and(wrapper_helper<W, sign> const & rhs) const
+    inline wrapper_helper<W, false> do_and(wrapper_helper<W, is_signed> const & rhs) const
     {
-        return wrapper_helper<W, is_signed>{_storage & rhs._storage};
+        return wrapper_helper<W, false>{_storage & rhs._storage};
     }
-    
-    template<bool sign>
-    inline wrapper_helper<W, is_signed> do_or(wrapper_helper<W, sign> const & rhs) const
+
+    inline wrapper_helper<W, false> do_or(wrapper_helper<W, is_signed> const & rhs) const
     {
-        return wrapper_helper<W, is_signed>{_storage | rhs._storage};
+        return wrapper_helper<W, false>{_storage | rhs._storage};
     }
 
     template<unsigned int N, bool val>
