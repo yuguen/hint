@@ -11,7 +11,7 @@
 using namespace std;
 
 template <unsigned int W, bool is_signed>
-class IntelWrapper : public ac_int<W, is_signed>
+class IntelWrapper : private ac_int<W, is_signed>
 {
 public:
     typedef IntelWrapper<W, true> type;
