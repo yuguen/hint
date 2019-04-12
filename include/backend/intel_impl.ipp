@@ -178,7 +178,7 @@ public:
         auto& this_ac = static_cast<storage_type const &>(*this);
         us_storage_helper<W> out;
         for(unsigned int i = 0 ; i < W ; ++i) {
-            out[i] = this_ac[W - i - 1];
+            out.template set_slc(i, this_ac.template slc<1>(W - i - 1));
         }
         return out;
     }
