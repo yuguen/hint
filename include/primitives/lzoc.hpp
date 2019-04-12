@@ -103,8 +103,9 @@ Wrapper<Static_Val<N+1>::_clog2, false> lzoc (
     auto msb = is_full_one.bitwise_and(last_bit_ok);
 
     auto low = input.template slice<N-upper_size - 2, 0>();
-    auto lzoclow = lzoc(low, leading);
-    auto ext_lowcount = lzoclow.template leftpad<Static_Val<N>::_flog2>();
+    Wrapper<Static_Val<N-upper_size>::_clog2, false> lzoclow = lzoc(low, leading);
+    // Wrapper<Static_Val<N>::_flog2-Static_Val<N-upper_size>::_clog2, false> padding = Wrapper<Static_Val<N>::_flog2-Static_Val<N-upper_size>::_clog2, false>{0};
+    Wrapper<Static_Val<N>::_flog2, false> ext_lowcount = Wrapper<Static_Val<N>::_flog2, false>{lzoclow};
 
     auto lsb = Wrapper<Static_Val<N>::_flog2, false>::mux(
                 msb,

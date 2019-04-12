@@ -23,7 +23,7 @@ struct VivadoBaseType<W, false>
 };
 
 template <unsigned int W, bool is_signed>
-class VivadoWrapper : private VivadoBaseType<W, is_signed>::type
+class VivadoWrapper : public VivadoBaseType<W, is_signed>::type
 {
 public:
     typedef VivadoWrapper<W, true> type;
