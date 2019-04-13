@@ -48,7 +48,7 @@ public:
         typename enable_if<high >= low and high < W>::type* = 0
     ) const
     {
-        return us_storage_helper<high-low+1>{storage_type::range(high, low)};
+        return us_storage_helper<high-low+1>{(*this).range(high, low)};
     }
 
     template<unsigned int idx>
@@ -58,7 +58,7 @@ public:
     {
         return us_storage_helper<1>{
             storage_helper<1>{
-                storage_type::operator[](idx)
+                (*this)[idx]
             }
         };
     }
@@ -68,21 +68,17 @@ public:
        typename enable_if<idx < W>::type* = 0
     ) const
     {
-        return (storage_type::operator[](idx) == 1);
+        return ((*this)[idx] == 1);
     }
 
     VivadoWrapper<W, false> bitwise_and(VivadoWrapper<W, is_signed> rhs) const
     {
-        auto& this_ap = static_cast<storage_type const &>(*this);
-        auto& rhs_ap = static_cast<storage_type const &>(*this);
-        return us_storage_helper<W>{this_ap & rhs};
+        return us_storage_helper<W>{(*this) & rhs};
     }
 
     VivadoWrapper<W, false> bitwise_or(VivadoWrapper<W, is_signed> rhs) const
     {
-        auto& this_ap = static_cast<storage_type const &>(*this);
-        auto& rhs_ap = static_cast<storage_type const &>(*this);
-        return us_storage_helper<W>{this_ap | rhs};
+        return us_storage_helper<W>{(*this) | rhs};
     }
 
     template<unsigned int newSize>
@@ -90,8 +86,7 @@ public:
             typename enable_if<(newSize >= W)>::type* = 0
             ) const
     {
-        auto& this_ap = static_cast<storage_type const &>(*this);
-        us_storage_helper<W> unsigned_this = this_ap;
+        us_storage_helper<W> unsigned_this = (*this);
         us_storage_helper<newSize> ret = unsigned_this;
         return ret;
     }
@@ -100,7 +95,7 @@ public:
     VivadoWrapper<W + Wrhs, false>
     concatenate(VivadoWrapper<Wrhs, isSignedRhs> const & val) const
     {
-        us_wrapper_helper<Wrhs + W> ret {storage_type::concat(val)};
+        us_wrapper_helper<Wrhs + W> ret {(*this).concat(val)};
         return  ret;
     }
 
@@ -110,16 +105,16 @@ public:
 
     VivadoWrapper<W, is_signed>& operator=(VivadoWrapper const & rhs)
     {
-        auto& this_ap = static_cast<storage_type&>(*this);
-        auto& rhs_ap = static_cast<storage_type const &>(rhs);
-        this_ap = rhs_ap;
+        // auto& this_ap = static_cast<storage_type&>(*this);
+        // auto& rhs_ap = static_cast<storage_type const &>(rhs);
+        storage_type::operator=(rhs);
         return *this;
     }
 
     static VivadoWrapper<W, false> generateSequence(VivadoWrapper<1, false> const & val)
     {
-        ap_int<1> sign = static_cast<storage_type const &>(val);
-        ap_int<W> ext = sign;
+        // ap_int<1> sign = static_cast<storage_type const &>(val);
+        ap_int<W> ext = val;
         us_storage_helper<W> ret = ext;
         return ret;
     }
@@ -129,18 +124,18 @@ public:
             VivadoWrapper<1, false> const & cin
         ) const
     {
-        auto& op1_ap = static_cast<storage_type const &>(*this);
-        auto& op2_ap = static_cast<storage_type const &>(op2);
-        auto& cin_ap = static_cast<us_storage_helper<1> const &>(cin);
-        auto res = op1_ap + op2_ap + cin_ap;
+        // auto& op1_ap = static_cast<storage_type const &>(*this);
+        // auto& op2_ap = static_cast<storage_type const &>(op2);
+        // auto& cin_ap = static_cast<us_storage_helper<1> const &>(cin);
+        auto res = (*this) + op2 + cin;
         return storage_helper<W+1>{res};
     }
 
     VivadoWrapper<W, false> modularAdd(VivadoWrapper<W, is_signed> const & op2) const
     {
-        auto& this_ap = static_cast<storage_type const &>(*this);
-        auto& op_2 = static_cast<storage_type const &>(op2);
-        return us_storage_helper<W>{this_ap + op_2};
+        // auto& this_ap = static_cast<storage_type const &>(*this);
+        // auto& op_2 = static_cast<storage_type const &>(op2);
+        return us_storage_helper<W>{(*this) + op2};
     }
 
     static VivadoWrapper<W, is_signed> mux(
@@ -160,35 +155,35 @@ public:
 
     us_wrapper_helper<W> as_unsigned() const
     {
-        auto& this_ap = static_cast<storage_type const &>(*this);
-        return us_storage_helper<W>{this_ap};
+        // auto& this_ap = static_cast<storage_type const &>(*this);
+        return us_storage_helper<W>{(*this)};
     }
 
     us_wrapper_helper<1> or_reduction() const
     {
-        auto& this_ap = static_cast<storage_type const &>(*this);
-        return us_storage_helper<1>{this_ap.or_reduce()};
+        // auto& this_ap = static_cast<storage_type const &>(*this);
+        return us_storage_helper<1>{(*this).or_reduce()};
     }
 
     us_wrapper_helper<1> and_reduction() const
     {
-        auto& this_ap = static_cast<storage_type const &>(*this);
-        return us_storage_helper<1>{this_ap.and_reduce()};
+        // auto& this_ap = static_cast<storage_type const &>(*this);
+        return us_storage_helper<1>{(*this).and_reduce()};
     }
 
     us_wrapper_helper<W> reverse() const
     {
-        auto& this_ap = static_cast<storage_type const &>(*this);
+        // auto& this_ap = static_cast<storage_type const &>(*this);
         us_storage_helper<W> out;
         for(unsigned int i = 0 ; i < W ; ++i) {
-            out[i] = this_ap[W - i - 1];
+            out[i] = (*this)[W - i - 1];
         }
         return out;
     }
 
     storage_type const & unravel() const
     {
-        return static_cast<storage_type const &>(*this);
+        return (*this);
     }
 
     template<unsigned int N, bool val>
