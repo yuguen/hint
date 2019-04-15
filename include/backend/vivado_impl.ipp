@@ -114,7 +114,7 @@ public:
     static VivadoWrapper<W, false> generateSequence(VivadoWrapper<1, false> const & val)
     {
         // ap_int<1> sign = static_cast<storage_type const &>(val);
-        ap_int<W> ext = val;
+        ap_int<W> ext = (ap_int<1>)val;
         us_storage_helper<W> ret = ext;
         return ret;
     }
