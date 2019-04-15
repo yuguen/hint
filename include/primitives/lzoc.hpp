@@ -19,13 +19,15 @@ Wrapper<Static_Val<N+1>::_clog2, false> getAlmost2PowLZOC(
 {
     constexpr int upper_half = (1 <<Static_Val<N>::_flog2);
     auto upper = input.template slice<N-1, N-upper_half>();
-    auto comp_seq = Wrapper<upper_half, false>::generateSequence(leading);
-    // auto and_red = upper.and_reduction();
-    // auto or_red = upper.or_reduction();
-    // auto comp = Wrapper<1, false>::mux(leading, and_red, Wrapper<1, false>{not(or_red).template isSet<0>()});
-    auto comp_eq = (upper.bitwise_xor(comp_seq));
+    // auto comp_seq = Wrapper<upper_half, false>::generateSequence(leading);
+    // auto comp_eq = (upper.bitwise_xor(comp_seq));
 
-    auto comp = comp_eq.or_reduction().invert();
+    // auto comp = comp_eq.or_reduction().invert();
+    
+    auto and_red = upper.and_reduction();
+    auto or_red = upper.or_reduction();
+    auto comp = Wrapper<1, false>::mux(leading, and_red, Wrapper<1, false>{not(or_red).template isSet<0>()});
+
     
 
     auto upper_input = upper.template slice <upper_half - 1, 1>();
