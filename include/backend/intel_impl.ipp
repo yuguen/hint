@@ -158,8 +158,16 @@ public:
             IntelWrapper<W, is_signed> const & opt0
         )
     {
-        auto& ac_control = static_cast<us_storage_helper<1> const &>(control);
-        return (control) ? opt1 : opt0;
+        // auto& ac_control = static_cast<us_storage_helper<1> const &>(control);
+        // return (control) ? opt1 : opt0;
+        ac_int<W, is_signed> result;
+        if(control==1){
+            result = opt1;
+        }
+        else{
+            result = opt0;
+        }
+        return result;
     }
 
     inline us_wrapper_helper<W> as_unsigned() const
