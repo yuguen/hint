@@ -32,7 +32,7 @@ public:
     }
 
     template<unsigned int high, unsigned int low>
-    IntelWrapper<high - low + 1, false> slice(
+    inline IntelWrapper<high - low + 1, false> slice(
         typename enable_if<high >= low and high < W>::type* = 0
     ) const
     {
@@ -42,7 +42,7 @@ public:
     }
 
     template<unsigned int idx>
-    IntelWrapper<1, false> get(
+    inline IntelWrapper<1, false> get(
        typename enable_if<idx < W>::type* = 0
     ) const
     {
@@ -52,7 +52,7 @@ public:
     }
 
     template<unsigned int idx>
-    bool isSet(
+    inline bool isSet(
        typename enable_if<idx < W>::type* = 0
     ) const
     {
@@ -60,34 +60,34 @@ public:
         return (this_ac.template slc<1>(idx) == 1);
     }
 
-    IntelWrapper<W, false> bitwise_and(IntelWrapper<W, is_signed> rhs) const
+    inline IntelWrapper<W, false> bitwise_and(IntelWrapper<W, is_signed> rhs) const
     {
         auto& this_ap = static_cast<storage_type const &>(*this);
         auto& rhs_ap = static_cast<storage_type const &>(*this);
         return us_storage_helper<W>{this_ap & rhs};
     }
 
-    IntelWrapper<W, false> bitwise_or(IntelWrapper<W, is_signed> rhs) const
+    inline IntelWrapper<W, false> bitwise_or(IntelWrapper<W, is_signed> rhs) const
     {
         auto& this_ap = static_cast<storage_type const &>(*this);
         auto& rhs_ap = static_cast<storage_type const &>(*this);
         return us_storage_helper<W>{this_ap | rhs};
     }
 
-    IntelWrapper<W, false> bitwise_xor(IntelWrapper<W, is_signed> rhs) const
+    inline IntelWrapper<W, false> bitwise_xor(IntelWrapper<W, is_signed> rhs) const
     {
         auto& this_ap = static_cast<storage_type const &>(*this);
         auto& rhs_ap = static_cast<storage_type const &>(*this);
         return us_storage_helper<W>{this_ap ^ rhs};
     }
 
-    IntelWrapper<W, false> invert() const
+    inline IntelWrapper<W, false> invert() const
     {
         return us_storage_helper<W>{~(*this)};
     }
 
     template<unsigned int newSize>
-    IntelWrapper<newSize, false> leftpad(
+    inline IntelWrapper<newSize, false> leftpad(
             typename enable_if<(newSize >= W)>::type* = 0
             ) const
     {
@@ -98,7 +98,7 @@ public:
     }
 
     template<unsigned int Wrhs, bool isSignedRhs>
-    IntelWrapper<W + Wrhs, false>
+    inline IntelWrapper<W + Wrhs, false>
     concatenate(IntelWrapper<Wrhs, isSignedRhs> const & val) const
     {
         auto& this_ac = static_cast<storage_type const &>(*this);
@@ -113,11 +113,11 @@ public:
         return res;
     }
 
-    IntelWrapper<1, false> operator==(IntelWrapper<W, is_signed> const & rhs) const {
+    inline IntelWrapper<1, false> operator==(IntelWrapper<W, is_signed> const & rhs) const {
         return us_storage_helper<1>{(static_cast<storage_type const &>(*this) == static_cast<storage_type const &>(rhs))};
     }
 
-    IntelWrapper<W, is_signed>& operator=(IntelWrapper const & rhs)
+    inline IntelWrapper<W, is_signed>& operator=(IntelWrapper const & rhs)
     {
         auto& this_ap = static_cast<storage_type&>(*this);
         auto& rhs_ap = static_cast<storage_type const &>(rhs);
@@ -125,7 +125,7 @@ public:
         return *this;
     }
 
-    static IntelWrapper<W, false> generateSequence(IntelWrapper<1, false> const & val)
+    static inline IntelWrapper<W, false> generateSequence(IntelWrapper<1, false> const & val)
     {
         auto& to_fill = static_cast<storage_type const &>(val);
         us_storage_helper<W> zero{0};
@@ -133,7 +133,7 @@ public:
         return ret;
     }
 
-    IntelWrapper<W+1, is_signed> addWithCarry(
+    inline IntelWrapper<W+1, is_signed> addWithCarry(
             IntelWrapper<W, is_signed> const & op2,
             IntelWrapper<1, false> const & cin
         ) const
@@ -145,14 +145,14 @@ public:
         return storage_helper<W+1>{res};
     }
 
-    IntelWrapper<W, false> modularAdd(IntelWrapper<W, is_signed> const & op2) const
+    inline IntelWrapper<W, false> modularAdd(IntelWrapper<W, is_signed> const & op2) const
     {
         auto& this_ap = static_cast<storage_type const &>(*this);
         auto& op_2 = static_cast<storage_type const &>(op2);
         return us_storage_helper<W>{this_ap + op_2};
     }
 
-    static IntelWrapper<W, is_signed> mux(
+    static inline IntelWrapper<W, is_signed> mux(
             IntelWrapper<1, false> const & control,
             IntelWrapper<W, is_signed> const & opt1,
             IntelWrapper<W, is_signed> const & opt0
@@ -162,30 +162,30 @@ public:
         return (control) ? opt1 : opt0;
     }
 
-    us_wrapper_helper<W> as_unsigned() const
+    inline us_wrapper_helper<W> as_unsigned() const
     {
         us_storage_helper<W> val = static_cast<storage_type const &>(*this);
         return val;
     }
 
-    us_wrapper_helper<1> or_reduction() const
+    inline us_wrapper_helper<1> or_reduction() const
     {
         auto& this_ap = static_cast<storage_type const &>(*this);
         return us_storage_helper<1>{this_ap.or_reduce()};
     }
 
-    us_wrapper_helper<1> and_reduction() const
+    inline us_wrapper_helper<1> and_reduction() const
     {
         auto& this_ap = static_cast<storage_type const &>(*this);
         return us_storage_helper<1>{this_ap.and_reduce()};
     }
 
-    storage_type const & unravel() const
+    inline storage_type const & unravel() const
     {
         return static_cast<storage_type const &>(*this);
     }
 
-    us_wrapper_helper<W> reverse() const
+    inline us_wrapper_helper<W> reverse() const
     {
         auto& this_ac = static_cast<storage_type const &>(*this);
         us_storage_helper<W> out;
