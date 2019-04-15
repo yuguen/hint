@@ -81,6 +81,17 @@ public:
         return us_storage_helper<W>{(*this) | rhs};
     }
 
+    VivadoWrapper<W, false> bitwise_xor(VivadoWrapper<W, is_signed> rhs) const
+    {
+        return us_storage_helper<W>{(*this) ^ rhs};
+    }
+
+    VivadoWrapper<W, false> invert() const
+    {
+        return us_storage_helper<W>{~(*this)};
+    }
+
+
     template<unsigned int newSize>
     VivadoWrapper<newSize, false> leftpad(
             typename enable_if<(newSize >= W)>::type* = 0

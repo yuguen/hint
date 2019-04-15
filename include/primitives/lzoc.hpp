@@ -23,7 +23,11 @@ Wrapper<Static_Val<N+1>::_clog2, false> getAlmost2PowLZOC(
     // auto and_red = upper.and_reduction();
     // auto or_red = upper.or_reduction();
     // auto comp = Wrapper<1, false>::mux(leading, and_red, Wrapper<1, false>{not(or_red).template isSet<0>()});
-    auto comp = (upper == comp_seq);
+    auto comp_eq = (upper.bitwise_xor(comp_seq));
+
+    auto comp = comp_eq.or_reduction().invert();
+    
+
     auto upper_input = upper.template slice <upper_half - 1, 1>();
     auto low = input.template slice<upper_half-2, 0>();
     auto next_stage_input = Wrapper<upper_half-1, false>::mux(comp, low, upper_input);

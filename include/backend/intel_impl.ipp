@@ -74,6 +74,18 @@ public:
         return us_storage_helper<W>{this_ap | rhs};
     }
 
+    IntelWrapper<W, false> bitwise_xor(IntelWrapper<W, is_signed> rhs) const
+    {
+        auto& this_ap = static_cast<storage_type const &>(*this);
+        auto& rhs_ap = static_cast<storage_type const &>(*this);
+        return us_storage_helper<W>{this_ap ^ rhs};
+    }
+
+    IntelWrapper<W, false> invert() const
+    {
+        return us_storage_helper<W>{~(*this)};
+    }
+
     template<unsigned int newSize>
     IntelWrapper<newSize, false> leftpad(
             typename enable_if<(newSize >= W)>::type* = 0
