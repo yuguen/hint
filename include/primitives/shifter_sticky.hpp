@@ -6,7 +6,7 @@
 
 #include "hint.hpp"
 #include "tools/static_math.hpp"
-#include "primitives/reverse.hpp"
+#include "primitives/backwards.hpp"
 
 //template<unsigned int S>
 //struct ShifterStickyStageInfo

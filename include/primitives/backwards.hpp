@@ -1,15 +1,15 @@
-#ifndef REVERSE_HPP
-#define REVERSE_HPP
+#ifndef BACKWARDS_HPP
+#define BACKWARDS_HPP
 
 //In case we need both the variable and its reversed value
 //(vivado reverse change the bit order of the value on which its called)
 template <unsigned int N, bool is_signed, template<unsigned int , bool> class Wrapper>
-Wrapper<N, false> reverse(
+Wrapper<N, false> backwards(
         Wrapper<N, is_signed> input
     )
 {
-    return input.reverse();
+    return input.backwards();
 }
 
 
-#endif // REVERSE_HPP
+#endif // BACKWARDS_HPP

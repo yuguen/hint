@@ -9,7 +9,7 @@
 #include "tools/static_math.hpp"
 // #include "tools/printing.hpp"
 #include "primitives/shifter.hpp"
-#include "primitives/reverse.hpp"
+#include "primitives/backwards.hpp"
 #include <iostream>
 
 using namespace std;
@@ -36,10 +36,23 @@ Wrapper<Static_Val<S>::_storage+N, false> getOneBelow2PowLZOC_shift(
     auto upper = input.template slice<N-1, N-upper_half>();
     auto lower = input.template slice<N-upper_half-1, 0>();
 
-    auto comp_seq = Wrapper<upper_half, false>::generateSequence(leading);
-    auto comp = (upper == comp_seq);
+    // auto comp_seq = Wrapper<upper_half, false>::generateSequence(leading);
+    // auto comp = (upper == comp_seq);
+
+
+    auto and_red = upper.and_reduction();
+    auto or_red = upper.or_reduction();
+    auto comp = Wrapper<1, false>::mux(leading, and_red, Wrapper<1, false>{not(or_red).template isSet<0>()});
 
     auto padding = Wrapper<upper_half, false>::generateSequence(fill_bit);
+    // if(fill_bit.template isSet<0>()){
+    //     padding = invert(Wrapper<upper_half, false>{0}); 
+    // }
+    // else{
+    //     padding = Wrapper<upper_half, false>{0}; 
+    // }
+
+    // auto padding = Wrapper<upper_half, false>::generateSequence(fill_bit);
 
     auto next_stage_input = Wrapper<N, false>::mux(
                 comp,
@@ -115,12 +128,8 @@ Wrapper<Static_Val<S>::_storage + N, false> LZOC_shift_stage (
 
     auto is_full_one = lzoc_shift_up.and_reduction();
     auto last_bit_is_leading = input.template get<N-1>() == leading;
-
-    auto onezeroseq = Wrapper<1, false>{1}.concatenate(
-                Wrapper<Static_Val<S>::_clog2, false>::generateSequence(
-                    Wrapper<1, false>{0}
-                    ));
-
+    Wrapper<Static_Val<S>::_clog2, false> zeros{0};
+    auto onezeroseq = Wrapper<1, false>{1}.concatenate(zeros);
     auto uncomplete = Wrapper<1, false>{0}.concatenate(lzoc_up);
 
     auto cond = is_full_one.bitwise_and(last_bit_is_leading);
@@ -146,13 +155,8 @@ Wrapper<Static_Val<S>::_storage + N, false> LZOC_shift_stage (
 
     auto lzoc_up = lzoc_shift_up.template slice<N + Static_Val<upper_size>::_clog2 -1,N>();
     auto shift_up = lzoc_shift_up.template slice<N-1,0>();
-
-   // cerr << "lzoc shift up " << to_string(lzoc_shift_up) << endl;
-   // cerr << "lzoc up " << to_string(lzoc_up) << endl;
-   // cerr << "shift up " << to_string(shift_up) << endl;
     auto is_full_one = lzoc_up.and_reduction();
     auto last_bit_is_leading = lzoc_shift_up.template get<N-1>() == leading;
-   // cerr << "last_bit_is_leading " << to_string(last_bit_is_leading) << endl;
     auto msb = is_full_one.bitwise_and(last_bit_is_leading);
 
     //If all was zero, we only need to count on the lowest bits
@@ -172,10 +176,6 @@ Wrapper<Static_Val<S>::_storage + N, false> LZOC_shift_stage (
     auto ext_lowcount = lzoc_low.template leftpad<Static_Val<upper_size>::_clog2>();
     auto padding = Wrapper<upper_size+1, false>::generateSequence(fill_bit);
 
-   // cerr << "lzoc shift low " << to_string(lzoc_shift_low) << endl;
-   // cerr << "lzoc low " << to_string(lzoc_low) << endl;
-   // cerr << "shift low " << to_string(shift_low) << endl;
-
     auto lsb = Wrapper<Static_Val<upper_size>::_clog2, false>::mux(
                 msb,
                 ext_lowcount,
@@ -188,7 +188,6 @@ Wrapper<Static_Val<S>::_storage + N, false> LZOC_shift_stage (
         shift_low.concatenate(padding),
         shift_up
         );
-    // cerr << "Value compound lzoc : " << to_string(result) << endl;
     return lzoc.concatenate(shift);
 }
 

@@ -193,7 +193,7 @@ public:
         return static_cast<storage_type const &>(*this);
     }
 
-    inline us_wrapper_helper<W> reverse() const
+    inline us_wrapper_helper<W> backwards() const
     {
         auto& this_ac = static_cast<storage_type const &>(*this);
         us_storage_helper<W> out;

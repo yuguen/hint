@@ -125,7 +125,14 @@ public:
     static VivadoWrapper<W, false> generateSequence(VivadoWrapper<1, false> const & val)
     {
         // ap_int<1> sign = static_cast<storage_type const &>(val);
-        ap_int<W> ext = (ap_int<1>)val;
+        ap_uint<W> ext;
+        ap_uint<W> zero{0};
+
+        if(val == 1){
+            ext = ~zero;
+        }else{
+            ext = zero;
+        }
         us_storage_helper<W> ret = ext;
         return ret;
     }
@@ -182,7 +189,7 @@ public:
         return us_storage_helper<1>{(*this).and_reduce()};
     }
 
-    us_wrapper_helper<W> reverse() const
+    us_wrapper_helper<W> backwards() const
     {
         // auto& this_ap = static_cast<storage_type const &>(*this);
         us_storage_helper<W> out;
