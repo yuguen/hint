@@ -263,8 +263,7 @@ template<unsigned int N, unsigned int S, bool is_signed, template<unsigned int ,
 Wrapper<Static_Val<S>::_storage + N, false> LZOC_shift(
         Wrapper<N, is_signed> const & input,
         Wrapper<1, false> const & leading,
-        Wrapper<1, false> const & fill_bit = 0,
-        typename enable_if<(N >= S) and not(Static_Val<S>::_isOneBelow2Pow or (S==1)) and not(Static_Val<S>::_is2Pow)>::type* = 0
+        Wrapper<1, false> const & fill_bit = 0
 )
 {
     return LZOC_shift_impl<N, S>(input.as_unsigned(), leading, fill_bit);
