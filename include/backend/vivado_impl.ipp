@@ -40,7 +40,7 @@ public:
     VivadoWrapper():storage_type{0}{}
 
 
-    VivadoWrapper(storage_type const & val):storage_type{val}{
+    VivadoWrapper(storage_type const val):storage_type{val}{
     }
 
     template<unsigned int high, unsigned int low>
@@ -104,27 +104,27 @@ public:
 
     template<unsigned int Wrhs, bool isSignedRhs>
     VivadoWrapper<W + Wrhs, false>
-    concatenate(VivadoWrapper<Wrhs, isSignedRhs> const & val) const
+    concatenate(VivadoWrapper<Wrhs, isSignedRhs> const val) const
     {
         us_wrapper_helper<Wrhs + W> ret {(*this).concat(val)};
         return  ret;
     }
 
-    VivadoWrapper<1, false> operator==(VivadoWrapper<W, is_signed> const & rhs) const {
-        return us_storage_helper<1>{(static_cast<storage_type const &>(*this) == static_cast<storage_type const &>(rhs))};
+    VivadoWrapper<1, false> operator==(VivadoWrapper<W, is_signed> const rhs) const {
+        return us_storage_helper<1>{(static_cast<storage_type const>(*this) == static_cast<storage_type const>(rhs))};
     }
 
-    VivadoWrapper<W, is_signed>& operator=(VivadoWrapper const & rhs)
+    VivadoWrapper<W, is_signed>& operator=(VivadoWrapper const rhs)
     {
         // auto& this_ap = static_cast<storage_type&>(*this);
-        // auto& rhs_ap = static_cast<storage_type const &>(rhs);
+        // auto& rhs_ap = static_cast<storage_type const>(rhs);
         storage_type::operator=(rhs);
         return *this;
     }
 
-    static VivadoWrapper<W, false> generateSequence(VivadoWrapper<1, false> const & val)
+    static VivadoWrapper<W, false> generateSequence(VivadoWrapper<1, false> const val)
     {
-        // ap_int<1> sign = static_cast<storage_type const &>(val);
+        // ap_int<1> sign = static_cast<storage_type const>(val);
         ap_uint<W> ext;
         ap_uint<W> zero{0};
 
@@ -138,28 +138,28 @@ public:
     }
 
     VivadoWrapper<W+1, is_signed> addWithCarry(
-            VivadoWrapper<W, is_signed> const & op2,
-            VivadoWrapper<1, false> const & cin
+            VivadoWrapper<W, is_signed> const op2,
+            VivadoWrapper<1, false> const cin
         ) const
     {
-        // auto& op1_ap = static_cast<storage_type const &>(*this);
-        // auto& op2_ap = static_cast<storage_type const &>(op2);
-        // auto& cin_ap = static_cast<us_storage_helper<1> const &>(cin);
+        // auto& op1_ap = static_cast<storage_type const>(*this);
+        // auto& op2_ap = static_cast<storage_type const>(op2);
+        // auto& cin_ap = static_cast<us_storage_helper<1> const>(cin);
         auto res = (*this) + op2 + cin;
         return storage_helper<W+1>{res};
     }
 
-    VivadoWrapper<W, false> modularAdd(VivadoWrapper<W, is_signed> const & op2) const
+    VivadoWrapper<W, false> modularAdd(VivadoWrapper<W, is_signed> const op2) const
     {
-        // auto& this_ap = static_cast<storage_type const &>(*this);
-        // auto& op_2 = static_cast<storage_type const &>(op2);
+        // auto& this_ap = static_cast<storage_type const>(*this);
+        // auto& op_2 = static_cast<storage_type const>(op2);
         return us_storage_helper<W>{(*this) + op2};
     }
 
     static VivadoWrapper<W, is_signed> mux(
-            VivadoWrapper<1, false> const & control,
-            VivadoWrapper<W, is_signed> const & opt1,
-            VivadoWrapper<W, is_signed> const & opt0
+            VivadoWrapper<1, false> const control,
+            VivadoWrapper<W, is_signed> const opt1,
+            VivadoWrapper<W, is_signed> const opt0
         )
     {
         storage_helper<W> res;
@@ -173,25 +173,25 @@ public:
 
     us_wrapper_helper<W> as_unsigned() const
     {
-        // auto& this_ap = static_cast<storage_type const &>(*this);
+        // auto& this_ap = static_cast<storage_type const>(*this);
         return us_storage_helper<W>{(*this)};
     }
 
     us_wrapper_helper<1> or_reduction() const
     {
-        // auto& this_ap = static_cast<storage_type const &>(*this);
+        // auto& this_ap = static_cast<storage_type const>(*this);
         return us_storage_helper<1>{(*this).or_reduce()};
     }
 
     us_wrapper_helper<1> and_reduction() const
     {
-        // auto& this_ap = static_cast<storage_type const &>(*this);
+        // auto& this_ap = static_cast<storage_type const>(*this);
         return us_storage_helper<1>{(*this).and_reduce()};
     }
 
     us_wrapper_helper<W> backwards() const
     {
-        // auto& this_ap = static_cast<storage_type const &>(*this);
+        // auto& this_ap = static_cast<storage_type const>(*this);
         us_storage_helper<W> out;
         for(unsigned int i = 0 ; i < W ; ++i) {
             out[i] = (*this)[W - i - 1];
@@ -199,7 +199,7 @@ public:
         return out;
     }
 
-    storage_type const & unravel() const
+    storage_type const unravel() const
     {
         return (*this);
     }

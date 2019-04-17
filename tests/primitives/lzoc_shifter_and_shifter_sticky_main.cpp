@@ -1,7 +1,7 @@
 #define BOOST_TEST_DYN_LINK   
-#define BOOST_TEST_MODULE VivadoBackendTestModule
+#define BOOST_TEST_MODULE PrimitiveTestModule
 
-#define AP_INT_MAX_W 2100
+#define AP_INT_MAX_W 1050
 
 #include <iostream>
 #include <boost/test/unit_test.hpp>
@@ -14,7 +14,7 @@
 
 using namespace  std;
 
-#define SIZE 2100
+#define SIZE 28
 
 #if defined(VIVADO_BACKEND)
 BOOST_AUTO_TEST_CASE(testLzocShifterAndShifterVivado)
@@ -78,9 +78,9 @@ BOOST_AUTO_TEST_CASE(testLzocShifterAndShifterIntel)
 	IntelWrapper<Static_Val<SIZE+1>::_clog2, false> expected_lzoc; 
 	IntelWrapper<SIZE, false> expected_shift; 
 	IntelWrapper<1, false> cmp;
-	for(int i=0; i<SIZE; i++){
+    for(int i=0; i<SIZE; i++){
         shifted_with_sticky = shifter_sticky(backwards(currentValue), IntelWrapper<1, false>{1}, IntelWrapper<1, false>{1});
-        //cerr << to_string(shifted_with_sticky) << endl;
+        // cerr << to_string(shifted_with_sticky) << endl;
         currentValue = backwards(shifted_with_sticky.slice<SIZE, 1>());
 		// cerr << to_string(currentValue) << endl;
 		computed_lzoc_shift = LZOC_shift<SIZE, SIZE>(currentValue, IntelWrapper<1, false>{0}, IntelWrapper<1, false>{0});

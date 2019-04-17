@@ -22,8 +22,8 @@ Wrapper<Static_Val<S>::_storage+N, false> getOneBelow2PowLZOC_shift(
             typename enable_if<Static_Val<S>::_isOneBelow2Pow and (S>1)>::type* = 0
         )
 {
-
     constexpr int upper_half = (1 <<Static_Val<S>::_flog2);
+    // cerr << "upper_half: " << upper_half << endl;
 
     auto upper = input.template slice<N-1, N-upper_half>();
     auto lower = input.template slice<N-upper_half-1, 0>();

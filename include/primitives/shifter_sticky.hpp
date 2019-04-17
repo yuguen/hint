@@ -25,6 +25,7 @@ Wrapper<IS+1, false> shifter_sticky_stage(
     )
 {
     constexpr unsigned int shiftsize = (1 << (S-1));
+
     auto high = input.template slice<IS-1, shiftsize>();
     auto low = input.template slice<shiftsize - 1, 0>();
     auto fill_seq = Wrapper<shiftsize, false>::generateSequence(fill_bit);
@@ -53,6 +54,7 @@ Wrapper<IS+1, false> shifter_sticky_stage(
         Wrapper<1, false> fill_bit = Wrapper<1, false>{0}
     )
 {
+
     auto high = input.template slice<IS-1, 1>();
     auto low = input.template get<0>();
     auto& needs_shift = count;
@@ -66,7 +68,8 @@ Wrapper<IS+1, false> shifter_sticky_stage(
                 fill_bit.concatenate(high),
                 input
               );
-    return res.concatenate(final_sticky);
+    Wrapper<IS+1, false> result = res.concatenate(final_sticky); 
+    return result;
 }
 
 template<unsigned int IS, unsigned int S, template<unsigned int, bool> class Wrapper>
@@ -108,8 +111,8 @@ Wrapper<IS+1, false> shifter_sticky(
 template<unsigned int S>
 struct ShifterStickyStageInfo
 {
-	static constexpr bool NeedsRecursion = (S>1);
-	static constexpr bool IsFinalStage = (S==1);
+    static constexpr bool NeedsRecursion = (S>1);
+    static constexpr bool IsFinalStage = (S==1);
 };
 
 template<unsigned int IS, unsigned int S, bool is_signed, template<unsigned int, bool> class Wrapper>
