@@ -87,9 +87,9 @@ Wrapper<IS, false> shifter(
                 Wrapper<1, false> fill_bit = Wrapper<1, false>{0}
     )
 {
-        Wrapper<IS, false> fin_input{isRightShift ? reverse(input) : input};
+        Wrapper<IS, false> fin_input{isRightShift ? backwards(input) : input};
         Wrapper<IS, false> shiftstick = shifter_stage<IS, S, is_signed, Wrapper>(fin_input, count, fill_bit);
-        Wrapper<IS, false> ret = isRightShift ? reverse(shiftstick) : shiftstick;
+        Wrapper<IS, false> ret = isRightShift ? backwards (shiftstick) : shiftstick;
         return ret;
 }
 
