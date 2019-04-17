@@ -24,7 +24,7 @@ template<unsigned int N, unsigned int S, template<unsigned int , bool> class Wra
 Wrapper<Static_Val<S>::_storage+N, false> getOneBelow2PowLZOC_shift(
             Wrapper<N, false> const & input,
             Wrapper<1, false> const & leading,
-            Wrapper<1, false> const & fill_bit = 0,
+            Wrapper<1, false> const & fill_bit,
             typename enable_if<Static_Val<S>::_isOneBelow2Pow and (S>1)>::type* = 0
         )
 {
@@ -69,7 +69,7 @@ template<unsigned int N, unsigned int S, template<unsigned int , bool> class Wra
 Wrapper<Static_Val<S>::_storage +N, false> getOneBelow2PowLZOC_shift(
         Wrapper<N, false> const & input,
         Wrapper<1, false> const & leading,
-        Wrapper<1, false> const & fill_bit = 0,
+        Wrapper<1, false> const & fill_bit,
         typename enable_if<(S==1) and (N >= 2)>::type* = 0
     )
 {
@@ -89,7 +89,7 @@ template<unsigned int N, unsigned int S, template<unsigned int , bool> class Wra
 Wrapper<Static_Val<S>::_storage +N, false> getOneBelow2PowLZOC_shift(
         Wrapper<N, false> const & input,
         Wrapper<1, false> const & leading,
-        Wrapper<1, false> const & fill_bit = 0,
+        Wrapper<1, false> const & fill_bit,
         typename enable_if<(S==1) and (N == 1)>::type* = 0
     )
 {
@@ -101,6 +101,7 @@ Wrapper<Static_Val<S>::_storage +N, false> getOneBelow2PowLZOC_shift(
     return ret;
 }
 
+/*
 template<unsigned int N, unsigned int S, template<unsigned int , bool> class Wrapper>
 Wrapper<Static_Val<S>::_storage + N, false> LZOC_shift_stage(
             Wrapper<N, false> const & input,
@@ -189,15 +190,85 @@ Wrapper<Static_Val<S>::_storage + N, false> LZOC_shift_stage (
         shift_up
         );
     return lzoc.concatenate(shift);
+}*/
+
+template<unsigned int N, unsigned int S, template<unsigned int , bool> class Wrapper>
+Wrapper<Static_Val<S>::_storage + N, false> LZOC_shift_impl(
+        Wrapper<N, false> const & input,
+        Wrapper<1, false> const & leading,
+        Wrapper<1, false> const & fill_bit,
+        typename enable_if<(N >= S) and (Static_Val<S>::_isOneBelow2Pow or (S==1))>::type* = 0
+)
+{
+    return getOneBelow2PowLZOC_shift<N, S>(input, leading, fill_bit);
+}
+
+template<unsigned int N, unsigned int S, template<unsigned int , bool> class Wrapper>
+Wrapper<Static_Val<S>::_storage + N, false> LZOC_shift_impl(
+        Wrapper<N, false> const & input,
+        Wrapper<1, false> const & leading,
+        Wrapper<1, false> const & fill_bit,
+        typename enable_if<(N >= S) and not(Static_Val<S>::_isOneBelow2Pow or (S==1)) and Static_Val<S>::_is2Pow>::type* = 0
+)
+{
+    constexpr unsigned int lzoc_up_size = Static_Val<S-1>::_storage;
+
+    auto lzoc_shifted_up = getOneBelow2PowLZOC_shift<N, S-1>(input.as_unsigned(), leading, fill_bit);
+
+    auto lzoc_up = lzoc_shifted_up.template slice<N+lzoc_up_size - 1, N>();
+    auto shifted_up = lzoc_shifted_up.template slice<N-1, 0>();
+
+    auto finalIsLeading = (input.template get<0>() == leading);
+    auto allTopIsLeading = lzoc_up.and_reduction();
+
+    auto msb = finalIsLeading.bitwise_and(allTopIsLeading);
+    auto lzoc_lsb = Wrapper<lzoc_up_size, false>::mux(
+                    msb,
+                    Wrapper<lzoc_up_size, false>{0},
+                    lzoc_up
+                );
+    auto lzoc = msb.concatenate(lzoc_lsb);
+    auto shifted_final = Wrapper<N, false>::mux(
+                msb,
+                Wrapper<N, false>::generateSequence(fill_bit),
+                shifted_up
+            );
+    return lzoc.concatenate(shifted_final);
+}
+
+template<unsigned int N, unsigned int S, template<unsigned int , bool> class Wrapper>
+Wrapper<Static_Val<S>::_storage + N, false> LZOC_shift_impl(
+        Wrapper<N, false> const & input,
+        Wrapper<1, false> const & leading,
+        Wrapper<1, false> const & fill_bit,
+        typename enable_if<(N >= S) and not(Static_Val<S>::_isOneBelow2Pow or (S==1)) and not(Static_Val<S>::_is2Pow)>::type* = 0
+)
+{
+    constexpr unsigned int count_size = (1 << Static_Val<S>::_storage) - 1;
+    constexpr unsigned int lzoc_size = Static_Val<S>::_storage;
+    auto lzoc_shifted_up = getOneBelow2PowLZOC_shift<N, count_size>(input, leading, fill_bit);
+    auto lzoc_up = lzoc_shifted_up.template slice<N+lzoc_size-1, N>();
+    auto shifted = lzoc_shifted_up.template slice<N-1, 0>();
+
+    auto lzoc_has_overflowed = lzoc_up.and_reduction();
+    auto lzoc_final = Wrapper<lzoc_size, false>::mux(
+                lzoc_has_overflowed,
+                Wrapper<lzoc_size, false>{S},
+                lzoc_up
+                );
+    return lzoc_final.concatenate(shifted);
 }
 
 template<unsigned int N, unsigned int S, bool is_signed, template<unsigned int , bool> class Wrapper>
 Wrapper<Static_Val<S>::_storage + N, false> LZOC_shift(
         Wrapper<N, is_signed> const & input,
         Wrapper<1, false> const & leading,
-        Wrapper<1, false> const & fill_bit = 0
+        Wrapper<1, false> const & fill_bit = 0,
+        typename enable_if<(N >= S) and not(Static_Val<S>::_isOneBelow2Pow or (S==1)) and not(Static_Val<S>::_is2Pow)>::type* = 0
 )
 {
-    return LZOC_shift_stage<N, S>(input.as_unsigned(), leading, fill_bit);
+    return LZOC_shift_impl<N, S>(input.as_unsigned(), leading, fill_bit);
 }
+
+
 #endif // LZOC_SHIFTER_HPP
