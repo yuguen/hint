@@ -10,6 +10,7 @@
 // #include "tools/printing.hpp"
 #include "primitives/shifter.hpp"
 #include "primitives/backwards.hpp"
+#include "primitives/reductions.hpp"
 #include <iostream>
 
 using namespace std;
@@ -30,7 +31,7 @@ inline Wrapper<Static_Val<S>::_storage+N, false> getOneBelow2PowLZOC_shift(
 
 
     auto and_red = upper.and_reduction();
-    auto or_red = upper.or_reduction();
+    auto or_red = or_reduction(upper);
     auto comp = Wrapper<1, false>::mux(leading, and_red, Wrapper<1, false>{not(or_red).template isSet<0>()});
 
     auto padding = Wrapper<upper_half, false>::generateSequence(fill_bit);
@@ -103,7 +104,7 @@ inline Wrapper<Static_Val<S>::_storage + N, false> LZOC_shift_impl(
 {
     constexpr unsigned int lzoc_up_size = Static_Val<S-1>::_storage;
 
-    auto lzoc_shifted_up = getOneBelow2PowLZOC_shift<N, S-1>(input.as_unsigned(), leading, fill_bit);
+    auto lzoc_shifted_up = getOneBelow2PowLZOC_shift<N, S-1>(input, leading, fill_bit);
 
     auto lzoc_up = lzoc_shifted_up.template slice<N+lzoc_up_size - 1, N>();
     auto shifted_up = lzoc_shifted_up.template slice<N-1, 0>();
