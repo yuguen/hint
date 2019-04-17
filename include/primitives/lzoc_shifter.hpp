@@ -15,7 +15,7 @@
 using namespace std;
 
 template<unsigned int N, unsigned int S, template<unsigned int , bool> class Wrapper>
-Wrapper<Static_Val<S>::_storage+N, false> getOneBelow2PowLZOC_shift(
+inline Wrapper<Static_Val<S>::_storage+N, false> getOneBelow2PowLZOC_shift(
             Wrapper<N, false> const input,
             Wrapper<1, false> const leading,
             Wrapper<1, false> const fill_bit,
@@ -46,7 +46,7 @@ Wrapper<Static_Val<S>::_storage+N, false> getOneBelow2PowLZOC_shift(
 }
 
 template<unsigned int N, unsigned int S, template<unsigned int , bool> class Wrapper>
-Wrapper<Static_Val<S>::_storage +N, false> getOneBelow2PowLZOC_shift(
+inline Wrapper<Static_Val<S>::_storage +N, false> getOneBelow2PowLZOC_shift(
         Wrapper<N, false> const input,
         Wrapper<1, false> const leading,
         Wrapper<1, false> const fill_bit,
@@ -66,7 +66,7 @@ Wrapper<Static_Val<S>::_storage +N, false> getOneBelow2PowLZOC_shift(
 }
 
 template<unsigned int N, unsigned int S, template<unsigned int , bool> class Wrapper>
-Wrapper<Static_Val<S>::_storage +N, false> getOneBelow2PowLZOC_shift(
+inline Wrapper<Static_Val<S>::_storage +N, false> getOneBelow2PowLZOC_shift(
         Wrapper<N, false> const input,
         Wrapper<1, false> const leading,
         Wrapper<1, false> const fill_bit,
@@ -83,7 +83,7 @@ Wrapper<Static_Val<S>::_storage +N, false> getOneBelow2PowLZOC_shift(
 
 
 template<unsigned int N, unsigned int S, template<unsigned int , bool> class Wrapper>
-Wrapper<Static_Val<S>::_storage + N, false> LZOC_shift_impl(
+inline Wrapper<Static_Val<S>::_storage + N, false> LZOC_shift_impl(
         Wrapper<N, false> const input,
         Wrapper<1, false> const leading,
         Wrapper<1, false> const fill_bit,
@@ -94,7 +94,7 @@ Wrapper<Static_Val<S>::_storage + N, false> LZOC_shift_impl(
 }
 
 template<unsigned int N, unsigned int S, template<unsigned int , bool> class Wrapper>
-Wrapper<Static_Val<S>::_storage + N, false> LZOC_shift_impl(
+inline Wrapper<Static_Val<S>::_storage + N, false> LZOC_shift_impl(
         Wrapper<N, false> const input,
         Wrapper<1, false> const leading,
         Wrapper<1, false> const fill_bit,
@@ -127,7 +127,7 @@ Wrapper<Static_Val<S>::_storage + N, false> LZOC_shift_impl(
 }
 
 template<unsigned int N, unsigned int S, template<unsigned int , bool> class Wrapper>
-Wrapper<Static_Val<S>::_storage + N, false> LZOC_shift_impl(
+inline Wrapper<Static_Val<S>::_storage + N, false> LZOC_shift_impl(
         Wrapper<N, false> const input,
         Wrapper<1, false> const leading,
         Wrapper<1, false> const fill_bit,
@@ -150,7 +150,7 @@ Wrapper<Static_Val<S>::_storage + N, false> LZOC_shift_impl(
 }
 
 template<unsigned int N, unsigned int S, bool is_signed, template<unsigned int , bool> class Wrapper>
-Wrapper<Static_Val<S>::_storage + N, false> LZOC_shift(
+inline Wrapper<Static_Val<S>::_storage + N, false> LZOC_shift(
         Wrapper<N, is_signed> const input,
         Wrapper<1, false> const leading,
         Wrapper<1, false> const fill_bit = 0
