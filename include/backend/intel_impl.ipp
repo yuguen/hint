@@ -28,7 +28,7 @@ public:
     IntelWrapper():storage_type{0}{}
 
 
-    IntelWrapper(storage_type const val):storage_type{val}{
+    IntelWrapper(storage_type const & val):storage_type{val}{
     }
 
     template<unsigned int high, unsigned int low>
