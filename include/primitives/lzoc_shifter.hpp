@@ -31,7 +31,8 @@ inline Wrapper<Static_Val<S>::_storage+N, false> getOneBelow2PowLZOC_shift(
 
 
     auto and_red = upper.and_reduction();
-    auto or_red = or_reduction<16>(upper);
+    auto or_red = upper.or_reduction();
+    // or_reduction<128>(upper);
     auto comp = Wrapper<1, false>::mux(leading, and_red, Wrapper<1, false>{not(or_red).template isSet<0>()});
 
     auto padding = Wrapper<upper_half, false>::generateSequence(fill_bit);

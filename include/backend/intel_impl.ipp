@@ -28,7 +28,7 @@ public:
     IntelWrapper():storage_type{0}{}
 
 
-    IntelWrapper(storage_type const & val):storage_type{val}{
+    IntelWrapper(storage_type const val):storage_type{val}{
     }
 
     template<unsigned int high, unsigned int low>
@@ -141,7 +141,7 @@ public:
         // auto& op1_ap = static_cast<storage_type const &>(*this);
         // auto& op2_ap = static_cast<storage_type const &>(op2);
         // auto& cin_ap = static_cast<us_storage_helper<1> const &>(cin);
-        auto res = (*this) + op2 + cin;
+        auto res = storage_type::operator+(op2) + cin;
         return storage_helper<W+1>{res};
     }
 
@@ -172,8 +172,7 @@ public:
 
     inline us_wrapper_helper<W> as_unsigned() const
     {
-        us_storage_helper<W> val = (*this);
-        return val;
+    	return us_storage_helper<W>{static_cast<storage_type const &>(*this)};
     }
 
     inline us_wrapper_helper<1> or_reduction() const
