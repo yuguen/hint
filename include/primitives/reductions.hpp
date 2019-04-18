@@ -1,27 +1,50 @@
 #ifndef REDUCTIONS_HPP
 #define REDUCTIONS_HPP
 
+#include <type_traits>
 
-template<unsigned int N, template<unsigned int, bool> class Wrapper>
-inline Wrapper<1, false> or_reduction(
+using namespace std;
+
+template<unsigned int max_builtin_size, unsigned int N, template<unsigned int, bool> class Wrapper>
+inline Wrapper<1, false> or_reduction_impl(
+    Wrapper<N, false> const input,
+    typename enable_if<(N>max_builtin_size) and (N%2==1)>::type* = 0
+    )
+{
+    #pragma HLS INLINE
+    return or_reduction_impl<max_builtin_size>(
+            input.template slice<N-2, (N-1)/2>().bitwise_or(
+                input.template slice<((N-1)/2)-1, 0>()
+                )
+            ).bitwise_or(input.template get<N-1>());
+}
+
+template<unsigned int max_builtin_size, unsigned int N, template<unsigned int, bool> class Wrapper>
+inline Wrapper<1, false> or_reduction_impl(
 	Wrapper<N, false> const input,
-    typename enable_if<(N>1)>::type* = 0
+    typename enable_if<(N>max_builtin_size) and (N%2==0)>::type* = 0
 	)
 {
 	#pragma HLS INLINE
-	constexpr unsigned int up_size = (N>>1);
-	constexpr unsigned int low_size = N-up_size;
-	auto high = input.template slice<N-1, N-up_size>();
-	auto low = input.template slice<N-up_size-1, 0>();
-
-	auto high_reduce = or_reduction(high);
-	auto low_reduce = or_reduction(low);
-	return high_reduce.bitwise_or(low_reduce);
+    return or_reduction_impl<max_builtin_size>(
+                input.template slice<N-1, N/2>().bitwise_or(
+                    input.template slice<(N/2)-1, 0>()
+                    )
+                );
 }
 
+template<unsigned int max_builtin_size, unsigned int N, template<unsigned int, bool> class Wrapper>
+inline Wrapper<1, false> or_reduction_impl(
+    Wrapper<N, false> const input,
+    typename enable_if<(N<=max_builtin_size) and (N > 1)>::type* = 0
+    )
+{
+    #pragma HLS INLINE
+    return input.or_reduction();
+}
 
-template<unsigned int N, template<unsigned int, bool> class Wrapper>
-inline Wrapper<1, false> or_reduction(
+template<unsigned int max_builtin_size, unsigned int N, template<unsigned int, bool> class Wrapper>
+inline Wrapper<1, false> or_reduction_impl(
 	Wrapper<N, false> const input,
     typename enable_if<(N==1)>::type* = 0
 	)
@@ -32,13 +55,14 @@ inline Wrapper<1, false> or_reduction(
 
 
 
-template<unsigned int N, bool is_signed, template<unsigned int, bool> class Wrapper>
+template<unsigned int max_builtin_size, unsigned int N, bool is_signed, template<unsigned int, bool> class Wrapper>
 inline Wrapper<1, false> or_reduction(
-	Wrapper<N, is_signed> const input 
+    Wrapper<N, is_signed> const input,
+        typename  enable_if<(max_builtin_size >= 1)>::type * = 0
 	)
 {
 	#pragma HLS INLINE
-	return or_reduction_impl(input.as_unsigned());
+    return or_reduction_impl<max_builtin_size>(input.as_unsigned());
 }
 
 
