@@ -26,7 +26,10 @@ inline Wrapper<Static_Val<S>::_storage+N, false> getOneBelow2PowLZOC_shift(
     constexpr int upper_half = (1 <<Static_Val<S>::_flog2);
     // cerr << "upper_half: " << upper_half << endl;
 
-    auto upper = input.template slice<N-1, N-upper_half>();
+    auto backwards_input = backwards(input);
+    auto upper_backwards = backwards_input.template slice<upper_half-1,0>();
+    auto upper = backwards(upper_backwards); 
+    // auto upper = input.template slice<N-1, N-upper_half>();
     auto lower = input.template slice<N-upper_half-1, 0>();
 
 
