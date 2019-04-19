@@ -129,7 +129,13 @@ public:
     {
         // auto& to_fill = static_cast<storage_type const &>(val);
         us_storage_helper<W> zero{0};
-        us_storage_helper<W> ret = (val==1) ? us_storage_helper<W>{~zero} : zero;
+        us_storage_helper<W> ret;
+        if(val == 1){
+            ret = us_storage_helper<W>{~zero};
+        } 
+        else{
+            ret = zero;
+        }
         return ret;
     }
 
