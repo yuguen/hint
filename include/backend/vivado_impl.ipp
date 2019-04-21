@@ -194,6 +194,7 @@ public:
         // auto& this_ap = static_cast<storage_type const>(*this);
         us_storage_helper<W> out;
         for(unsigned int i = 0 ; i < W ; ++i) {
+		#pragma HLS UNROLL
             out[i] = (*this)[W - i - 1];
         }
         return out;

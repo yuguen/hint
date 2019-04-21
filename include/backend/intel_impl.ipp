@@ -202,6 +202,7 @@ public:
     {
         // auto& this_ac = static_cast<storage_type const &>(*this);
         us_storage_helper<W> out;
+	#pragma unroll W
         for(unsigned int i = 0 ; i < W ; ++i) {
             out.template set_slc(i, (*this).template slc<1>(W - i - 1));
         }
