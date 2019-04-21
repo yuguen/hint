@@ -110,7 +110,14 @@ inline Wrapper<Static_Val<S>::_storage + N, false> LZOC_shift_impl(
 
     auto lzoc_shifted_up = getOneBelow2PowLZOC_shift<N, S-1>(input, leading, fill_bit);
 
-    auto lzoc_up = lzoc_shifted_up.template slice<N+lzoc_up_size - 1, N>();
+    // auto lzoc_up = lzoc_shifted_up.template slice<N+lzoc_up_size - 1, N>();
+
+    auto backwards_lzoc_shifted_up = backwards(lzoc_shifted_up);
+    auto lzoc_up_backwards = backwards_lzoc_shifted_up.template slice<lzoc_up_size-1,0>();
+    auto lzoc_up = backwards(lzoc_up_backwards); 
+
+
+
     auto shifted_up = lzoc_shifted_up.template slice<N-1, 0>();
 
     auto finalIsLeading = (input.template get<0>() == leading);
@@ -142,7 +149,13 @@ inline Wrapper<Static_Val<S>::_storage + N, false> LZOC_shift_impl(
     constexpr unsigned int count_size = (1 << Static_Val<S>::_storage) - 1;
     constexpr unsigned int lzoc_size = Static_Val<S>::_storage;
     auto lzoc_shifted_up = getOneBelow2PowLZOC_shift<N, count_size>(input, leading, fill_bit);
-    auto lzoc_up = lzoc_shifted_up.template slice<N+lzoc_size-1, N>();
+
+
+    // auto lzoc_up = lzoc_shifted_up.template slice<N+lzoc_size-1, N>();
+    auto backwards_lzoc_shifted_up = backwards(lzoc_shifted_up);
+    auto lzoc_up_backwards = backwards_lzoc_shifted_up.template slice<lzoc_size-1,0>();
+    auto lzoc_up = backwards(lzoc_up_backwards); 
+
     auto shifted = lzoc_shifted_up.template slice<N-1, 0>();
 
     auto lzoc_has_overflowed = lzoc_up.and_reduction();
