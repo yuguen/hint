@@ -12,10 +12,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #set(CPACK_PACKAGE_NAME "libhint")
 #set(CPACK_PACKAGE_VENDOR "(Florent de Dinechin, Luc Forget, Yohann Uguen)@[Citi Lab - INSA Lyon - INRIA]  David Thomas@Imperial College London")
 
-option(VIVADO_BACKEND "Enable Vivado Backend")
-option(INTEL_BACKEND "Enable Intel Backend")
-option(BITSET_BACKEND "Enable bitset backend" ON)
-
 set(INCLUDE_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 add_library(hint INTERFACE)
@@ -25,25 +21,31 @@ target_include_directories(
     $<INSTALL_INTERFACE:include/hint>
 )
 
-if(VIVADO_BACKEND)
-	if(NOT DEFINED VIVADO_INCLUDES)
-		Message(FATAL_ERROR "Please provide path to Vivado ap_int include in VIVADO_INCLUDES")
-	endif()	
-	set(VIVADO_INCLUDES ${VIVADO_INCLUDES} CACHE PATH "Path to vivado ap_int includes" FORCE)
-	add_library(VIVADO_AP_INT INTERFACE IMPORTED)
-	target_include_directories(VIVADO_AP_INT INTERFACE ${VIVADO_INCLUDES})
-	target_link_libraries(hint INTERFACE VIVADO_AP_INT)
-	target_compile_definitions(hint INTERFACE VIVADO_BACKEND)
+set(VIVADO_INCLUDES ${VIVADO_INCLUDES} CACHE PATH "Path to vivado ap_int includes")
+
+if(EXISTS ${VIVADO_INCLUDES}/ap_int.h)
+    set(VIVADO_BACKEND ON)
+    message(STATUS "Using ${VIVADO_INCLUDES} as vivado include directory")
+    #add_library(VIVADO_AP_INT INTERFACE IMPORTED)
+    #target_include_directories(VIVADO_AP_INT INTERFACE ${VIVADO_INCLUDES})
+    # Direct inclusion is less elegant but most simpler for export
+    target_include_directories(hint INTERFACE ${VIVADO_INCLUDES})
+    target_compile_definitions(hint INTERFACE VIVADO_BACKEND)
+else()
+	message(STATUS "Vivado include path unset please set VIVADO_INCLUDES if you inten to use Vivado HLS backend" )
 endif()
-if(INTEL_BACKEND)
-	if(NOT DEFINED INTEL_INCLUDES)
-		Message(FATAL_ERROR "Please provide path to INTEL ac_int include in INTEL_INCLUDES")
-	endif()	
-	set(INTEL_INCLUDES ${INTEL_INCLUDES} CACHE PATH "Path to INTEL ac_int includes" FORCE)
-	add_library(INTEL_AC_INT INTERFACE IMPORTED)
-	target_include_directories(INTEL_AC_INT INTERFACE ${INTEL_INCLUDES})
-	target_link_libraries(hint INTERFACE INTEL_AC_INT)
-	target_compile_definitions(hint INTERFACE INTEL_BACKEND)
+
+set(INTEL_INCLUDES ${INTEL_INCLUDES} CACHE PATH "Path to INTEL ac_int includes")
+if(EXISTS ${INTEL_INCLUDES}/ref/ac_int.h)
+    set(INTEL_BACKEND ON)
+    message(STATUS "Using ${INTEL_INCLUDES} as intelHLS include directory")
+    #add_library(INTEL_AC_INT INTERFACE IMPORTED)
+    # Direct inclusion is less elegant but most simpler for export
+    target_include_directories(hint INTERFACE ${INTEL_INCLUDES})
+    #target_link_libraries(hint INTERFACE INTEL_AC_INT)
+    target_compile_definitions(hint INTERFACE INTEL_BACKEND)
+else()
+	message(STATUS "IntelHLS include path unset please set INTEL_INCLUDES if you inten to use Intel HLS backend" )
 endif()
 
 if(BITSET_BACKEND)
@@ -58,7 +60,8 @@ install(
     PUBLIC_HEADER DESTINATION "include/hint"
     )
 install(EXPORT libhint DESTINATION ${CMAKE_INSTALL_PREFIX}/include/hint/)
-export(EXPORT libhint FILE hint-config.cmake)
+export(EXPORT libhint FILE libhint-config.cmake)
+export(PACKAGE libhint)
 
 OPTION(BUILD_UNIT_TEST "Build the operators unit tests") 
 if(BUILD_UNIT_TEST)
