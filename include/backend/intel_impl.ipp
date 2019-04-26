@@ -33,13 +33,19 @@ public:
 
     template<unsigned int high, unsigned int low>
     inline IntelWrapper<high - low + 1, false> slice(
-        typename enable_if<high >= low and high < W>::type* = 0
+		typename enable_if<(high > low) and (high < W)>::type* = 0
     ) const
     {
-        return us_storage_helper<high-low+1>{
-            storage_type::template slc<high - low + 1>(low)
-        };
+		return get<high>().concatenate(slice<high-1, low>());
     }
+
+	template<unsigned int high, unsigned int low>
+	inline IntelWrapper<high - low + 1, false> slice(
+		typename enable_if<(high == low) and (high < W)>::type* = 0
+	) const
+	{
+		return get<high>();
+	}
 
     template<unsigned int idx>
     inline IntelWrapper<1, false> get(
