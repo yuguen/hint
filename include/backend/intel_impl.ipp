@@ -157,12 +157,19 @@ public:
         return storage_helper<W+1>{res};
     }
 
-    inline IntelWrapper<W, false> modularAdd(IntelWrapper<W, is_signed> const op2) const
+	inline IntelWrapper<W, false> modularAdd(IntelWrapper<W, is_signed> const op2) const
     {
         // auto& this_ap = static_cast<storage_type const &>(*this);
         // auto& op_2 = static_cast<storage_type const &>(op2);
         return us_storage_helper<W>{(*this) + op2};
     }
+
+	inline IntelWrapper<W, false> modularSub(IntelWrapper<W, is_signed> const op2) const
+	{
+		// auto& this_ap = static_cast<storage_type const &>(*this);
+		// auto& op_2 = static_cast<storage_type const &>(op2);
+		return us_storage_helper<W>{(*this) - op2};
+	}
 
     static inline IntelWrapper<W, is_signed> mux(
             IntelWrapper<1, false> const control,

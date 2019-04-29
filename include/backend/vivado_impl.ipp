@@ -156,6 +156,13 @@ public:
         return us_storage_helper<W>{(*this) + op2};
     }
 
+	VivadoWrapper<W, false> modularSub(VivadoWrapper<W, is_signed> const op2) const
+	{
+		// auto& this_ap = static_cast<storage_type const>(*this);
+		// auto& op_2 = static_cast<storage_type const>(op2);
+		return us_storage_helper<W>{(*this) - op2};
+	}
+
     static VivadoWrapper<W, is_signed> mux(
             VivadoWrapper<1, false> const control,
             VivadoWrapper<W, is_signed> const opt1,
