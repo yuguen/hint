@@ -10,11 +10,27 @@
 #endif
 using namespace std;
 
+#include "tools/static_math.hpp"
+
+template <unsigned int W, bool is_signed>
+class IntelWrapper;
+
+template<unsigned int W, bool is_signed>
+IntelWrapper<Arithmetic_Prop<W, W>::_prodSize, is_signed> operator*(
+		IntelWrapper<W, is_signed> const & lhs,
+		IntelWrapper<W, is_signed> const & rhs
+	)
+{
+	return	static_cast<typename IntelWrapper<W, is_signed>::storage_type const &>(lhs) *
+			static_cast<typename IntelWrapper<W, is_signed>::storage_type const &>(rhs);
+}
+
+
 template <unsigned int W, bool is_signed>
 class IntelWrapper : private ac_int<W, is_signed>
 {
 public:
-    typedef IntelWrapper<W, true> type;
+	typedef IntelWrapper<W, is_signed> type;
     typedef ac_int<W, is_signed> storage_type;
     template<unsigned int N>
     using storage_helper = ac_int<N, is_signed>;
@@ -56,6 +72,12 @@ public:
               storage_type::template slc<1>(idx)
         };
     }
+
+	inline IntelWrapper<1, false> operator>(type const & rhs) const
+	{
+		us_wrapper_helper<1> ret = storage_type::operator>(rhs);
+		return ret;
+	}
 
     template<unsigned int idx>
     inline bool isSet(
@@ -222,10 +244,14 @@ public:
         return out;
     }
 
+	friend
+	IntelWrapper<Arithmetic_Prop<W, W>::_prodSize, is_signed> operator*<W, is_signed>(
+			type const & lhs,
+			type const & rhs
+		);
 
     template<unsigned int N, bool val>
     friend class IntelWrapper;
 };
-
 
 #endif

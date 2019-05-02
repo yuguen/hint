@@ -4,6 +4,7 @@
 #include <type_traits>
 
 #include "ap_int.h"
+#include "tools/static_math.hpp"
 
 using namespace std;
 
@@ -23,10 +24,23 @@ struct VivadoBaseType<W, false>
 };
 
 template <unsigned int W, bool is_signed>
+class VivadoWrapper;
+
+template<unsigned int W, bool is_signed>
+VivadoWrapper<Arithmetic_Prop<W, W>::_prodSize, is_signed> operator*(
+		VivadoWrapper<W, is_signed> const & lhs,
+		VivadoWrapper<W, is_signed> const & rhs
+	)
+{
+	return	static_cast<typename VivadoWrapper<W, is_signed>::storage_type const &>(lhs) *
+			static_cast<typename VivadoWrapper<W, is_signed>::storage_type const &>(rhs);
+}
+
+template <unsigned int W, bool is_signed>
 class VivadoWrapper : private VivadoBaseType<W, is_signed>::type
 {
 public:
-    typedef VivadoWrapper<W, true> type;
+	typedef VivadoWrapper<W, is_signed> type;
     typedef typename VivadoBaseType<W, is_signed>::type storage_type;
     template<unsigned int N>
     using storage_helper = typename VivadoBaseType<N, is_signed>::type;
@@ -90,6 +104,12 @@ public:
     {
         return us_storage_helper<W>{~(*this)};
     }
+
+	VivadoWrapper<1, false> operator>(type const & rhs) const
+	{
+		us_wrapper_helper<1> ret = storage_type::operator>(rhs);
+		return ret;
+	}
 
 
     template<unsigned int newSize>
@@ -211,6 +231,12 @@ public:
     {
         return (*this);
     }
+
+	friend
+	VivadoWrapper<Arithmetic_Prop<W, W>::_prodSize, is_signed> operator*<W, is_signed>(
+			type const & lhs,
+			type const & rhs
+		);
 
     template<unsigned int N, bool val>
     friend class VivadoWrapper;
