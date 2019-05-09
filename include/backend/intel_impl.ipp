@@ -134,14 +134,9 @@ public:
     inline IntelWrapper<W + Wrhs, false>
     concatenate(IntelWrapper<Wrhs, isSignedRhs> const val) const
     {
-        // auto& this_ac = static_cast<storage_type const &>(*this);
-        // auto & low_ac = static_cast<ac_int<Wrhs, isSignedRhs> const &>(val);
-        us_storage_helper<Wrhs> unsigned_low_ac = val;
-        us_storage_helper<W> unsigned_upper_ac = (*this);
-
         ac_int<W + Wrhs, false> res;
-        res.template set_slc(0, unsigned_low_ac);
-        res.template set_slc(Wrhs, unsigned_upper_ac);
+		res.set_slc(0, val);
+		res.set_slc(Wrhs, *this);
 
         return res;
     }
