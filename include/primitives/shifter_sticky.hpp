@@ -16,7 +16,7 @@
 //};
 
 template<unsigned int IS, unsigned int S, template<unsigned int, bool> class Wrapper>
-Wrapper<IS+1, false> shifter_sticky_stage(
+inline Wrapper<IS+1, false> shifter_sticky_stage(
         Wrapper<IS, false> input,
         Wrapper<S, false> count,
         Wrapper<1, false> sticky_in,
@@ -47,7 +47,7 @@ Wrapper<IS+1, false> shifter_sticky_stage(
 }
 
 template<unsigned int IS, template<unsigned int, bool> class Wrapper>
-Wrapper<IS+1, false> shifter_sticky_stage(
+inline Wrapper<IS+1, false> shifter_sticky_stage(
         Wrapper<IS, false> input,
         Wrapper<1, false> count,
         Wrapper<1, false> sticky_in,
@@ -57,7 +57,7 @@ Wrapper<IS+1, false> shifter_sticky_stage(
 
     auto high = input.template slice<IS-1, 1>();
     auto low = input.template get<0>();
-    auto& needs_shift = count;
+    auto needs_shift = count;
     auto final_sticky = Wrapper<1, false>::mux(
                 needs_shift,
                 sticky_in.bitwise_or(low),
@@ -73,7 +73,7 @@ Wrapper<IS+1, false> shifter_sticky_stage(
 }
 
 template<unsigned int IS, unsigned int S, template<unsigned int, bool> class Wrapper>
-Wrapper<IS+1, false> shifter_sticky_stage(
+inline Wrapper<IS+1, false> shifter_sticky_stage(
         Wrapper<IS, false> input,
         Wrapper<S, false> count,
         Wrapper<1, false> sticky_in,
@@ -97,7 +97,7 @@ Wrapper<IS+1, false> shifter_sticky_stage(
 }
 
 template<unsigned int IS, unsigned int S, bool is_signed, template<unsigned int , bool> class Wrapper>
-Wrapper<IS+1, false> shifter_sticky(
+inline Wrapper<IS+1, false> shifter_sticky(
                 Wrapper<IS, is_signed> input,
                 Wrapper<S, false> count,
                 Wrapper<1, false> fill_bit = Wrapper<1, false>{0}

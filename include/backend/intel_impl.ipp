@@ -49,23 +49,11 @@ public:
 
     template<unsigned int high, unsigned int low>
     inline IntelWrapper<high - low + 1, false> slice(
-		typename enable_if<(high > low) and (high < W)>::type* = 0
+		typename enable_if<(high >= low) and (high < W)>::type* = 0
     ) const
     {
-		constexpr unsigned int size = high - low + 1;
-		constexpr unsigned int half_size = size >> 1;
-		auto highbits = slice<high, high - half_size + 1>();
-		auto lowbits = slice<high - half_size, low>();
-		return highbits.concatenate(lowbits);
-	}
-
-	template<unsigned int high, unsigned int low>
-	inline IntelWrapper<high - low + 1, false> slice(
-		typename enable_if<(high == low) and (high < W)>::type* = 0
-	) const
-	{
-		return get<high>();
-	}
+        return this->template slc<high-low+1>(low);	
+    }
 
     template<unsigned int idx>
     inline IntelWrapper<1, false> get(
