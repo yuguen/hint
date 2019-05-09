@@ -48,17 +48,6 @@ public:
         }
         return ret;
     }
-
-//    void to_stream(ostream & out) const {
-//        for (unsigned int i = 1 ; i <= W ; ++i) {
-//            if (_storage[W-i]) {
-//                out << "1";
-//            } else {
-//                out << "0";
-//            }
-//        }
-//    }
-
 };
 
 #endif // BITSET_IMPL_IPP

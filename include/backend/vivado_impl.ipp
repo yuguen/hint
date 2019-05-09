@@ -1,6 +1,8 @@
 #ifndef VIVADO_IMPL_IPP
 #define VIVADO_IMPL_IPP
 
+#include <cstdint>
+#include <limits>
 #include <type_traits>
 
 #include "ap_int.h"
@@ -34,6 +36,16 @@ VivadoWrapper<Arithmetic_Prop<W, W>::_prodSize, is_signed> operator*(
 {
 	return	static_cast<typename VivadoWrapper<W, is_signed>::storage_type const &>(lhs) *
 			static_cast<typename VivadoWrapper<W, is_signed>::storage_type const &>(rhs);
+}
+
+template<unsigned int W, bool is_signed>
+VivadoWrapper<W+1, is_signed> operator+(
+		VivadoWrapper<W, is_signed> const & lhs,
+		VivadoWrapper<W, is_signed> const & rhs
+	)
+{
+	return	{static_cast<typename VivadoWrapper<W, is_signed>::storage_type const &>(lhs) +
+			static_cast<typename VivadoWrapper<W, is_signed>::storage_type const &>(rhs)};
 }
 
 template <unsigned int W, bool is_signed>
@@ -111,6 +123,10 @@ public:
 		return ret;
 	}
 
+	uint64_t to_uint(typename enable_if<(W <= numeric_limits<uint64_t>::digits)>::type * = 0 ) const
+	{
+		return static_cast<uint64_t>(static_cast<us_wrapper_helper<64> >(static_cast<us_wrapper_helper<W>>(*this)));
+	}
 
     template<unsigned int newSize>
     VivadoWrapper<newSize, false> leftpad(
@@ -168,6 +184,15 @@ public:
         auto res = (*this) + op2 + cin;
         return storage_helper<W+1>{res};
     }
+
+	VivadoWrapper<W+1, is_signed> addWithBorrow(
+			VivadoWrapper<W, is_signed> const op2,
+			VivadoWrapper<1, false> const bin
+		) const
+	{
+		auto res = (*this) + op2 - bin;
+		return storage_helper<W+1>{res};
+	}
 
     VivadoWrapper<W, false> modularAdd(VivadoWrapper<W, is_signed> const op2) const
     {
@@ -234,6 +259,11 @@ public:
 
 	friend
 	VivadoWrapper<Arithmetic_Prop<W, W>::_prodSize, is_signed> operator*<W, is_signed>(
+			type const & lhs,
+			type const & rhs
+		);
+	friend
+	VivadoWrapper<W+1, is_signed> operator+<W, is_signed>(
 			type const & lhs,
 			type const & rhs
 		);

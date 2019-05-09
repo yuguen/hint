@@ -69,7 +69,7 @@ constexpr unsigned int prod_contrib(unsigned int N)
 }
 
 template<unsigned int s1, unsigned int s2>
-struct Arithmetic_Prop
+class Arithmetic_Prop
 {
 	public:
 		static constexpr unsigned int _prodSize = (prod_contrib(s1) + prod_contrib(s2)) < 1 ? 1 : prod_contrib(s1) + prod_contrib(s2);
