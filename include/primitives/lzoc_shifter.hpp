@@ -110,11 +110,11 @@ inline Wrapper<Static_Val<S>::_storage + N, false> LZOC_shift_impl(
 
     auto lzoc_shifted_up = getOneBelow2PowLZOC_shift<N, S-1>(input, leading, fill_bit);
 
-	auto lzoc_up = lzoc_shifted_up.template slice<N+lzoc_up_size - 1, N>();
+    // auto lzoc_up = lzoc_shifted_up.template slice<N+lzoc_up_size - 1, N>();
 
-	//auto backwards_lzoc_shifted_up = backwards(lzoc_shifted_up);
-	//auto lzoc_up_backwards = backwards_lzoc_shifted_up.template slice<lzoc_up_size-1,0>();
-	//auto lzoc_up = backwards(lzoc_up_backwards);
+    auto backwards_lzoc_shifted_up = backwards(lzoc_shifted_up);
+    auto lzoc_up_backwards = backwards_lzoc_shifted_up.template slice<lzoc_up_size-1,0>();
+    auto lzoc_up = backwards(lzoc_up_backwards); 
 
 
 
