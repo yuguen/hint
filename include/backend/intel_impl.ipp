@@ -2,6 +2,7 @@
 #define INTEL_IMPL_IPP
 
 #include <type_traits>
+#include <cstdint>
 
 #ifdef __INTELFPGA_COMPILER__
 #include "HLS/ac_int.h"
@@ -22,6 +23,16 @@ IntelWrapper<Arithmetic_Prop<W, W>::_prodSize, is_signed> operator*(
 	)
 {
 	return	static_cast<typename IntelWrapper<W, is_signed>::storage_type const &>(lhs) *
+			static_cast<typename IntelWrapper<W, is_signed>::storage_type const &>(rhs);
+}
+
+template<unsigned int W, bool is_signed>
+IntelWrapper<W+1, is_signed> operator+(
+		IntelWrapper<W, is_signed> const & lhs,
+		IntelWrapper<W, is_signed> const & rhs
+	)
+{
+	return	static_cast<typename IntelWrapper<W, is_signed>::storage_type const &>(lhs) +
 			static_cast<typename IntelWrapper<W, is_signed>::storage_type const &>(rhs);
 }
 
@@ -49,10 +60,12 @@ public:
 
     template<unsigned int high, unsigned int low>
     inline IntelWrapper<high - low + 1, false> slice(
-		typename enable_if<(high >= low) and (high < W)>::type* = 0
+        typename enable_if<high >= low and high < W>::type* = 0
     ) const
     {
-        return this->template slc<high-low+1>(low);	
+        return us_storage_helper<high-low+1>{
+            storage_type::template slc<high - low + 1>(low)
+        };
     }
 
     template<unsigned int idx>
@@ -133,6 +146,11 @@ public:
         return res;
     }
 
+	uint64_t to_uint(typename enable_if<(W <= numeric_limits<uint64_t>::digits)>::type * = 0 ) const
+	{
+		return storage_type::to_uint64();
+	}
+
     inline IntelWrapper<1, false> operator==(IntelWrapper<W, is_signed> const rhs) const {
         return us_storage_helper<1>{(storage_type::operator==(rhs))};
     }
@@ -170,6 +188,15 @@ public:
         auto res = storage_type::operator+(op2) + cin;
         return storage_helper<W+1>{res};
     }
+
+	inline IntelWrapper<W+1, is_signed> addWithBorrow(
+			IntelWrapper<W, is_signed> const op2,
+			IntelWrapper<1, false> const bin
+		) const
+	{
+		auto res = storage_type::operator+(op2) - bin;
+		return storage_helper<W+1>{res};
+	}
 
 	inline IntelWrapper<W, false> modularAdd(IntelWrapper<W, is_signed> const op2) const
     {
@@ -238,6 +265,11 @@ public:
 
 	friend
 	IntelWrapper<Arithmetic_Prop<W, W>::_prodSize, is_signed> operator*<W, is_signed>(
+			type const & lhs,
+			type const & rhs
+		);
+	friend
+	IntelWrapper<W+1, is_signed> operator+<W, is_signed>(
 			type const & lhs,
 			type const & rhs
 		);
