@@ -49,7 +49,7 @@ inline Wrapper<IS+1, false> shifter_sticky_stage(
 
     auto high = input.template slice<IS-1, 1>();
     auto low = input.template get<0>();
-    auto needs_shift = count;
+	auto needs_shift = count;
     auto final_sticky = Wrapper<1, false>::mux(
                 needs_shift,
                 sticky_in.bitwise_or(low),
@@ -80,9 +80,9 @@ inline Wrapper<IS+1, false> shifter_sticky_stage(
 
     auto sticky = input.or_reduction();
 
-    auto ret = Wrapper<IS, false>::mux(
+	auto ret = Wrapper<IS+1, false>::mux(
                 stageNeedsShift,
-                sticky.concatenate(Wrapper<IS-1, false>::generateSequence(fill_bit)),
+				Wrapper<IS, false>::generateSequence(fill_bit).concatenate(sticky),
                 shifter_sticky_stage(input, next_count, sticky_in, fill_bit)
             );
     return ret;

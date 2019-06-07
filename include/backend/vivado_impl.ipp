@@ -119,7 +119,7 @@ public:
 
 	VivadoWrapper<1, false> operator>(type const & rhs) const
 	{
-		us_wrapper_helper<1> ret = storage_type::operator>(rhs);
+		us_wrapper_helper<1> ret{storage_type::operator>(rhs)};
 		return ret;
 	}
 
@@ -184,6 +184,18 @@ public:
         auto res = (*this) + op2 + cin;
         return storage_helper<W+1>{res};
     }
+
+	VivadoWrapper<W+1, is_signed> subWithCarry(
+			VivadoWrapper<W, is_signed> const op2,
+			VivadoWrapper<1, false> const cin
+		) const
+	{
+		// auto& op1_ap = static_cast<storage_type const>(*this);
+		// auto& op2_ap = static_cast<storage_type const>(op2);
+		// auto& cin_ap = static_cast<us_storage_helper<1> const>(cin);
+		auto res = (*this) - op2 + cin;
+		return storage_helper<W+1>{res};
+	}
 
 	VivadoWrapper<W+1, is_signed> addWithBorrow(
 			VivadoWrapper<W, is_signed> const op2,

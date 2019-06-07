@@ -171,7 +171,7 @@ template<unsigned int N, unsigned int S, bool is_signed, template<unsigned int ,
 inline Wrapper<Static_Val<S>::_storage + N, false> LZOC_shift(
         Wrapper<N, is_signed> const input,
         Wrapper<1, false> const leading,
-        Wrapper<1, false> const fill_bit = 0
+		Wrapper<1, false> const fill_bit = {0}
 )
 {
     return LZOC_shift_impl<N, S>(input.as_unsigned(), leading, fill_bit);

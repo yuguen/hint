@@ -80,7 +80,7 @@ public:
 
 	inline IntelWrapper<1, false> operator>(type const & rhs) const
 	{
-		us_wrapper_helper<1> ret = storage_type::operator>(rhs);
+		us_wrapper_helper<1> ret{storage_type::operator>(rhs)};
 		return ret;
 	}
 
@@ -134,14 +134,9 @@ public:
     inline IntelWrapper<W + Wrhs, false>
     concatenate(IntelWrapper<Wrhs, isSignedRhs> const val) const
     {
-        // auto& this_ac = static_cast<storage_type const &>(*this);
-        // auto & low_ac = static_cast<ac_int<Wrhs, isSignedRhs> const &>(val);
-        us_storage_helper<Wrhs> unsigned_low_ac = val;
-        us_storage_helper<W> unsigned_upper_ac = (*this);
-
         ac_int<W + Wrhs, false> res;
-        res.template set_slc(0, unsigned_low_ac);
-        res.template set_slc(Wrhs, unsigned_upper_ac);
+		res.set_slc(0, val);
+		res.set_slc(Wrhs, *this);
 
         return res;
     }
@@ -188,6 +183,18 @@ public:
         auto res = storage_type::operator+(op2) + cin;
         return storage_helper<W+1>{res};
     }
+
+	inline IntelWrapper<W+1, is_signed> subWithCarry(
+			IntelWrapper<W, is_signed> const op2,
+			IntelWrapper<1, false> const cin
+		) const
+	{
+		// auto& op1_ap = static_cast<storage_type const &>(*this);
+		// auto& op2_ap = static_cast<storage_type const &>(op2);
+		// auto& cin_ap = static_cast<us_storage_helper<1> const &>(cin);
+		auto res = storage_type::operator-(op2) + cin;
+		return storage_helper<W+1>{res};
+	}
 
 	inline IntelWrapper<W+1, is_signed> addWithBorrow(
 			IntelWrapper<W, is_signed> const op2,
