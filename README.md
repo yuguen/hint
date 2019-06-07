@@ -32,7 +32,7 @@ A libhint cmake package is also exported at [INSTALL_PATH]/include/hint/libhint.
 
 If you use cmake on your project, you can use the following line in your CMakeList.txt : 
 
-```
+```CMake
 find_package(libhint CONFIG REQUIRED)
 ```
 
@@ -52,7 +52,7 @@ As wrappers includes backend specific headers, it avoid the need to have all the
 Here is a (extremely simple) toy example of a component adding two 17-bits unsigned integer, in order to understand the general hint usage syntax.
 
 The portable architecture is written using the hint API in `file_comp.hpp`.
-```
+```C++
 template<template<unsigned int, bool> class Wrapper>
 Wrapper<18, false> add17(
 	Wrapper<17, false> in0,
@@ -70,12 +70,13 @@ So `in0` and `in1` are defined as two 17 bit unsigned integers of a certain Wrap
 To implement a Vivado HLS or Intel HLS version, only the top level component differs, to provide the interface that the tool is waiting for : 
 
 For vivado HLS :
-```
+```C++
 #include "ap_int.h" 
 
-#define VIVADO_BACKEND
+//enable the VivadoWrapper<> type
+#define VIVADO_BACKEND 
 #include "hint.hpp"
-#include "hint_comp.hpp" //Our component description
+#include "hint_comp.hpp" 
 
 ap_uint<18> comp(ap_uint<17> in0, ap_uint<17> in1)
 {
@@ -92,10 +93,12 @@ ap_uint<18> comp(ap_uint<17> in0, ap_uint<17> in1)
 
 for intel HLS :
 
-```
+```C++
+#include "ac_int.h"
+
+// enable the IntelWrapper<> type
 #define INTEL_BACKEND
 #include "hint.hpp"
-#include "ac_int.h"
 using namespace ihc;
 
 #include "hint_comp.hpp"
