@@ -11,7 +11,7 @@ one operator and synthetising using the main vendor tools.
 + Create a cmake build 
 + Install the headers
 
-```
+```Shell
 git clone https://github.com/yuguen/hint.git 
 cd hint
 mkdir build
@@ -130,12 +130,37 @@ component intel_comp(
 # Build Unit Tests
 To build the unit tests, go to your build folder and type;
 
-```
+```Shell
 cmake <path to CMake_Lists.txt> -DBUILD_UNIT_TEST=ON 
 	# for testing the Vivado backend
-	-DVIVADO_BACKEND=ON -DVIVADO_INCLUDES=<path to Vivado include dir>
+	-DVIVADO_INCLUDES=<path to Vivado include dir>
 	# for testing the Intel backend
-	-DINTEL_BACKEND=ON -DINTEL_INCLUDES=<path to IntelFPGA/hls/ include dir>
+	-DINTEL_INCLUDES=<path to IntelFPGA/hls/ include dir>
 	-B .
 make
+```
+
+# Reference 
+
+Hint was first presented at the HEART 2019 conference in Nagasaki.
+The original article can be found [here](https://hal.archives-ouvertes.fr/hal-02131798).
+
+If you use this library, please cite the following reference : 
+
+```Tex
+@inproceedings{forget:hal-02131798,
+  TITLE = {{A type-safe arbitrary precision arithmetic portability layer for HLS tools}},
+  AUTHOR = {Forget, Luc and Uguen, Yohann and de Dinechin, Florent and Thomas, David},
+  URL = {https://hal.inria.fr/hal-02131798},
+  BOOKTITLE = {{HEART 2019 - International Symposium on Highly Efficient Accelerators and Reconfigurable Technologies}},
+  ADDRESS = {Nagasaki, Japan},
+  PAGES = {1-6},
+  YEAR = {2019},
+  MONTH = Jun,
+  DOI = {10.1145/3337801.3337809},
+  KEYWORDS = {arithmetic ; arbitrary precision ; HLS ; floating-point},
+  PDF = {https://hal.inria.fr/hal-02131798/file/hal_hint.pdf},
+  HAL_ID = {hal-02131798},
+  HAL_VERSION = {v2},
+}
 ```
