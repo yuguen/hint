@@ -4,13 +4,55 @@ Hint is an header-only arbitrary size integer API with strong semantic for C++.
 Multiple backends are provided using various HLS library, allowing a user to write 
 one operator and synthetising using the main vendor tools.
 
-# Example
+# Installation 
+
++ Clone the current repository 
++ Create a build directory 
++ Create a cmake build 
++ Install the headers
+
+```
+git clone https://github.com/yuguen/hint.git 
+cd hint
+mkdir build
+cd build
+cmake -DCMAKE_INSTALL_PREFIX=[INSTALL_PATH] ..
+make install
+```
+
+The hint headers will be installed in [INSTALL_PATH]/include/hint. 
+
+A libhint cmake package is also exported at [INSTALL_PATH]/include/hint.
+
+# Using hint in your project
+
+## Inclusion
+
+### With cmake
+
+If you use cmake on your project, you can use the following line in your CMakeList.txt : 
+
+```
+find_package(libhint CONFIG REQUIRED)
+```
+
+it will enable a `hint` library target to which you can link your targets.
+
+### Without cmake
+
+add the `-I[INSTALL_PATH]/include/hint` flag to your compiler.
+
+## Activating a backend
+
+Before including the `hint.hpp` header you need to define `INTEL_BACKEND` or `VIVADO_BACKEND` to enable the corresponding wrapper.
+As wrappers includes backend specific headers, it avoid the need to have all the tools installed if you only target one of the backend.
+
+# API usage example
 
 Here is a (extremely simple) toy example of a component adding two 17-bits unsigned integer, in order to understand the general hint usage syntax.
 
+The portable architecture is written using the hint API in `file_comp.hpp`.
 ```
-// file hint_comp.hpp
-
 template<template<unsigned int, bool> class Wrapper>
 Wrapper<18, false> add17(
 	Wrapper<17, false> in0,
@@ -21,17 +63,19 @@ Wrapper<18, false> add17(
 }
 ```
 
-the idea is to parametrize your operator code with a template template parameter (called Wrapper in the toy exemple). 
-The two parameters of this template template type is the width of the represented integer and its signedness. 
-So `in0` and `in1` are defined as two 17 bit unsigned integers of a certain type.
+the idea is to parametrize your operator code with a template template type (called Wrapper in the toy exemple). 
+The two parameters of this template template type are the width of the represented integer and its signedness. 
+So `in0` and `in1` are defined as two 17 bit unsigned integers of a certain Wrapper type.
 
 To implement a Vivado HLS or Intel HLS version, only the top level component differs, to provide the interface that the tool is waiting for : 
 
 For vivado HLS :
 ```
 #include "ap_int.h" 
+
+#define VIVADO_BACKEND
 #include "hint.hpp"
-#include "hint_comp.hpp" //
+#include "hint_comp.hpp" //Our component description
 
 ap_uint<18> comp(ap_uint<17> in0, ap_uint<17> in1)
 {
@@ -49,6 +93,7 @@ ap_uint<18> comp(ap_uint<17> in0, ap_uint<17> in1)
 for intel HLS :
 
 ```
+#define INTEL_BACKEND
 #include "hint.hpp"
 #include "ac_int.h"
 using namespace ihc;
