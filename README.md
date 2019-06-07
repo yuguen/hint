@@ -51,7 +51,7 @@ As wrappers includes backend specific headers, it avoid the need to have all the
 
 Here is a (extremely simple) toy example of a component adding two 17-bits unsigned integer, in order to understand the general hint usage syntax.
 
-The portable architecture is written using the hint API in `file_comp.hpp`.
+The portable architecture is written using the hint API in `hint_comp.hpp`.
 ```C++
 template<template<unsigned int, bool> class Wrapper>
 Wrapper<18, false> add17(
