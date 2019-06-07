@@ -22,7 +22,7 @@ make install
 
 The hint headers will be installed in [INSTALL_PATH]/include/hint. 
 
-A libhint cmake package is also exported at [INSTALL_PATH]/include/hint.
+A libhint cmake package is also exported at [INSTALL_PATH]/include/hint/libhint.cmake.
 
 # Using hint in your project
 
