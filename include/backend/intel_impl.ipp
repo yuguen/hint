@@ -26,6 +26,15 @@ IntelWrapper<Arithmetic_Prop<W, W>::_prodSize, is_signed> operator*(
 			static_cast<typename IntelWrapper<W, is_signed>::storage_type const &>(rhs);
 }
 
+template<unsigned int shiftedSize, bool isShiftedSigned, unsigned int shifterSize>
+IntelWrapper<shiftedSize, isShiftedSigned> operator>>(
+		IntelWrapper<shiftedSize, isShiftedSigned> const & lhs,
+		IntelWrapper<shifterSize, false> const & rhs
+		) {
+	return static_cast<typename IntelWrapper<shiftedSize, isShiftedSigned>::storage_type const &>(lhs) >>
+			static_cast<typename IntelWrapper<shifterSize, false>::storage_type const &>(rhs);
+}
+
 template<unsigned int W, bool is_signed>
 IntelWrapper<W+1, is_signed> operator+(
 		IntelWrapper<W, is_signed> const & lhs,
@@ -281,7 +290,7 @@ public:
     {
         // auto& this_ac = static_cast<storage_type const &>(*this);
         us_storage_helper<W> out;
-	#pragma unroll W
+		#pragma unroll W
         for(unsigned int i = 0 ; i < W ; ++i) {
             out.template set_slc(i, (*this).template slc<1>(W - i - 1));
         }
@@ -297,6 +306,18 @@ public:
 	IntelWrapper<W+1, is_signed> operator+<W, is_signed>(
 			type const & lhs,
 			type const & rhs
+		);
+
+	template<unsigned int ShiftSize>
+	friend IntelWrapper<W, is_signed> operator>>(
+			type const & lhs,
+			us_wrapper_helper<ShiftSize> const & rhs
+			);
+
+	template<unsigned int ShiftedSize, bool isSignedShifted>
+	friend IntelWrapper<ShiftedSize, isSignedShifted> operator>>(
+			IntelWrapper<ShiftedSize, isSignedShifted> & lhs,
+			us_wrapper_helper<W> const & rhs
 		);
 
     template<unsigned int N, bool val>

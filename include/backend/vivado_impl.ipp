@@ -38,6 +38,15 @@ VivadoWrapper<Arithmetic_Prop<W, W>::_prodSize, is_signed> operator*(
 			static_cast<typename VivadoWrapper<W, is_signed>::storage_type const &>(rhs);
 }
 
+template<unsigned int shiftedSize, bool isShiftedSigned, unsigned int shifterSize>
+VivadoWrapper<shiftedSize, isShiftedSigned> operator>>(
+		VivadoWrapper<shiftedSize, isShiftedSigned> const & lhs,
+		VivadoWrapper<shifterSize, false> const & rhs
+		) {
+	return static_cast<typename VivadoWrapper<shiftedSize, isShiftedSigned>::storage_type const &>(lhs) >>
+			static_cast<typename VivadoWrapper<shifterSize, false>::storage_type const &>(rhs);
+}
+
 template<unsigned int W, bool is_signed>
 VivadoWrapper<W+1, is_signed> operator+(
 		VivadoWrapper<W, is_signed> const & lhs,
@@ -296,6 +305,18 @@ public:
 	VivadoWrapper<W+1, is_signed> operator+<W, is_signed>(
 			type const & lhs,
 			type const & rhs
+		);
+
+	template<unsigned int ShiftSize>
+	friend VivadoWrapper<W, is_signed> operator>>(
+			type const & lhs,
+			us_wrapper_helper<ShiftSize> const & rhs
+			);
+
+	template<unsigned int ShiftedSize, bool isSignedShifted>
+	friend VivadoWrapper<ShiftedSize, isSignedShifted> operator>>(
+			VivadoWrapper<ShiftedSize, isSignedShifted> & lhs,
+			us_wrapper_helper<W> const & rhs
 		);
 
     template<unsigned int N, bool val>

@@ -36,6 +36,15 @@ GMPWrapper<Arithmetic_Prop<W, W>::_prodSize, is_signed> operator*(
 	return {res};
 }
 
+template<unsigned int shiftedSize, bool isShiftedSigned, unsigned int shifterSize>
+GMPWrapper<shiftedSize, isShiftedSigned> operator>>(
+		GMPWrapper<shiftedSize, isShiftedSigned> const & lhs,
+		GMPWrapper<shifterSize, false> const & rhs
+		) {
+	mpz_class res = lhs.val >> rhs.val;
+	return {res};
+}
+
 template<unsigned int W, bool is_signed>
 GMPWrapper<W+1, is_signed> operator+(
 		GMPWrapper<W, is_signed> const & lhs,
@@ -344,6 +353,18 @@ class GMPWrapper
 		GMPWrapper<W+1, is_signed> operator+<W, is_signed>(
 				GMPWrapper<W, is_signed> const & lhs,
 				GMPWrapper<W, is_signed> const & rhs
+			);
+
+		template<unsigned int ShiftSize>
+		friend GMPWrapper<W, is_signed> operator>>(
+				GMPWrapper<W, is_signed> const & lhs,
+				GMPWrapper<ShiftSize, false> const & rhs
+				);
+
+		template<unsigned int ShiftedSize, bool isSignedShifted>
+		friend GMPWrapper<ShiftedSize, isSignedShifted> operator>>(
+				GMPWrapper<ShiftedSize, isSignedShifted> & lhs,
+				GMPWrapper<W, false> const & rhs
 			);
 
 		template<unsigned int N, bool val>
