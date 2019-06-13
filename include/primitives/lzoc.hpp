@@ -102,13 +102,16 @@ inline Wrapper<Static_Val<N+1>::_clog2, false> lzoc (
     constexpr int upper_size = (1 << Static_Val<N>::_flog2) - 1;
     auto upper = input.template slice<N-1, N-upper_size>();
     auto lzocup = getAlmost2PowLZOC(upper, leading);
+	//cerr << "lzocup : " << to_string(lzocup) << endl;
 
     auto is_full_one = lzocup.and_reduction();
+	//cerr << "IFO : " << to_string(is_full_one) << endl;
     auto last_bit_ok = input.template get<N-upper_size-1>() == leading;
 
     auto msb = is_full_one.bitwise_and(last_bit_ok);
 
     auto low = input.template slice<N-upper_size - 2, 0>();
+	//cerr << "low"<< to_string(low) << endl;
     auto lzoclow = lzoc(low, leading);
     auto ext_lowcount = lzoclow.template leftpad<Static_Val<N>::_flog2>();
 

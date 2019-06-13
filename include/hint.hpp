@@ -5,6 +5,18 @@
 
 using namespace std;
 
+#if defined(VIVADO_BACKEND)
+#include "backend/vivado_impl.ipp"
+#endif
+
+#if defined(INTEL_BACKEND)
+#include "backend/intel_impl.ipp"
+#endif
+
+#if defined(FASTSIM_BACKEND)
+#include "backend/gmp_impl.ipp"
+#endif
+
 
 /***
  * CRTP Base class
@@ -133,10 +145,3 @@ public:
 #include "backend/bitset_impl.ipp"
 #endif
 */
-#if defined(VIVADO_BACKEND)
-#include "backend/vivado_impl.ipp"
-#endif
-
-#if defined(INTEL_BACKEND)
-#include "backend/intel_impl.ipp"
-#endif

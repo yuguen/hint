@@ -21,15 +21,6 @@ target_include_directories(
     $<INSTALL_INTERFACE:include/hint>
 )
 
-
-
-
-
-if(BITSET_BACKEND)
-        target_compile_definitions(hint INTERFACE BITSET_BACKEND)
-endif()
-
-
 install(DIRECTORY ${INCLUDE_ROOT}/ DESTINATION include/hint FILES_MATCHING PATTERN "*.hpp" PATTERN "*.ipp")
 install(
     TARGETS hint
@@ -40,9 +31,22 @@ install(EXPORT libhint DESTINATION ${CMAKE_INSTALL_PREFIX}/include/hint/)
 export(EXPORT libhint FILE libhint-config.cmake)
 export(PACKAGE libhint)
 
+find_path(GMP_INCLUDE_DIR gmpxx.h)
+find_library(GMP gmp)
+find_library(GMPXX gmpxx)
+
+if (NOT (GMPXX-NOTFOUND OR GMP-NOTFOUND OR GMP_INCLUDE_DIR-NOTFOUND))
+	set(GMPTARGET-OK ON)
+	message(STATUS "GMP found")
+else()
+	set(GMPTARGET-NOTFOUND ON)
+	message(STATUS "GMP Not found")
+endif()
+
 OPTION(BUILD_UNIT_TEST "Build the operators unit tests") 
 if(BUILD_UNIT_TEST)
 	find_package(Boost 1.55 REQUIRED COMPONENTS unit_test_framework)
+
 	enable_testing()
 
 	set(VIVADO_INCLUDES ${VIVADO_INCLUDES} CACHE PATH "Path to vivado ap_int includes")
@@ -77,6 +81,13 @@ if(BUILD_UNIT_TEST)
 		target_include_directories(testIntelBackend_exe PRIVATE ${INTEL_INCLUDES})
 		target_compile_definitions(testIntelBackend_exe PRIVATE INTEL_BACKEND)
 		add_test(testIntelBackend testIntelBackend_exe)
+	endif()
+
+	if(GMPTARGET-OK)
+		add_executable(testGMPBackend_exe tests/backend/gmp_main.cpp)
+		target_link_libraries(testGMPBackend_exe hint ${Boost_LIBRARIES} ${GMP} ${GMPXX})
+		target_compile_definitions(testGMPBackend_exe PRIVATE FASTSIM_BACKEND)
+		add_test(testGMPBackend testGMPBackend_exe)
 	endif()
 
     if(VIVADO_BACKEND OR INTEL_BACKEND)

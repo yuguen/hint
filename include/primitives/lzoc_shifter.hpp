@@ -3,15 +3,12 @@
 #include <iostream>
 #include <type_traits>
 
-
-
 #include "hint.hpp"
 #include "tools/static_math.hpp"
-// #include "tools/printing.hpp"
+#include "tools/printing.hpp"
 #include "primitives/shifter.hpp"
 #include "primitives/backwards.hpp"
 #include "primitives/reductions.hpp"
-#include <iostream>
 
 using namespace std;
 
@@ -26,18 +23,28 @@ inline Wrapper<Static_Val<S>::_storage+N, false> getOneBelow2PowLZOC_shift(
     constexpr int upper_half = (1 <<Static_Val<S>::_flog2);
     // cerr << "upper_half: " << upper_half << endl;
 
-    auto backwards_input = backwards(input);
-    auto upper_backwards = backwards_input.template slice<upper_half-1,0>();
+	// -------- Backward stuff due to intel HLS that sometimes shifts slices that doesn't start at index 0 ---
+	auto backwards_input = backwards(input);
+	auto upper_backwards = backwards_input.template slice<upper_half-1,0>();
     auto upper = backwards(upper_backwards); 
     // auto upper = input.template slice<N-1, N-upper_half>();
+	// ---------------------------------------------------------------------------------------------------------
     auto lower = input.template slice<N-upper_half-1, 0>();
+
+	//cerr << "lower : " << to_string(lower) << endl;
 
 
     auto and_red = upper.and_reduction();
-    auto or_red = upper.or_reduction();
-    // or_reduction<128>(upper);
-    auto comp = Wrapper<1, false>::mux(leading, and_red, or_red.template get<0>().invert());
+	//cerr << "and_red : " << to_string(and_red) << endl;
 
+    auto or_red = upper.or_reduction();
+	//cerr << "or_red : " << to_string(or_red) << endl;
+    // or_reduction<128>(upper);
+	auto op1 = and_red;
+	auto op0inv = or_red.template get<0>();
+	auto op0 = op0inv.invert();
+	auto comp = Wrapper<1, false>::mux(leading, op1, op0);
+	auto test = 17;
     auto padding = Wrapper<upper_half, false>::generateSequence(fill_bit);
 
     auto next_stage_input = Wrapper<N, false>::mux(
@@ -45,8 +52,9 @@ inline Wrapper<Static_Val<S>::_storage+N, false> getOneBelow2PowLZOC_shift(
                 lower.concatenate(padding),
                 input
             );
-
-    auto ret = comp.concatenate(getOneBelow2PowLZOC_shift<N, upper_half-1>(next_stage_input, leading, fill_bit));
+	//cerr << "Next stage input : " << to_string(next_stage_input) << endl;
+	auto intermediate  = getOneBelow2PowLZOC_shift<N, upper_half-1>(next_stage_input, leading, fill_bit);
+	auto ret = comp.concatenate(intermediate);
     return ret;
 }
 
@@ -174,7 +182,8 @@ inline Wrapper<Static_Val<S>::_storage + N, false> LZOC_shift(
 		Wrapper<1, false> const fill_bit = {0}
 )
 {
-    return LZOC_shift_impl<N, S>(input.as_unsigned(), leading, fill_bit);
+	auto ret = LZOC_shift_impl<N, S>(input.as_unsigned(), leading, fill_bit);
+	return ret;
 }
 
 
