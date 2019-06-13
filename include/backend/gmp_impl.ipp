@@ -45,6 +45,19 @@ GMPWrapper<shiftedSize, isShiftedSigned> operator>>(
 	return {res};
 }
 
+template<unsigned int shiftedSize, bool isShiftedSigned, unsigned int shifterSize>
+GMPWrapper<shiftedSize, isShiftedSigned> operator<<(
+		GMPWrapper<shiftedSize, isShiftedSigned> const & lhs,
+		GMPWrapper<shifterSize, false> const & rhs
+		) {
+	mpz_class res = lhs.val << rhs.val;
+	mpz_class mask = 1;
+	mask << shiftedSize;
+	mask -= 1;
+	res &= mask;
+	return {res};
+}
+
 template<unsigned int W, bool is_signed>
 GMPWrapper<W+1, is_signed> operator+(
 		GMPWrapper<W, is_signed> const & lhs,
@@ -398,6 +411,18 @@ class GMPWrapper
 
 		template<unsigned int ShiftedSize, bool isSignedShifted>
 		friend GMPWrapper<ShiftedSize, isSignedShifted> operator>>(
+				GMPWrapper<ShiftedSize, isSignedShifted> & lhs,
+				GMPWrapper<W, false> const & rhs
+			);
+
+		template<unsigned int ShiftSize>
+		friend GMPWrapper<W, is_signed> operator<<(
+				GMPWrapper<W, is_signed> const & lhs,
+				GMPWrapper<ShiftSize, false> const & rhs
+				);
+
+		template<unsigned int ShiftedSize, bool isSignedShifted>
+		friend GMPWrapper<ShiftedSize, isSignedShifted> operator<<(
 				GMPWrapper<ShiftedSize, isSignedShifted> & lhs,
 				GMPWrapper<W, false> const & rhs
 			);

@@ -35,6 +35,15 @@ IntelWrapper<shiftedSize, isShiftedSigned> operator>>(
 			static_cast<typename IntelWrapper<shifterSize, false>::storage_type const &>(rhs);
 }
 
+template<unsigned int shiftedSize, bool isShiftedSigned, unsigned int shifterSize>
+IntelWrapper<shiftedSize, isShiftedSigned> operator<<(
+		IntelWrapper<shiftedSize, isShiftedSigned> const & lhs,
+		IntelWrapper<shifterSize, false> const & rhs
+		) {
+	return static_cast<typename IntelWrapper<shiftedSize, isShiftedSigned>::storage_type const &>(lhs) <<
+			static_cast<typename IntelWrapper<shifterSize, false>::storage_type const &>(rhs);
+}
+
 template<unsigned int W, bool is_signed>
 IntelWrapper<W+1, is_signed> operator+(
 		IntelWrapper<W, is_signed> const & lhs,
@@ -74,7 +83,6 @@ IntelWrapper<W, false> operator^(
 	return	static_cast<typename IntelWrapper<W, is_signed>::storage_type const &>(lhs) ^
 			static_cast<typename IntelWrapper<W, is_signed>::storage_type const &>(rhs);
 }
-
 
 template <unsigned int W, bool is_signed>
 class IntelWrapper : private ac_int<W, is_signed>
@@ -364,6 +372,18 @@ public:
 
 	template<unsigned int ShiftedSize, bool isSignedShifted>
 	friend IntelWrapper<ShiftedSize, isSignedShifted> operator>>(
+			IntelWrapper<ShiftedSize, isSignedShifted> & lhs,
+			us_wrapper_helper<W> const & rhs
+		);
+
+	template<unsigned int ShiftSize>
+	friend IntelWrapper<W, is_signed> operator<<(
+			type const & lhs,
+			us_wrapper_helper<ShiftSize> const & rhs
+			);
+
+	template<unsigned int ShiftedSize, bool isSignedShifted>
+	friend IntelWrapper<ShiftedSize, isSignedShifted> operator<<(
 			IntelWrapper<ShiftedSize, isSignedShifted> & lhs,
 			us_wrapper_helper<W> const & rhs
 		);
