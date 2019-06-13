@@ -27,7 +27,7 @@ inline Wrapper<IS+1, false> shifter_sticky_stage(
 
     auto next_sticky = Wrapper<1, false>::mux(
                 needs_shift,
-                sticky_in.bitwise_or(low.or_reduction()),
+				sticky_in | low.or_reduction(),
                 sticky_in
          );
     auto next_res = Wrapper<IS, false>::mux(
@@ -52,7 +52,7 @@ inline Wrapper<IS+1, false> shifter_sticky_stage(
 	auto needs_shift = count;
     auto final_sticky = Wrapper<1, false>::mux(
                 needs_shift,
-                sticky_in.bitwise_or(low),
+				sticky_in | low,
                 sticky_in
                 );
     auto res = Wrapper<IS, false>::mux(

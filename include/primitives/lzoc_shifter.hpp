@@ -131,7 +131,7 @@ inline Wrapper<Static_Val<S>::_storage + N, false> LZOC_shift_impl(
     auto finalIsLeading = (input.template get<0>() == leading);
     auto allTopIsLeading = lzoc_up.and_reduction();
 
-    auto msb = finalIsLeading.bitwise_and(allTopIsLeading);
+	auto msb = finalIsLeading & allTopIsLeading;
     auto lzoc_lsb = Wrapper<lzoc_up_size, false>::mux(
                     msb,
                     Wrapper<lzoc_up_size, false>{0},

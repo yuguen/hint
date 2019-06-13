@@ -80,7 +80,7 @@ inline Wrapper<Static_Val<N+1>::_clog2 , false> lzoc (
     auto uncomplete = Wrapper<1, false>{0}.concatenate(lzocup);
 
     auto result = Wrapper<Static_Val<N+1>::_clog2, false>::mux(
-                is_full_one.bitwise_and(last_bit_ok),
+				is_full_one & last_bit_ok,
                 onezeroseq,
                 uncomplete
         );

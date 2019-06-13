@@ -45,6 +45,36 @@ IntelWrapper<W+1, is_signed> operator+(
 			static_cast<typename IntelWrapper<W, is_signed>::storage_type const &>(rhs);
 }
 
+template<unsigned int W, bool is_signed>
+IntelWrapper<W, false> operator&(
+		IntelWrapper<W, is_signed> const & lhs,
+		IntelWrapper<W, is_signed> const & rhs
+	)
+{
+	return	static_cast<typename IntelWrapper<W, is_signed>::storage_type const &>(lhs) &
+			static_cast<typename IntelWrapper<W, is_signed>::storage_type const &>(rhs);
+}
+
+template<unsigned int W, bool is_signed>
+IntelWrapper<W, false> operator|(
+		IntelWrapper<W, is_signed> const & lhs,
+		IntelWrapper<W, is_signed> const & rhs
+	)
+{
+	return	static_cast<typename IntelWrapper<W, is_signed>::storage_type const &>(lhs) |
+			static_cast<typename IntelWrapper<W, is_signed>::storage_type const &>(rhs);
+}
+
+template<unsigned int W, bool is_signed>
+IntelWrapper<W, false> operator^(
+		IntelWrapper<W, is_signed> const & lhs,
+		IntelWrapper<W, is_signed> const & rhs
+	)
+{
+	return	static_cast<typename IntelWrapper<W, is_signed>::storage_type const &>(lhs) ^
+			static_cast<typename IntelWrapper<W, is_signed>::storage_type const &>(rhs);
+}
+
 
 template <unsigned int W, bool is_signed>
 class IntelWrapper : private ac_int<W, is_signed>
@@ -306,6 +336,24 @@ public:
 	IntelWrapper<W+1, is_signed> operator+<W, is_signed>(
 			type const & lhs,
 			type const & rhs
+		);
+
+	friend
+	IntelWrapper<W, false> operator|<W, is_signed>(
+			IntelWrapper<W, is_signed> const & lhs,
+			IntelWrapper<W, is_signed> const & rhs
+		);
+
+	friend
+	IntelWrapper<W, false> operator&<W, is_signed>(
+			IntelWrapper<W, is_signed> const & lhs,
+			IntelWrapper<W, is_signed> const & rhs
+		);
+
+	friend
+	IntelWrapper<W, false> operator^<W, is_signed>(
+			IntelWrapper<W, is_signed> const & lhs,
+			IntelWrapper<W, is_signed> const & rhs
 		);
 
 	template<unsigned int ShiftSize>

@@ -57,6 +57,37 @@ VivadoWrapper<W+1, is_signed> operator+(
 			static_cast<typename VivadoWrapper<W, is_signed>::storage_type const &>(rhs)};
 }
 
+template<unsigned int W, bool is_signed>
+VivadoWrapper<W, false> operator&(
+		VivadoWrapper<W, is_signed> const & lhs,
+		VivadoWrapper<W, is_signed> const & rhs
+	)
+{
+	return	{static_cast<typename VivadoWrapper<W, is_signed>::storage_type const &>(lhs) &
+			static_cast<typename VivadoWrapper<W, is_signed>::storage_type const &>(rhs)};
+}
+
+template<unsigned int W, bool is_signed>
+VivadoWrapper<W, false> operator|(
+		VivadoWrapper<W, is_signed> const & lhs,
+		VivadoWrapper<W, is_signed> const & rhs
+	)
+{
+	return	{static_cast<typename VivadoWrapper<W, is_signed>::storage_type const &>(lhs) |
+			static_cast<typename VivadoWrapper<W, is_signed>::storage_type const &>(rhs)};
+}
+
+template<unsigned int W, bool is_signed>
+VivadoWrapper<W, false> operator^(
+		VivadoWrapper<W, is_signed> const & lhs,
+		VivadoWrapper<W, is_signed> const & rhs
+	)
+{
+	return	{static_cast<typename VivadoWrapper<W, is_signed>::storage_type const &>(lhs) ^
+			static_cast<typename VivadoWrapper<W, is_signed>::storage_type const &>(rhs)};
+}
+
+
 template <unsigned int W, bool is_signed>
 class VivadoWrapper : private VivadoBaseType<W, is_signed>::type
 {
@@ -305,6 +336,24 @@ public:
 	VivadoWrapper<W+1, is_signed> operator+<W, is_signed>(
 			type const & lhs,
 			type const & rhs
+		);
+
+	friend
+	VivadoWrapper<W, false> operator|<W, is_signed>(
+			VivadoWrapper<W, is_signed> const & lhs,
+			VivadoWrapper<W, is_signed> const & rhs
+		);
+
+	friend
+	VivadoWrapper<W, false> operator&<W, is_signed>(
+			VivadoWrapper<W, is_signed> const & lhs,
+			VivadoWrapper<W, is_signed> const & rhs
+		);
+
+	friend
+	VivadoWrapper<W, false> operator^<W, is_signed>(
+			VivadoWrapper<W, is_signed> const & lhs,
+			VivadoWrapper<W, is_signed> const & rhs
 		);
 
 	template<unsigned int ShiftSize>

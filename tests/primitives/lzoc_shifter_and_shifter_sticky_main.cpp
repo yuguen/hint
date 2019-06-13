@@ -28,17 +28,17 @@ BOOST_AUTO_TEST_CASE(testLzocShifterAndShifterVivado)
 	VivadoWrapper<1, false> cmp;
     for(int i=0; i<SIZE; i++){
         shifted_with_sticky = shifter_sticky(backwards(currentValue), VivadoWrapper<1, false>{1}, VivadoWrapper<1, false>{1});
-		cerr << to_string(shifted_with_sticky) << endl;
+//		cerr << to_string(shifted_with_sticky) << endl;
         currentValue = backwards(shifted_with_sticky.slice<SIZE, 1>());
-		cerr << to_string(currentValue) << endl;
+//		cerr << to_string(currentValue) << endl;
 		computed_lzoc_shift = LZOC_shift<SIZE, SIZE>(currentValue, VivadoWrapper<1, false>{0}, VivadoWrapper<1, false>{0});
-		cerr << to_string(computed_lzoc_shift) << endl;
+//		cerr << to_string(computed_lzoc_shift) << endl;
         expected_lzoc = VivadoWrapper<Static_Val<SIZE+1>::_clog2, false>{SIZE-1-i};
-		cerr << to_string(expected_lzoc) << endl;
+//		cerr << to_string(expected_lzoc) << endl;
         expected_shift = backwards(currentValue);
-//        cerr << to_string(expected_shift) << endl;
+//      cerr << to_string(expected_shift) << endl;
         expected_lzoc_shift = expected_lzoc.concatenate(expected_shift);
-//        cerr << to_string(expected_lzoc_shift) << endl;
+//      cerr << to_string(expected_lzoc_shift) << endl;
 		cmp = VivadoWrapper<1, false>{expected_lzoc_shift == computed_lzoc_shift};
 		BOOST_REQUIRE_MESSAGE(cmp.isSet<0>(), "Vivado The combined test of the shifter_sticky and the lzoc_shifter failed !");
 	}

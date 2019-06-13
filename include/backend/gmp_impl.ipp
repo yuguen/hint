@@ -66,6 +66,23 @@ GMPWrapper<W+1, is_signed> operator+(
 	return {res};
 }
 
+template<unsigned int W, bool is_signed>
+GMPWrapper<W, false> operator|(GMPWrapper<W, is_signed> const & rhs, GMPWrapper<W, is_signed> const & lhs)
+{
+	return {lhs.val | rhs.val};
+}
+
+template<unsigned int W, bool is_signed>
+GMPWrapper<W, false> operator&(GMPWrapper<W, is_signed> const & rhs, GMPWrapper<W, is_signed> const & lhs)
+{
+	return {lhs.val & rhs.val};
+}
+
+template<unsigned int W, bool is_signed>
+GMPWrapper<W, false> operator^(GMPWrapper<W, is_signed> const & rhs, GMPWrapper<W, is_signed> const & lhs)
+{
+	return {lhs.val ^ rhs.val};
+}
 
 template <unsigned int W, bool is_signed>
 class GMPWrapper
@@ -351,6 +368,24 @@ class GMPWrapper
 			);
 		friend
 		GMPWrapper<W+1, is_signed> operator+<W, is_signed>(
+				GMPWrapper<W, is_signed> const & lhs,
+				GMPWrapper<W, is_signed> const & rhs
+			);
+
+		friend
+		GMPWrapper<W, false> operator|<W, is_signed>(
+				GMPWrapper<W, is_signed> const & lhs,
+				GMPWrapper<W, is_signed> const & rhs
+			);
+
+		friend
+		GMPWrapper<W, false> operator&<W, is_signed>(
+				GMPWrapper<W, is_signed> const & lhs,
+				GMPWrapper<W, is_signed> const & rhs
+			);
+
+		friend
+		GMPWrapper<W, false> operator^<W, is_signed>(
 				GMPWrapper<W, is_signed> const & lhs,
 				GMPWrapper<W, is_signed> const & rhs
 			);
