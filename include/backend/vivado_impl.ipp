@@ -123,6 +123,24 @@ public:
 		return ret;
 	}
 
+	VivadoWrapper<1, false> operator<(type const & rhs) const
+	{
+		us_wrapper_helper<1> ret{storage_type::operator<(rhs)};
+		return ret;
+	}
+
+	VivadoWrapper<1, false> operator>=(type const & rhs) const
+	{
+		us_wrapper_helper<1> ret{storage_type::operator>=(rhs)};
+		return ret;
+	}
+
+	VivadoWrapper<1, false> operator<=(type const & rhs) const
+	{
+		us_wrapper_helper<1> ret{storage_type::operator<=(rhs)};
+		return ret;
+	}
+
 	uint64_t to_uint(typename enable_if<(W <= numeric_limits<uint64_t>::digits)>::type * = 0 ) const
 	{
 		return static_cast<uint64_t>(static_cast<us_wrapper_helper<64> >(static_cast<us_wrapper_helper<W>>(*this)));

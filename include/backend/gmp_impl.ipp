@@ -157,8 +157,52 @@ class GMPWrapper
 
 		GMPWrapper<1, false> operator>(GMPWrapper<W, is_signed> const & rhs) const
 		{
-			return {val > rhs.val};
+			mpz_class sval = val;
+			if(negValue)
+				mpz_neg(sval.get_mpz_t(), sval.get_mpz_t());
+
+			mpz_class srhsval = rhs.val;
+			if(rhs.negValue)
+				mpz_neg(srhsval.get_mpz_t(), srhsval.get_mpz_t());
+			return {sval > srhsval};
 		}
+
+		GMPWrapper<1, false> operator<(GMPWrapper<W, is_signed> const & rhs) const
+		{
+			mpz_class sval = val;
+			if(negValue)
+				mpz_neg(sval.get_mpz_t(), sval.get_mpz_t());
+
+			mpz_class srhsval = rhs.val;
+			if(rhs.negValue)
+				mpz_neg(srhsval.get_mpz_t(), srhsval.get_mpz_t());
+			return {sval < srhsval};
+		}
+
+		GMPWrapper<1, false> operator>=(GMPWrapper<W, is_signed> const & rhs) const
+		{
+			mpz_class sval = val;
+			if(negValue)
+				mpz_neg(sval.get_mpz_t(), sval.get_mpz_t());
+
+			mpz_class srhsval = rhs.val;
+			if(rhs.negValue)
+				mpz_neg(srhsval.get_mpz_t(), srhsval.get_mpz_t());
+			return {sval >= srhsval};
+		}
+
+		GMPWrapper<1, false> operator<=(GMPWrapper<W, is_signed> const & rhs) const
+		{
+			mpz_class sval = val;
+			if(negValue)
+				mpz_neg(sval.get_mpz_t(), sval.get_mpz_t());
+
+			mpz_class srhsval = rhs.val;
+			if(rhs.negValue)
+				mpz_neg(srhsval.get_mpz_t(), srhsval.get_mpz_t());
+			return {sval <= srhsval};
+		}
+
 
 		uint64_t to_uint(typename enable_if<(W <= numeric_limits<uint64_t>::digits)>::type * = 0 ) const
 		{

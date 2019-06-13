@@ -84,6 +84,24 @@ public:
 		return ret;
 	}
 
+	inline IntelWrapper<1, false> operator>=(type const & rhs) const
+	{
+		us_wrapper_helper<1> ret{storage_type::operator>=(rhs)};
+		return ret;
+	}
+
+	inline IntelWrapper<1, false> operator<=(type const & rhs) const
+	{
+		us_wrapper_helper<1> ret{storage_type::operator<=(rhs)};
+		return ret;
+	}
+
+	inline IntelWrapper<1, false> operator<(type const & rhs) const
+	{
+		us_wrapper_helper<1> ret{storage_type::operator<(rhs)};
+		return ret;
+	}
+
     template<unsigned int idx>
     inline bool isSet(
        typename enable_if<idx < W>::type* = 0
