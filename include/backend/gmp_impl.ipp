@@ -1,7 +1,7 @@
 #ifndef GMP_IMPL_IPP
 #define GMP_IMPL_IPP
 
-#include <iostream>
+//#include <iostream>
 #include <type_traits>
 
 #include <gmp.h>
@@ -14,25 +14,45 @@ using namespace std;
 template <unsigned int W, bool is_signed>
 class GMPWrapper;
 
+template<unsigned int W>
+mpz_class gmp_two_comp(mpz_class const & val)
+{
+	mpz_class ret = val;
+	mpz_class mask = 1;
+	mask <<= W;
+	mask -= 1;
+	ret ^= mask;
+	ret += 1;
+	ret &= mask;
+	return ret;
+}
+
 template<unsigned int W, bool is_signed>
 GMPWrapper<Arithmetic_Prop<W, W>::_prodSize, is_signed> operator*(
 		GMPWrapper<W, is_signed> const & lhs,
 		GMPWrapper<W, is_signed> const & rhs
 	)
 {
-
 	mpz_class op1{lhs.val};
 	mpz_class op2{rhs.val};
+	bool negRes = false;
 	if(is_signed) {
 		if(lhs.negValue) {
+			op1 = gmp_two_comp<W>(op1);
 			mpz_neg(op1.get_mpz_t(), op1.get_mpz_t());
+			negRes = true;
 		}
 		if (rhs.negValue) {
+			op2 = gmp_two_comp<W>(op2);
 			mpz_neg(op2.get_mpz_t(), op2.get_mpz_t());
+			negRes ^= true;
 		}
 	}
 	mpz_class res;
 	mpz_mul(res.get_mpz_t(), op1.get_mpz_t(), op2.get_mpz_t());
+	if(negRes) {
+		res = gmp_two_comp<Arithmetic_Prop<W, W>::_prodSize>(res);
+	}
 	return {res};
 }
 
@@ -41,8 +61,10 @@ GMPWrapper<shiftedSize, isShiftedSigned> operator>>(
 		GMPWrapper<shiftedSize, isShiftedSigned> const & lhs,
 		GMPWrapper<shifterSize, false> const & rhs
 		) {
-	mpz_class res = lhs.val >> rhs.val;
-	return {res};
+	if (rhs.val >= shiftedSize)
+		return {0};
+	mpz_class final = lhs.val >> rhs.val.get_ui();
+	return {final};
 }
 
 template<unsigned int shiftedSize, bool isShiftedSigned, unsigned int shifterSize>
@@ -50,11 +72,20 @@ GMPWrapper<shiftedSize, isShiftedSigned> operator<<(
 		GMPWrapper<shiftedSize, isShiftedSigned> const & lhs,
 		GMPWrapper<shifterSize, false> const & rhs
 		) {
-	mpz_class res = lhs.val << rhs.val;
+	if (rhs.val >= shiftedSize)
+		return {0};
+	//cerr << lhs.val.get_str(2) << endl;
+	//cerr << shiftedSize << endl;
+	auto val = rhs.val.get_ui();
+	//cerr << val << endl;
+	mpz_class res = lhs.val;
+	mpz_mul_2exp(res.get_mpz_t(), res.get_mpz_t(), val);
 	mpz_class mask = 1;
-	mask << shiftedSize;
+	mask <<= shiftedSize;
+	//cerr << mask.get_str(2) << endl;
 	mask -= 1;
 	res &= mask;
+	//cerr << res.get_str(2) << endl;
 	return {res};
 }
 
@@ -66,16 +97,23 @@ GMPWrapper<W+1, is_signed> operator+(
 {
 	mpz_class op1{lhs.val};
 	mpz_class op2{rhs.val};
-	if(is_signed) {
-		if(lhs.negValue) {
-			mpz_neg(op1.get_mpz_t(), op1.get_mpz_t());
-		}
-		if (rhs.negValue) {
-			mpz_neg(op2.get_mpz_t(), op2.get_mpz_t());
-		}
-	}
-	mpz_class res;
-	mpz_add(res.get_mpz_t(), op1.get_mpz_t(), op2.get_mpz_t());
+	mpz_class res = op1 + op2;
+	return {res};
+}
+
+template<unsigned int W, bool is_signed>
+GMPWrapper<W+1, is_signed> operator-(
+		GMPWrapper<W, is_signed> const & lhs,
+		GMPWrapper<W, is_signed> const & rhs
+	)
+{
+	mpz_class op1 = lhs.val;
+	mpz_class op2 = gmp_two_comp<W+1>(rhs.val);
+	mpz_class res = op1 + op2;
+	mpz_class mask = 1;
+	mask <<= W+1;
+	mask -= 1;
+	res &= mask;
 	return {res};
 }
 
@@ -118,16 +156,11 @@ class GMPWrapper
 					throw "Trying to initialise a GMPWrapper with a negative value";
 				} else {
 					mpz_abs(val.get_mpz_t(), val.get_mpz_t());
-					if (size < W) {
-						// Perform sign extension
-						unsigned int diffval = W - size;
-						mpz_class signext = 1;
-						signext <<= diffval;
-						signext -= 1;
-						signext <<= size;
-						val = signext | val;
-					}
+					val = gmp_two_comp<W>(val);
 				}
+			}
+			if (is_signed) {
+				negValue = mpz_tstbit(val.get_mpz_t(), W-1);
 			}
 		}
 
@@ -379,8 +412,15 @@ class GMPWrapper
 				GMPWrapper<W, is_signed> const & lhs,
 				GMPWrapper<W, is_signed> const & rhs
 			);
+
 		friend
 		GMPWrapper<W+1, is_signed> operator+<W, is_signed>(
+				GMPWrapper<W, is_signed> const & lhs,
+				GMPWrapper<W, is_signed> const & rhs
+			);
+
+		friend
+		GMPWrapper<W+1, is_signed> operator-<W, is_signed>(
 				GMPWrapper<W, is_signed> const & lhs,
 				GMPWrapper<W, is_signed> const & rhs
 			);
@@ -403,29 +443,18 @@ class GMPWrapper
 				GMPWrapper<W, is_signed> const & rhs
 			);
 
-		template<unsigned int ShiftSize>
-		friend GMPWrapper<W, is_signed> operator>>(
-				GMPWrapper<W, is_signed> const & lhs,
-				GMPWrapper<ShiftSize, false> const & rhs
+		template<unsigned int ShiftedSize, bool shiftedSigned, unsigned int shifterSize>
+		friend GMPWrapper<ShiftedSize, shiftedSigned> operator>>(
+				GMPWrapper<ShiftedSize, shiftedSigned> const & lhs,
+				GMPWrapper<shifterSize, false> const & rhs
 				);
 
-		template<unsigned int ShiftedSize, bool isSignedShifted>
-		friend GMPWrapper<ShiftedSize, isSignedShifted> operator>>(
-				GMPWrapper<ShiftedSize, isSignedShifted> & lhs,
-				GMPWrapper<W, false> const & rhs
-			);
-
-		template<unsigned int ShiftSize>
-		friend GMPWrapper<W, is_signed> operator<<(
-				GMPWrapper<W, is_signed> const & lhs,
-				GMPWrapper<ShiftSize, false> const & rhs
+		template<unsigned int ShiftedSize, bool shiftedSigned, unsigned int shifterSize>
+		friend GMPWrapper<ShiftedSize, shiftedSigned> operator<<(
+				GMPWrapper<ShiftedSize, shiftedSigned> const & lhs,
+				GMPWrapper<shifterSize, false> const & rhs
 				);
 
-		template<unsigned int ShiftedSize, bool isSignedShifted>
-		friend GMPWrapper<ShiftedSize, isSignedShifted> operator<<(
-				GMPWrapper<ShiftedSize, isSignedShifted> & lhs,
-				GMPWrapper<W, false> const & rhs
-			);
 
 		template<unsigned int N, bool val>
 		friend class GMPWrapper;

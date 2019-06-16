@@ -67,6 +67,16 @@ VivadoWrapper<W+1, is_signed> operator+(
 }
 
 template<unsigned int W, bool is_signed>
+VivadoWrapper<W+1, is_signed> operator-(
+		VivadoWrapper<W, is_signed> const & lhs,
+		VivadoWrapper<W, is_signed> const & rhs
+	)
+{
+	return	{static_cast<typename VivadoWrapper<W, is_signed>::storage_type const &>(lhs) -
+			static_cast<typename VivadoWrapper<W, is_signed>::storage_type const &>(rhs)};
+}
+
+template<unsigned int W, bool is_signed>
 VivadoWrapper<W, false> operator&(
 		VivadoWrapper<W, is_signed> const & lhs,
 		VivadoWrapper<W, is_signed> const & rhs
@@ -341,8 +351,15 @@ public:
 			type const & lhs,
 			type const & rhs
 		);
+
 	friend
 	VivadoWrapper<W+1, is_signed> operator+<W, is_signed>(
+			type const & lhs,
+			type const & rhs
+		);
+
+	friend
+	VivadoWrapper<W+1, is_signed> operator-<W, is_signed>(
 			type const & lhs,
 			type const & rhs
 		);

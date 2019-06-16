@@ -55,6 +55,16 @@ IntelWrapper<W+1, is_signed> operator+(
 }
 
 template<unsigned int W, bool is_signed>
+IntelWrapper<W+1, is_signed> operator-(
+		IntelWrapper<W, is_signed> const & lhs,
+		IntelWrapper<W, is_signed> const & rhs
+	)
+{
+	return	static_cast<typename IntelWrapper<W, is_signed>::storage_type const &>(lhs) -
+			static_cast<typename IntelWrapper<W, is_signed>::storage_type const &>(rhs);
+}
+
+template<unsigned int W, bool is_signed>
 IntelWrapper<W, false> operator&(
 		IntelWrapper<W, is_signed> const & lhs,
 		IntelWrapper<W, is_signed> const & rhs
@@ -340,8 +350,15 @@ public:
 			type const & lhs,
 			type const & rhs
 		);
+
 	friend
 	IntelWrapper<W+1, is_signed> operator+<W, is_signed>(
+			type const & lhs,
+			type const & rhs
+		);
+
+	friend
+	IntelWrapper<W+1, is_signed> operator-<W, is_signed>(
 			type const & lhs,
 			type const & rhs
 		);
