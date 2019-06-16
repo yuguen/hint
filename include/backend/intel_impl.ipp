@@ -381,29 +381,17 @@ public:
 			IntelWrapper<W, is_signed> const & rhs
 		);
 
-	template<unsigned int ShiftSize>
-	friend IntelWrapper<W, is_signed> operator>>(
-			type const & lhs,
-			us_wrapper_helper<ShiftSize> const & rhs
+	template<unsigned int ShiftedSize, bool shiftedSigned, unsigned int shifterSize>
+	friend IntelWrapper<ShiftedSize, shiftedSigned> operator>>(
+			IntelWrapper<ShiftedSize, shiftedSigned> const & lhs,
+			IntelWrapper<shifterSize, false> const & rhs
 			);
 
-	template<unsigned int ShiftedSize, bool isSignedShifted>
-	friend IntelWrapper<ShiftedSize, isSignedShifted> operator>>(
-			IntelWrapper<ShiftedSize, isSignedShifted> & lhs,
-			us_wrapper_helper<W> const & rhs
-		);
-
-	template<unsigned int ShiftSize>
-	friend IntelWrapper<W, is_signed> operator<<(
-			type const & lhs,
-			us_wrapper_helper<ShiftSize> const & rhs
+	template<unsigned int ShiftedSize, bool shiftedSigned, unsigned int shifterSize>
+	friend IntelWrapper<ShiftedSize, shiftedSigned> operator<<(
+			IntelWrapper<ShiftedSize, shiftedSigned> const & lhs,
+			IntelWrapper<shifterSize, false> const & rhs
 			);
-
-	template<unsigned int ShiftedSize, bool isSignedShifted>
-	friend IntelWrapper<ShiftedSize, isSignedShifted> operator<<(
-			IntelWrapper<ShiftedSize, isSignedShifted> & lhs,
-			us_wrapper_helper<W> const & rhs
-		);
 
     template<unsigned int N, bool val>
     friend class IntelWrapper;

@@ -382,29 +382,18 @@ public:
 			VivadoWrapper<W, is_signed> const & rhs
 		);
 
-	template<unsigned int ShiftSize>
-	friend VivadoWrapper<W, is_signed> operator>>(
-			type const & lhs,
-			us_wrapper_helper<ShiftSize> const & rhs
+	template<unsigned int ShiftedSize, bool shiftedSigned, unsigned int shifterSize>
+	friend VivadoWrapper<ShiftedSize, shiftedSigned> operator>>(
+			VivadoWrapper<ShiftedSize, shiftedSigned> const & lhs,
+			VivadoWrapper<shifterSize, false> const & rhs
 			);
 
-	template<unsigned int ShiftedSize, bool isSignedShifted>
-	friend VivadoWrapper<ShiftedSize, isSignedShifted> operator>>(
-			VivadoWrapper<ShiftedSize, isSignedShifted> & lhs,
-			us_wrapper_helper<W> const & rhs
-		);
-
-	template<unsigned int ShiftSize>
-	friend VivadoWrapper<W, is_signed> operator<<(
-			type const & lhs,
-			us_wrapper_helper<ShiftSize> const & rhs
+	template<unsigned int ShiftedSize, bool shiftedSigned, unsigned int shifterSize>
+	friend VivadoWrapper<ShiftedSize, shiftedSigned> operator<<(
+			VivadoWrapper<ShiftedSize, shiftedSigned> const & lhs,
+			VivadoWrapper<shifterSize, false> const & rhs
 			);
 
-	template<unsigned int ShiftedSize, bool isSignedShifted>
-	friend VivadoWrapper<ShiftedSize, isSignedShifted> operator<<(
-			VivadoWrapper<ShiftedSize, isSignedShifted> & lhs,
-			us_wrapper_helper<W> const & rhs
-		);
 
     template<unsigned int N, bool val>
     friend class VivadoWrapper;
