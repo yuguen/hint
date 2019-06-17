@@ -13,6 +13,7 @@
 #include "primitives/shifter_sticky.hpp"
 
 using namespace  std;
+using namespace hint;
 
 #define SIZE 28
 

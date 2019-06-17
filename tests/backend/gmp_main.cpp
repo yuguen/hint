@@ -15,6 +15,7 @@
 #include "primitives/shifter_sticky.hpp"
 
 using namespace  std;
+using namespace  hint;
 
 BOOST_AUTO_TEST_CASE(testBackend)
 {

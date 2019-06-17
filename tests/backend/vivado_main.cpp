@@ -10,7 +10,8 @@
 #include "tools/printing.hpp"
 // #include "primitives/lzoc_shifter.hpp"
 
-using namespace  std;
+using namespace std;
+using namespace hint;
 
 BOOST_AUTO_TEST_CASE(testBackend)
 {
