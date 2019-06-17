@@ -36,10 +36,10 @@ namespace hint {
 					fill_seq.concatenate(high),
 					input);
 
-		return shifter_sticky_stage(next_res, next_count, next_sticky, fill_bit);
+		return shifter_sticky_stage<IS, S-1>(next_res, next_count, next_sticky, fill_bit);
 	}
 
-	template<unsigned int IS, template<unsigned int, bool> class Wrapper>
+	template<unsigned int IS, unsigned int S, template<unsigned int, bool> class Wrapper>
 	inline Wrapper<IS+1, false> shifter_sticky_stage(
 			Wrapper<IS, false> input,
 			Wrapper<1, false> count,
@@ -84,7 +84,7 @@ namespace hint {
 		auto ret = Wrapper<IS+1, false>::mux(
 					stageNeedsShift,
 					Wrapper<IS, false>::generateSequence(fill_bit).concatenate(sticky),
-					shifter_sticky_stage(input, next_count, sticky_in, fill_bit)
+					shifter_sticky_stage<IS, S-nb_null_shift, Wrapper>(input, next_count, sticky_in, fill_bit)
 				);
 		return ret;
 	}
@@ -97,7 +97,7 @@ namespace hint {
 		)
 	{
 		auto t = input.as_unsigned();
-		return shifter_sticky_stage(input, count, Wrapper<1, false>{0}, fill_bit);
+		return shifter_sticky_stage<IS, S>(input, count, Wrapper<1, false>{0}, fill_bit);
 	}
 }
 
