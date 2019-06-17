@@ -45,8 +45,10 @@ namespace hint
 			VivadoWrapper<shiftedSize, isShiftedSigned> const & lhs,
 			VivadoWrapper<shifterSize, false> const & rhs
 			) {
-		return static_cast<typename VivadoWrapper<shiftedSize, isShiftedSigned>::storage_type const &>(lhs) >>
-				static_cast<typename VivadoWrapper<shifterSize, false>::storage_type const &>(rhs);
+		return VivadoWrapper<shiftedSize, isShiftedSigned>{
+					static_cast<typename VivadoWrapper<shiftedSize, isShiftedSigned>::storage_type const &>(lhs) >>
+					static_cast<typename VivadoWrapper<shifterSize, false>::storage_type const &>(rhs)
+				};
 	}
 
 	template<unsigned int shiftedSize, bool isShiftedSigned, unsigned int shifterSize>
@@ -54,8 +56,9 @@ namespace hint
 			VivadoWrapper<shiftedSize, isShiftedSigned> const & lhs,
 			VivadoWrapper<shifterSize, false> const & rhs
 			) {
-		return static_cast<typename VivadoWrapper<shiftedSize, isShiftedSigned>::storage_type const &>(lhs) <<
-				static_cast<typename VivadoWrapper<shifterSize, false>::storage_type const &>(rhs);
+		return VivadoWrapper<shiftedSize, isShiftedSigned>{
+				static_cast<typename VivadoWrapper<shiftedSize, isShiftedSigned>::storage_type const &>(lhs) <<
+				static_cast<typename VivadoWrapper<shifterSize, false>::storage_type const &>(rhs)};
 	}
 
 	template<unsigned int W, bool is_signed>
