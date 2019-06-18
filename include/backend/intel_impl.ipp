@@ -61,8 +61,10 @@ namespace hint {
 			IntelWrapper<W, is_signed> const & rhs
 		)
 	{
-		return	static_cast<typename IntelWrapper<W, is_signed>::storage_type const &>(lhs) -
-				static_cast<typename IntelWrapper<W, is_signed>::storage_type const &>(rhs);
+		return typename IntelWrapper<W+1, is_signed>::storage_type{
+			static_cast<typename IntelWrapper<W, is_signed>::storage_type const &>(lhs) -
+			static_cast<typename IntelWrapper<W, is_signed>::storage_type const &>(rhs)
+		};
 	}
 
 	template<unsigned int W, bool is_signed>
