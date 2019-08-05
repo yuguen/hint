@@ -15,46 +15,13 @@ namespace hint {
 	template <unsigned int W, bool is_signed>
 	class GMPWrapper;
 
-	template<unsigned int W>
-	mpz_class gmp_two_comp(mpz_class const & val)
-	{
-		mpz_class ret = val;
-		mpz_class mask = 1;
-		mask <<= W;
-		mask -= 1;
-		ret ^= mask;
-		ret += 1;
-		ret &= mask;
-		return ret;
-	}
-
 	template<unsigned int W, bool is_signed>
 	GMPWrapper<Arithmetic_Prop<W, W>::_prodSize, is_signed> operator*(
 			GMPWrapper<W, is_signed> const & lhs,
 			GMPWrapper<W, is_signed> const & rhs
 		)
 	{
-		mpz_class op1{lhs.val};
-		mpz_class op2{rhs.val};
-		bool negRes = false;
-		if(is_signed) {
-			if(lhs.negValue) {
-				op1 = gmp_two_comp<W>(op1);
-				mpz_neg(op1.get_mpz_t(), op1.get_mpz_t());
-				negRes = true;
-			}
-			if (rhs.negValue) {
-				op2 = gmp_two_comp<W>(op2);
-				mpz_neg(op2.get_mpz_t(), op2.get_mpz_t());
-				negRes ^= true;
-			}
-		}
-		mpz_class res;
-		mpz_mul(res.get_mpz_t(), op1.get_mpz_t(), op2.get_mpz_t());
-		if(negRes) {
-			res = gmp_two_comp<Arithmetic_Prop<W, W>::_prodSize>(res);
-		}
-		return {res};
+		return {lhs.val * rhs.val};
 	}
 
 	template<unsigned int shiftedSize, bool isShiftedSigned, unsigned int shifterSize>
@@ -75,18 +42,14 @@ namespace hint {
 			) {
 		if (rhs.val >= shiftedSize)
 			return {0};
-		//cerr << lhs.val.get_str(2) << endl;
-		//cerr << shiftedSize << endl;
 		auto val = rhs.val.get_ui();
-		//cerr << val << endl;
 		mpz_class res = lhs.val;
 		mpz_mul_2exp(res.get_mpz_t(), res.get_mpz_t(), val);
-		mpz_class mask = 1;
-		mask <<= shiftedSize;
-		//cerr << mask.get_str(2) << endl;
-		mask -= 1;
-		res &= mask;
-		//cerr << res.get_str(2) << endl;
+		mpz_t mask;
+		mpz_init2(mask, shiftedSize + 1);
+		mpz_setbit(mask, shiftedSize);
+		mpz_mod(res.get_mpz_t(), res.get_mpz_t(), mask);
+		mpz_clear(mask);
 		return {res};
 	}
 
@@ -96,10 +59,7 @@ namespace hint {
 			GMPWrapper<W, is_signed> const & rhs
 		)
 	{
-		mpz_class op1{lhs.val};
-		mpz_class op2{rhs.val};
-		mpz_class res = op1 + op2;
-		return {res};
+		return {lhs.val + rhs.val};
 	}
 
 	template<unsigned int W, bool is_signed>
@@ -108,32 +68,33 @@ namespace hint {
 			GMPWrapper<W, is_signed> const & rhs
 		)
 	{
-		mpz_class op1 = lhs.val;
-		mpz_class op2 = gmp_two_comp<W+1>(rhs.val);
-		mpz_class res = op1 + op2;
-		mpz_class mask = 1;
-		mask <<= W+1;
-		mask -= 1;
-		res &= mask;
+		mpz_class res = lhs.val - rhs.val;
+		if (res < 0) {
+			mpz_t mask;
+			mpz_init2(mask, W+2);
+			mpz_setbit(mask, W+1);
+			mpz_add(res.get_mpz_t(), res.get_mpz_t(), mask);
+			mpz_clear(mask);
+		}
 		return {res};
 	}
 
 	template<unsigned int W, bool is_signed>
 	GMPWrapper<W, false> operator|(GMPWrapper<W, is_signed> const & rhs, GMPWrapper<W, is_signed> const & lhs)
 	{
-		return {lhs.val | rhs.val};
+		return {lhs.get_repr() | rhs.get_repr()};
 	}
 
 	template<unsigned int W, bool is_signed>
 	GMPWrapper<W, false> operator&(GMPWrapper<W, is_signed> const & rhs, GMPWrapper<W, is_signed> const & lhs)
 	{
-		return {lhs.val & rhs.val};
+		return {lhs.get_repr() & rhs.get_repr()};
 	}
 
 	template<unsigned int W, bool is_signed>
 	GMPWrapper<W, false> operator^(GMPWrapper<W, is_signed> const & rhs, GMPWrapper<W, is_signed> const & lhs)
 	{
-		return {lhs.val ^ rhs.val};
+		return {lhs.get_repr() ^ rhs.get_repr()};
 	}
 
 	template <unsigned int W, bool is_signed>
@@ -141,45 +102,54 @@ namespace hint {
 	{
 		private:
 			mpz_class val;
-			bool negValue;
+
+			inline mpz_class get_repr() const
+			{
+				mpz_class repr = val;
+				if (val < 0) {
+					mpz_class offset;
+					mpz_setbit(offset.get_mpz_t(), W);
+					repr += offset;
+				}
+				return repr;
+			}
 
 		public:
-			GMPWrapper(mpz_class init_val):val{init_val},negValue{true}
+			GMPWrapper(mpz_class init_val):val{init_val}
 			{
 				auto size = mpz_sizeinbase(init_val.get_mpz_t(), 2);
 				if(size > W) {
-
 					throw "Trying to initialise a GMPWrapper with too many bits";
 				}
-				negValue = init_val < 0;
-				if(negValue) {
+				if(init_val < 0) {
 					if (not is_signed) {
 						throw "Trying to initialise a GMPWrapper with a negative value";
-					} else {
-						mpz_abs(val.get_mpz_t(), val.get_mpz_t());
-						val = gmp_two_comp<W>(val);
 					}
 				}
-				if (is_signed) {
-					negValue = mpz_tstbit(val.get_mpz_t(), W-1);
+				if (is_signed and init_val > 0) {
+					bool negvalue = mpz_tstbit(val.get_mpz_t(), W-1);
+					if (negvalue) {
+						mpz_class offset{1};
+						offset <<= W;
+						val -= offset;
+					}
 				}
 			}
 
-			GMPWrapper():val{},negValue{false}{}
+			GMPWrapper():val{}{}
 
 			template<unsigned int high, unsigned int low>
 			inline GMPWrapper<high - low + 1, false> slice(
 					typename enable_if<high >= low and high < W>::type* = 0
 			) const
 			{
-				mpz_class res{val >> low};
+				mpz_class res{get_repr() >> low};
 				if(high < W-1) { //clear extra bits
 					constexpr unsigned int size = high - low + 1;
 					mpz_t mask;
 					mpz_init2(mask, size + 1);
 					mpz_setbit(mask, size);
-					mpz_sub_ui(mask, mask, 1);
-					mpz_and(res.get_mpz_t(), res.get_mpz_t(), mask);
+					mpz_mod(res.get_mpz_t(), res.get_mpz_t(), mask);
 					mpz_clear(mask);
 				}
 				return {res};
@@ -191,7 +161,7 @@ namespace hint {
 			) const
 			{
 				return {mpz_class{
-						mpz_tstbit(val.get_mpz_t(), idx)
+						mpz_tstbit(get_repr().get_mpz_t(), idx)
 					}};
 			}
 
@@ -200,86 +170,58 @@ namespace hint {
 			   typename enable_if<idx < W>::type* = 0
 			) const
 			{
-				return mpz_tstbit(val.get_mpz_t(), idx);
+				return mpz_tstbit(get_repr().get_mpz_t(), idx);
 			}
 
 			GMPWrapper<W, false> bitwise_and(GMPWrapper<W, is_signed> rhs) const
 			{
-				return {rhs.val & val};
+				return {rhs.get_repr() & get_repr()};
 			}
 
 			GMPWrapper<W, false> bitwise_or(GMPWrapper<W, is_signed> rhs) const
 			{
-				return {rhs.val | val};
+				return {rhs.get_repr() | get_repr()};
 			}
 
 			GMPWrapper<W, false> bitwise_xor(GMPWrapper<W, is_signed> rhs) const
 			{
-				return {rhs.val ^ val};
+				return {rhs.get_repr() ^ get_repr()};
 			}
 
 			GMPWrapper<W, false> invert() const
 			{
-				mpz_class mask = 1;
-				mpz_mul_2exp(mask.get_mpz_t(), mask.get_mpz_t(), W);
-				mask -= 1;
-				mpz_class res = mask ^ val;
-				auto testbis = mpz_sizeinbase(res.get_mpz_t(), 2);
-				return {res};
+				mpz_class ret = get_repr();
+				mpz_com(ret.get_mpz_t(), ret.get_mpz_t());
+				mpz_class offset;
+				mpz_setbit(offset.get_mpz_t(), W);
+				ret += offset;
+				return {ret};
 			}
 
 			GMPWrapper<1, false> operator>(GMPWrapper<W, is_signed> const & rhs) const
 			{
-				mpz_class sval = val;
-				if(negValue)
-					mpz_neg(sval.get_mpz_t(), sval.get_mpz_t());
-
-				mpz_class srhsval = rhs.val;
-				if(rhs.negValue)
-					mpz_neg(srhsval.get_mpz_t(), srhsval.get_mpz_t());
-				return {sval > srhsval};
+				return {val > rhs.val};
 			}
 
 			GMPWrapper<1, false> operator<(GMPWrapper<W, is_signed> const & rhs) const
 			{
-				mpz_class sval = val;
-				if(negValue)
-					mpz_neg(sval.get_mpz_t(), sval.get_mpz_t());
-
-				mpz_class srhsval = rhs.val;
-				if(rhs.negValue)
-					mpz_neg(srhsval.get_mpz_t(), srhsval.get_mpz_t());
-				return {sval < srhsval};
+				return {val < rhs.val};
 			}
 
 			GMPWrapper<1, false> operator>=(GMPWrapper<W, is_signed> const & rhs) const
 			{
-				mpz_class sval = val;
-				if(negValue)
-					mpz_neg(sval.get_mpz_t(), sval.get_mpz_t());
-
-				mpz_class srhsval = rhs.val;
-				if(rhs.negValue)
-					mpz_neg(srhsval.get_mpz_t(), srhsval.get_mpz_t());
-				return {sval >= srhsval};
+				return {val >= rhs.val};
 			}
 
 			GMPWrapper<1, false> operator<=(GMPWrapper<W, is_signed> const & rhs) const
 			{
-				mpz_class sval = val;
-				if(negValue)
-					mpz_neg(sval.get_mpz_t(), sval.get_mpz_t());
-
-				mpz_class srhsval = rhs.val;
-				if(rhs.negValue)
-					mpz_neg(srhsval.get_mpz_t(), srhsval.get_mpz_t());
-				return {sval <= srhsval};
+				return {val <= rhs.val};
 			}
 
 
 			uint64_t to_uint(typename enable_if<(W <= numeric_limits<uint64_t>::digits)>::type * = 0 ) const
 			{
-				return mpz_get_ui(val.get_mpz_t());
+				return mpz_get_ui(get_repr().get_mpz_t());
 			}
 
 			template<unsigned int newSize>
@@ -287,14 +229,14 @@ namespace hint {
 					typename enable_if<(newSize >= W)>::type* = 0
 					) const
 			{
-				return {val};
+				return {get_repr()};
 			}
 
 			template<unsigned int Wrhs, bool isSignedRhs>
 			GMPWrapper<W + Wrhs, false>
 			concatenate(GMPWrapper<Wrhs, isSignedRhs> const next) const
 			{
-				return {(val << Wrhs) | next.val};
+				return {(get_repr() << Wrhs) | next.val};
 			}
 
 			GMPWrapper<1, false> operator==(GMPWrapper<W, is_signed> const rhs) const {
@@ -333,28 +275,38 @@ namespace hint {
 
 			GMPWrapper<W, false> modularAdd(GMPWrapper<W, is_signed> const op2) const
 			{
-				// auto& this_ap = static_cast<storage_type const>(*this);
-				// auto& op_2 = static_cast<storage_type const>(op2);
-				mpz_class mask = 1;
-				mask = (mask << W) - 1;
-				return {(val + op2.val) & mask};
+				mpz_class res = val + op2.val;
+				mpz_t mask;
+				mpz_init2(mask, W + 1);
+				mpz_setbit(mask, W);
+				if (res < 0) {
+					mpz_add(res.get_mpz_t(), res.get_mpz_t(), mask);
+				}
+				mpz_mod(res.get_mpz_t(), res.get_mpz_t(), mask);
+				mpz_clear(mask);
+				return {res};
 			}
 
 			GMPWrapper<W, false> modularSub(GMPWrapper<W, is_signed> const op2) const
 			{
-				// auto& this_ap = static_cast<storage_type const>(*this);
-				// auto& op_2 = static_cast<storage_type const>(op2);
-				mpz_class mask = 1;
-				mask = (mask << W) - 1;
-				return {(val - op2.val) & mask};
+				mpz_class res = val - op2.val;
+				mpz_t mask;
+				mpz_init2(mask, W + 1);
+				mpz_setbit(mask, W);
+				if (res < 0) {
+					mpz_add(res.get_mpz_t(), res.get_mpz_t(), mask);
+				}
+				mpz_mod(res.get_mpz_t(), res.get_mpz_t(), mask);
+				mpz_clear(mask);
+				return {res};
 			}
 
 			static GMPWrapper<W, false> generateSequence(GMPWrapper<1, false> const fillbit)
 			{
 				if (mpz_tstbit(fillbit.val.get_mpz_t(), 0))
 				{
-					mpz_class res = 1;
-					res <<= W;
+					mpz_class res;
+					mpz_setbit(res.get_mpz_t(), W);
 					res -= 1;
 					return {res};
 				} else {
@@ -377,8 +329,8 @@ namespace hint {
 
 			GMPWrapper<1, false> and_reduction() const
 			{
-				mpz_class cmp = 1;
-				cmp <<= W;
+				mpz_class cmp;
+				mpz_setbit(cmp.get_mpz_t(), W);
 				cmp -= 1;
 				return {static_cast<unsigned int>(cmp == val)};
 			}
@@ -395,7 +347,7 @@ namespace hint {
 
 			mpz_class const unravel() const
 			{
-				return val;
+				return get_repr();
 			}
 
 			static GMPWrapper<W, is_signed> mux(

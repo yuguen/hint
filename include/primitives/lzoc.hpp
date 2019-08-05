@@ -20,21 +20,21 @@ namespace hint {
 	{
 		constexpr int upper_half = (1 <<Static_Val<N>::_flog2);
 		auto upper = input.template slice<N-1, N-upper_half>();
-		// auto comp_seq = Wrapper<upper_half, false>::generateSequence(leading);
-		// auto comp_eq = (upper.bitwise_xor(comp_seq));
-
-		// auto comp = comp_eq.or_reduction().invert();
-
 		auto and_red = upper.and_reduction();
 		auto or_red = upper.or_reduction();
+
 		auto comp = Wrapper<1, false>::mux(leading, and_red, Wrapper<1, false>{not(or_red).template isSet<0>()});
-
-
 
 		auto upper_input = upper.template slice <upper_half - 1, 1>();
 		auto low = input.template slice<upper_half-2, 0>();
+
 		auto next_stage_input = Wrapper<upper_half-1, false>::mux(comp, low, upper_input);
+
+		//cerr << to_string(next_stage_input) << endl;
+
 		auto ret = comp.concatenate(getAlmost2PowLZOC(next_stage_input, leading));
+
+		//cerr << to_string(ret) << endl;
 		return ret;
 	}
 
@@ -69,7 +69,7 @@ namespace hint {
 	)
 	{
 
-	//    cerr << "Call lzoc on 2pow " << endl;
+		//cerr << "Call lzoc on 2pow " << endl;
 		auto upper = input.template slice<N-1, 1>();
 		auto lzocup = getAlmost2PowLZOC(upper, leading);
 		auto is_full_one = lzocup.and_reduction();
@@ -85,7 +85,7 @@ namespace hint {
 					onezeroseq,
 					uncomplete
 			);
-	//    cerr << "Value 2pow lzoc : " << to_string(result) << endl;
+		//cerr << "Value 2pow lzoc : " << to_string(result) << endl;
 		return result;
 	}
 
@@ -99,7 +99,7 @@ namespace hint {
 	)
 	{
 
-	//    cerr << "Call Compound lzoc " << N << endl;
+		//cerr << "Call Compound lzoc " << N << endl;
 		constexpr int upper_size = (1 << Static_Val<N>::_flog2) - 1;
 		auto upper = input.template slice<N-1, N-upper_size>();
 		auto lzocup = getAlmost2PowLZOC(upper, leading);
@@ -136,9 +136,9 @@ namespace hint {
 		typename enable_if<(N == 1)>::type* = 0
 		)
 	{
-		// cerr << "Call lzoc on size one" << endl;
+		//cerr << "Call lzoc on size one" << endl;
 		auto res =  getAlmost2PowLZOC(input, leading);
-		// cerr << "Res : " << res << endl;
+		//cerr << "Res : " << res << endl;
 		return res;
 	}
 

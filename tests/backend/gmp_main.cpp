@@ -1,5 +1,5 @@
 #define BOOST_TEST_DYN_LINK   
-#define BOOST_TEST_MODULE IntelBackendTestModule
+#define BOOST_TEST_MODULE GMPBackendTestModule
 
 #define WRAPPER GMPWrapper
 
