@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.10)
 project(Hint
         VERSION 0.4.0
 	DESCRIPTION "A type safe compatibility layer between major HLS tools"
-	HOMEPAGE_URL https://github.com/yuguen/hint
 	LANGUAGES CXX
     )
 
