@@ -26,7 +26,6 @@ struct printer<integral_constant<unsigned int, 0>, W, is_signed, wrapper>
     }
 };
 
-
 template <unsigned int W, bool is_signed, template<unsigned int, bool> class wrapper>
 string to_string(wrapper<W, is_signed> const & signal)
 {
