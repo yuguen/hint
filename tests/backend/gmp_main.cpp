@@ -19,7 +19,6 @@ using namespace  hint;
 
 BOOST_AUTO_TEST_CASE(testBackend)
 {
-
     // Simple slice that gets a subset of the input 
     // Verification using isSet() 
     WRAPPER<5, false> a{0b01110};

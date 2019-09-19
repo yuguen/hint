@@ -103,6 +103,10 @@ if(BUILD_UNIT_TEST)
 	endif()
         add_test(testPrimitives testPrimitives_exe)
 	endif()
+
+	add_executable(testArithmetic_exe tests/arithmetic/arithmetic_main.cpp tests/arithmetic/tiling.cpp)
+	target_link_libraries(testArithmetic_exe hint ${Boost_LIBRARIES})
+	add_test(testArithmetic testArithmetic_exe)
 endif()
 
 #include(CPack)

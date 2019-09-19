@@ -130,7 +130,4 @@ BOOST_AUTO_TEST_CASE(testBackend)
     WRAPPER<14, false> expected_h2{0b0};
     WRAPPER<1, false> cmp_h2{expected_h2 == h2};
     BOOST_REQUIRE_MESSAGE(cmp_h2.isSet<0>(), "The generateSequence method failed! (h)");
-
-
-
 }
