@@ -219,10 +219,6 @@ namespace hint {
 			return res;
 		}
 
-		uint64_t to_uint(typename enable_if<(W <= numeric_limits<uint64_t>::digits)>::type * = 0 ) const
-		{
-			return storage_type::to_uint64();
-		}
 
 		inline IntelWrapper<1, false> operator==(IntelWrapper<W, is_signed> const rhs) const {
 			return us_storage_helper<1>{(storage_type::operator==(rhs))};
