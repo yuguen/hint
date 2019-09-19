@@ -205,11 +205,6 @@ namespace hint
 			return ret;
 		}
 
-		uint64_t to_uint(typename enable_if<(W <= numeric_limits<uint64_t>::digits)>::type * = 0 ) const
-		{
-			return static_cast<uint64_t>(static_cast<us_wrapper_helper<64> >(static_cast<us_wrapper_helper<W>>(*this)));
-		}
-
 		template<unsigned int newSize>
 		VivadoWrapper<newSize, false> leftpad(
 				typename enable_if<(newSize >= W)>::type* = 0

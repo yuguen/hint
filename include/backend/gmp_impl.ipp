@@ -218,12 +218,6 @@ namespace hint {
 				return {val <= rhs.val};
 			}
 
-
-			uint64_t to_uint(typename enable_if<(W <= numeric_limits<uint64_t>::digits)>::type * = 0 ) const
-			{
-				return mpz_get_ui(get_repr().get_mpz_t());
-			}
-
 			template<unsigned int newSize>
 			GMPWrapper<newSize, false> leftpad(
 					typename enable_if<(newSize >= W)>::type* = 0
