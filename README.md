@@ -131,12 +131,12 @@ component intel_comp(
 To build the unit tests, go to your build folder and type;
 
 ```Shell
-cmake <path to CMake_Lists.txt> -DBUILD_UNIT_TEST=ON 
-	# for testing the Vivado backend
-	-DVIVADO_INCLUDES=<path to Vivado include dir>
-	# for testing the Intel backend
-	-DINTEL_INCLUDES=<path to IntelFPGA/hls/ include dir>
-	-B .
+cmake <path to CMake_Lists.txt> -DBUILD_UNIT_TEST=ON \
+	# for testing the Vivado backend \
+	-DVIVADO_INCLUDES=<path to Vivado include dir> \
+	# for testing the Intel backend \
+	-DINTEL_INCLUDES=<path to IntelFPGA/hls/ include dir> \
+	-B . 
 make
 ```
 
