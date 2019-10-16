@@ -4,8 +4,8 @@
 
 struct Squarer {
 	template<unsigned int val>
-	static unsigned int map() {
-		return val * val;
+	static hint::VivadoWrapper<8, false> map() {
+		return {val * val};
 	}
 
 	static unsigned int runtime_map(unsigned int val) {

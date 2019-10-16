@@ -16,12 +16,11 @@ namespace hint {
 	{
 		#pragma HLS INLINE
 		constexpr unsigned int one_val = (1 << level) | lowerBitsVal;
-		switch (key.template isSet<level>()) {
-			case true:
-				return _vivado_table_func_impl<mapping, KeySize, ValueSize, level + 1, one_val>(key);
-			case false:
-				return _vivado_table_func_impl<mapping, KeySize, ValueSize, level + 1, lowerBitsVal>(key);
-		}
+		return VivadoWrapper<ValueSize, false>::mux(
+					key.template get<level>(),
+					_vivado_table_func_impl<mapping, KeySize, ValueSize, level + 1, one_val>(key),
+					_vivado_table_func_impl<mapping, KeySize, ValueSize, level + 1, lowerBitsVal>(key)
+			);
 	}
 
 	template<class mapping, unsigned int KeySize, unsigned int ValueSize, unsigned int level, unsigned int lowerBitsVal>
@@ -31,15 +30,11 @@ namespace hint {
 	{
 		#pragma HLS INLINE
 		constexpr unsigned int one_val = (1 << level) | lowerBitsVal;
-		auto one_ret = mapping::template map<one_val>();
-		auto zero_ret = mapping::template map<lowerBitsVal>();
-		switch (key.template isSet<level>()) {
-			case true:
-				return {one_ret};
-			case false:
-				return {zero_ret};
-		}
-
+		return VivadoWrapper<ValueSize, false>::mux(
+					key.template get<level>(),
+					mapping::template map<one_val>(),
+					mapping::template map<lowerBitsVal>()
+			);
 	}
 
 	template<class mapping, unsigned int KeySize, unsigned int ValueSize>
