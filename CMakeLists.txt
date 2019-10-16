@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
 project(Hint
-        VERSION 0.4.0
+		VERSION 0.4.0
 	DESCRIPTION "A type safe compatibility layer between major HLS tools"
 	LANGUAGES CXX
-    )
+	)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -15,17 +15,17 @@ set(INCLUDE_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 add_library(hint INTERFACE)
 target_include_directories(
-    hint INTERFACE
-    $<BUILD_INTERFACE:${INCLUDE_ROOT}>
-    $<INSTALL_INTERFACE:include/hint>
+	hint INTERFACE
+	$<BUILD_INTERFACE:${INCLUDE_ROOT}>
+	$<INSTALL_INTERFACE:include/hint>
 )
 
 install(DIRECTORY ${INCLUDE_ROOT}/ DESTINATION include/hint FILES_MATCHING PATTERN "*.hpp" PATTERN "*.ipp")
 install(
-    TARGETS hint
-    EXPORT libhint
-    PUBLIC_HEADER DESTINATION "include/hint"
-    )
+	TARGETS hint
+	EXPORT libhint
+	PUBLIC_HEADER DESTINATION "include/hint"
+	)
 install(EXPORT libhint DESTINATION ${CMAKE_INSTALL_PREFIX}/include/hint/)
 export(EXPORT libhint FILE libhint-config.cmake)
 export(PACKAGE libhint)
@@ -42,7 +42,7 @@ else()
 	message(STATUS "GMP Not found")
 endif()
 
-OPTION(BUILD_UNIT_TEST "Build the operators unit tests") 
+OPTION(BUILD_UNIT_TEST "Build the operators unit tests")
 if(BUILD_UNIT_TEST)
 	find_package(Boost 1.55 REQUIRED COMPONENTS unit_test_framework)
 
@@ -51,22 +51,22 @@ if(BUILD_UNIT_TEST)
 	set(VIVADO_INCLUDES ${VIVADO_INCLUDES} CACHE PATH "Path to vivado ap_int includes")
 
 	if(EXISTS ${VIVADO_INCLUDES}/ap_int.h)
-	    set(VIVADO_BACKEND ON)
-	    message(STATUS "Using ${VIVADO_INCLUDES} as vivado include directory")
+		set(VIVADO_BACKEND ON)
+		message(STATUS "Using ${VIVADO_INCLUDES} as vivado include directory")
 	else()
-	        message(STATUS "Vivado include path unset please set VIVADO_INCLUDES if you intend to use Vivado HLS backend" )
+			message(STATUS "Vivado include path unset please set VIVADO_INCLUDES if you intend to use Vivado HLS backend" )
 	endif()
 
 	set(INTEL_INCLUDES ${INTEL_INCLUDES} CACHE PATH "Path to INTEL ac_int includes")
 	if(EXISTS ${INTEL_INCLUDES}/ref/ac_int.h)
-	    set(INTEL_BACKEND ON)
-	    message(STATUS "Using ${INTEL_INCLUDES} as intelHLS include directory")
+		set(INTEL_BACKEND ON)
+		message(STATUS "Using ${INTEL_INCLUDES} as intelHLS include directory")
 	else()
-	        message(STATUS "IntelHLS include path unset please set INTEL_INCLUDES if you intend to use Intel HLS backend" )
+			message(STATUS "IntelHLS include path unset please set INTEL_INCLUDES if you intend to use Intel HLS backend" )
 	endif()
 
 	if(VIVADO_BACKEND)
-		add_executable(testVivadoBackend_exe tests/backend/vivado_main.cpp)
+		add_executable(testVivadoBackend_exe tests/backend/vivado_main.cpp tests/backend/vivado_table.cpp)
 		target_link_libraries(testVivadoBackend_exe hint ${Boost_LIBRARIES})
 		target_include_directories(testVivadoBackend_exe PRIVATE ${Boost_INCLUDE_DIR})
 		target_include_directories(testVivadoBackend_exe PRIVATE ${VIVADO_INCLUDES})
@@ -89,19 +89,19 @@ if(BUILD_UNIT_TEST)
 		add_test(testGMPBackend testGMPBackend_exe)
 	endif()
 
-    if(VIVADO_BACKEND OR INTEL_BACKEND)
-        add_executable(testPrimitives_exe tests/primitives/lzoc_shifter_and_shifter_sticky_main.cpp)
+	if(VIVADO_BACKEND OR INTEL_BACKEND)
+		add_executable(testPrimitives_exe tests/primitives/lzoc_shifter_and_shifter_sticky_main.cpp)
 	target_link_libraries(testPrimitives_exe hint ${Boost_LIBRARIES})
 	target_include_directories(testPrimitives_exe PRIVATE ${Boost_INCLUDE_DIR})
 	if(VIVADO_BACKEND)
-	    target_include_directories(testPrimitives_exe PRIVATE ${VIVADO_INCLUDES})
-	    target_compile_definitions(testPrimitives_exe PRIVATE VIVADO_BACKEND)
+		target_include_directories(testPrimitives_exe PRIVATE ${VIVADO_INCLUDES})
+		target_compile_definitions(testPrimitives_exe PRIVATE VIVADO_BACKEND)
 	endif()
 	if(INTEL_BACKEND)
-	    target_include_directories(testPrimitives_exe PRIVATE ${INTEL_INCLUDES})
-	    target_compile_definitions(testPrimitives_exe PRIVATE INTEL_BACKEND)
+		target_include_directories(testPrimitives_exe PRIVATE ${INTEL_INCLUDES})
+		target_compile_definitions(testPrimitives_exe PRIVATE INTEL_BACKEND)
 	endif()
-        add_test(testPrimitives testPrimitives_exe)
+		add_test(testPrimitives testPrimitives_exe)
 	endif()
 
 	add_executable(testArithmetic_exe tests/arithmetic/arithmetic_main.cpp tests/arithmetic/tiling.cpp)
