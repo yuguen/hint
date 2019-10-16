@@ -31,8 +31,8 @@ namespace hint {
 	{
 		#pragma HLS INLINE
 		constexpr unsigned int one_val = (1 << level) | lowerBitsVal;
-		auto one_ret = mapping::map(one_val);
-		auto zero_ret = mapping::map(lowerBitsVal);
+		auto one_ret = mapping::template map<one_val>();
+		auto zero_ret = mapping::template map<lowerBitsVal>();
 		switch (key.template isSet<level>()) {
 			case 1:
 				return {one_ret};
