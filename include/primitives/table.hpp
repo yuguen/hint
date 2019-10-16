@@ -17,9 +17,9 @@ namespace hint {
 		#pragma HLS INLINE
 		constexpr unsigned int one_val = (1 << level) | lowerBitsVal;
 		switch (key.template isSet<level>()) {
-			case 1:
+			case true:
 				return _vivado_table_func_impl<mapping, KeySize, ValueSize, level + 1, one_val>(key);
-			case 0:
+			case false:
 				return _vivado_table_func_impl<mapping, KeySize, ValueSize, level + 1, lowerBitsVal>(key);
 		}
 	}
@@ -34,9 +34,9 @@ namespace hint {
 		auto one_ret = mapping::template map<one_val>();
 		auto zero_ret = mapping::template map<lowerBitsVal>();
 		switch (key.template isSet<level>()) {
-			case 1:
+			case true:
 				return {one_ret};
-			case 0:
+			case false:
 				return {zero_ret};
 		}
 
