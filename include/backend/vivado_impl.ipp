@@ -36,8 +36,8 @@ namespace hint
 			VivadoWrapper<W, is_signed> const & rhs
 		)
 	{
-		return	static_cast<typename VivadoWrapper<W, is_signed>::storage_type const &>(lhs) *
-				static_cast<typename VivadoWrapper<W, is_signed>::storage_type const &>(rhs);
+		return	{static_cast<typename VivadoWrapper<W, is_signed>::storage_type const &>(lhs) *
+				static_cast<typename VivadoWrapper<W, is_signed>::storage_type const &>(rhs)};
 	}
 
 	template<unsigned int shiftedSize, bool isShiftedSigned, unsigned int shifterSize>

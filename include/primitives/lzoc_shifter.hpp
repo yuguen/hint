@@ -45,7 +45,6 @@ namespace hint {
 		auto op0inv = or_red.template get<0>();
 		auto op0 = op0inv.invert();
 		auto comp = Wrapper<1, false>::mux(leading, op1, op0);
-		auto test = 17;
 		auto padding = Wrapper<upper_half, false>::generateSequence(fill_bit);
 
 		auto next_stage_input = Wrapper<N, false>::mux(
@@ -176,6 +175,11 @@ namespace hint {
 		return lzoc_final.concatenate(shifted);
 	}
 
+	/**
+	 * N : size of the input
+	 * S : how many bit to count and shift
+	 * is_siggned : don't care
+	 */
 	template<unsigned int N, unsigned int S, bool is_signed, template<unsigned int , bool> class Wrapper>
 	inline Wrapper<Static_Val<S>::_storage + N, false> LZOC_shift(
 			Wrapper<N, is_signed> const input,
