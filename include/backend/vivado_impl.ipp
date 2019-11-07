@@ -123,9 +123,13 @@ namespace hint
 		template<unsigned int N>
 		using us_storage_helper = typename VivadoBaseType<N, false>::type;
 		template<unsigned int N>
+		using signed_storage_helper = typename VivadoBaseType<N, true>::type;
+		template<unsigned int N>
 		using wrapper_helper = VivadoWrapper<N, is_signed>;
 		template<unsigned int N>
 		using us_wrapper_helper = VivadoWrapper<N, false>;
+		template<unsigned int N>
+		using signed_wrapper_helper = VivadoWrapper<N, true>;
 
 		VivadoWrapper():storage_type{0}{}
 
@@ -316,6 +320,11 @@ namespace hint
 		{
 			// auto& this_ap = static_cast<storage_type const>(*this);
 			return us_storage_helper<W>{(*this)};
+		}
+
+		signed_wrapper_helper<W> as_signed() const
+		{
+			return signed_storage_helper<W>{(*this)};
 		}
 
 		us_wrapper_helper<1> or_reduction() const
