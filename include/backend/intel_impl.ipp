@@ -202,13 +202,13 @@ namespace hint {
 		}
 
 		template<unsigned int newSize>
-		inline IntelWrapper<newSize, false> leftpad(
-				typename enable_if<(newSize >= W)>::type* = 0
+		inline IntelWrapper<newSize, is_signed> leftpad(
 				) const
 		{
 			// auto& this_ap = static_cast<storage_type const &>(*this);
-			us_storage_helper<W> unsigned_this = (*this);
-			us_storage_helper<newSize> ret = unsigned_this;
+			static_assert ((newSize >= W), "Trying to leftpad to a width smaller than current width. See slice instead.");
+			storage_helper<W> unsigned_this = (*this);
+			storage_helper<newSize> ret = unsigned_this;
 			return ret;
 		}
 
