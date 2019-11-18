@@ -36,8 +36,8 @@ namespace hint
 			VivadoWrapper<W, is_signed> const & rhs
 		)
 	{
-		return	static_cast<typename VivadoWrapper<W, is_signed>::storage_type const &>(lhs) *
-				static_cast<typename VivadoWrapper<W, is_signed>::storage_type const &>(rhs);
+		return	{static_cast<typename VivadoWrapper<W, is_signed>::storage_type const &>(lhs) *
+				static_cast<typename VivadoWrapper<W, is_signed>::storage_type const &>(rhs)};
 	}
 
 	template<unsigned int shiftedSize, bool isShiftedSigned, unsigned int shifterSize>
@@ -123,9 +123,13 @@ namespace hint
 		template<unsigned int N>
 		using us_storage_helper = typename VivadoBaseType<N, false>::type;
 		template<unsigned int N>
+		using signed_storage_helper = typename VivadoBaseType<N, true>::type;
+		template<unsigned int N>
 		using wrapper_helper = VivadoWrapper<N, is_signed>;
 		template<unsigned int N>
 		using us_wrapper_helper = VivadoWrapper<N, false>;
+		template<unsigned int N>
+		using signed_wrapper_helper = VivadoWrapper<N, true>;
 
 		VivadoWrapper():storage_type{0}{}
 
@@ -206,12 +210,12 @@ namespace hint
 		}
 
 		template<unsigned int newSize>
-		VivadoWrapper<newSize, false> leftpad(
-				typename enable_if<(newSize >= W)>::type* = 0
+		VivadoWrapper<newSize, is_signed> leftpad(
 				) const
 		{
-			us_storage_helper<W> unsigned_this = (*this);
-			us_storage_helper<newSize> ret = unsigned_this;
+			static_assert((newSize >= W), "Trying to left pad a value to a size which is smaller than actual size. See slice instead.");
+			storage_helper<W> unsigned_this = (*this);
+			storage_helper<newSize> ret = unsigned_this;
 			return ret;
 		}
 
@@ -316,6 +320,11 @@ namespace hint
 		{
 			// auto& this_ap = static_cast<storage_type const>(*this);
 			return us_storage_helper<W>{(*this)};
+		}
+
+		signed_wrapper_helper<W> as_signed() const
+		{
+			return signed_storage_helper<W>{(*this)};
 		}
 
 		us_wrapper_helper<1> or_reduction() const

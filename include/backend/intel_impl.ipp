@@ -108,9 +108,13 @@ namespace hint {
 		template<unsigned int N>
 		using us_storage_helper = ac_int<N, false>;
 		template<unsigned int N>
+		using signed_storage_helper = ac_int<N, true>;
+		template<unsigned int N>
 		using wrapper_helper = IntelWrapper<N, is_signed>;
 		template<unsigned int N>
 		using us_wrapper_helper = IntelWrapper<N, false>;
+		template<unsigned int N>
+		using signed_wrapper_helper = IntelWrapper<N, true>;
 
 		IntelWrapper():storage_type{0}{}
 
@@ -198,13 +202,13 @@ namespace hint {
 		}
 
 		template<unsigned int newSize>
-		inline IntelWrapper<newSize, false> leftpad(
-				typename enable_if<(newSize >= W)>::type* = 0
+		inline IntelWrapper<newSize, is_signed> leftpad(
 				) const
 		{
 			// auto& this_ap = static_cast<storage_type const &>(*this);
-			us_storage_helper<W> unsigned_this = (*this);
-			us_storage_helper<newSize> ret = unsigned_this;
+			static_assert ((newSize >= W), "Trying to leftpad to a width smaller than current width. See slice instead.");
+			storage_helper<W> unsigned_this = (*this);
+			storage_helper<newSize> ret = unsigned_this;
 			return ret;
 		}
 
@@ -314,6 +318,11 @@ namespace hint {
 		inline us_wrapper_helper<W> as_unsigned() const
 		{
 			return us_storage_helper<W>{static_cast<storage_type const &>(*this)};
+		}
+
+		inline signed_wrapper_helper<W> as_signed() const
+		{
+			return signed_storage_helper<W>{static_cast<storage_type const &>(*this)};
 		}
 
 		inline us_wrapper_helper<1> or_reduction() const
