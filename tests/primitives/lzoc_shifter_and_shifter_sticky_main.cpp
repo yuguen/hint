@@ -11,6 +11,7 @@
 #include "primitives/lzoc_shifter.hpp"
 #include "primitives/lzoc.hpp"
 #include "primitives/shifter_sticky.hpp"
+#include "primitives/lossless_shifter.hpp"
 
 using namespace  std;
 using namespace hint;
@@ -18,6 +19,16 @@ using namespace hint;
 #define SIZE 28
 
 #if defined(VIVADO_BACKEND)
+BOOST_AUTO_TEST_CASE(testLossLessShifter)
+{
+    VivadoWrapper<1, false> currentValue{1};
+    VivadoWrapper<1+(1<<2)-1, false> expected{1};
+    VivadoWrapper<2, false> shift_value{0};
+    VivadoWrapper<1, false> cmp  = VivadoWrapper<1, false>{expected == lossless_shifter<false>(currentValue, shift_value)};
+    BOOST_REQUIRE_MESSAGE(cmp.isSet<0>(), "Vivado The combined test of the shifter_sticky and the lzoc_shifter failed !");
+}
+
+
 BOOST_AUTO_TEST_CASE(testLzocShifterAndShifterVivado)
 {
 	VivadoWrapper<SIZE, false> currentValue{0};
