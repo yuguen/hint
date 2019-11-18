@@ -12,6 +12,10 @@ using namespace std;
 #include "backend/intel_impl.ipp"
 #endif
 
+#if defined(CATAPULT_BACKEND)
+#include "backend/catapult_impl.ipp"
+#endif
+
 #if defined(FASTSIM_BACKEND)
 #include "backend/gmp_impl.ipp"
 #endif
