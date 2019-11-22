@@ -316,12 +316,12 @@ namespace hint {
 
 		inline us_wrapper_helper<W> as_unsigned() const
 		{
-			return us_storage_helper<W>{static_cast<storage_type const &>(*this)};
+			return us_storage_helper<W>{(*this)._val};
 		}
 
 		inline signed_wrapper_helper<W> as_signed() const
 		{
-			return signed_storage_helper<W>{static_cast<storage_type const &>(*this)};
+			return signed_storage_helper<W>{(*this)._val};
 		}
 
 		inline us_wrapper_helper<1> or_reduction() const

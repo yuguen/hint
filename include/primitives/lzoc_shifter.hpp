@@ -125,11 +125,14 @@ namespace hint {
 		auto lzoc_up = backwards(lzoc_up_backwards);
 
 
+		cerr << "lzoc_up: " << to_string(lzoc_up) << endl;
 
 		auto shifted_up = lzoc_shifted_up.template slice<N-1, 0>();
 
-		auto finalIsLeading = (input.template get<0>() == leading);
+		auto finalIsLeading = (shifted_up.template get<N-1>() == leading);
 		auto allTopIsLeading = lzoc_up.and_reduction();
+
+		cerr << "allTopIsLeading: " << to_string(allTopIsLeading) << endl;
 
 		auto msb = finalIsLeading & allTopIsLeading;
 		auto lzoc_lsb = Wrapper<lzoc_up_size, false>::mux(
@@ -140,7 +143,7 @@ namespace hint {
 		auto lzoc = msb.concatenate(lzoc_lsb);
 		auto shifted_final = Wrapper<N, false>::mux(
 					msb,
-					Wrapper<N, false>::generateSequence(fill_bit),
+					shifted_up.template slice<N-2,0>().concatenate(fill_bit),
 					shifted_up
 				);
 		return lzoc.concatenate(shifted_final);
@@ -177,7 +180,7 @@ namespace hint {
 
 	/**
 	 * N : size of the input
-	 * S : how many bit to count and shift
+	 * S : how many bit to count and shift (must be a power of 2, or one below a power of two)
 	 * is_siggned : don't care
 	 */
 	template<unsigned int N, unsigned int S, bool is_signed, template<unsigned int , bool> class Wrapper>
