@@ -74,7 +74,8 @@ namespace hint {
 			typename std::enable_if<((IS) < (1 << (S-1)))>::type * = 0
 		)
 	{
-		constexpr unsigned int nb_null_shift = S - Static_Val<IS-1>::_log2;
+		constexpr unsigned int nb_null_shift = S - Static_Val<IS>::_log2;
+		cerr << IS << " " << S << " " << nb_null_shift << endl;
 		auto shift_weights_will_zero = count.template slice<S - 1, S - nb_null_shift>();
 		auto next_count = count.template slice<S-nb_null_shift-1, 0>();
 		auto stageNeedsShift = shift_weights_will_zero.or_reduction();
