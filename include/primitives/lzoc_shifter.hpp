@@ -125,14 +125,14 @@ namespace hint {
 		auto lzoc_up = backwards(lzoc_up_backwards);
 
 
-		cerr << "lzoc_up: " << to_string(lzoc_up) << endl;
+		// cerr << "lzoc_up: " << to_string(lzoc_up) << endl;
 
 		auto shifted_up = lzoc_shifted_up.template slice<N-1, 0>();
 
 		auto finalIsLeading = (shifted_up.template get<N-1>() == leading);
 		auto allTopIsLeading = lzoc_up.and_reduction();
 
-		cerr << "allTopIsLeading: " << to_string(allTopIsLeading) << endl;
+		// cerr << "allTopIsLeading: " << to_string(allTopIsLeading) << endl;
 
 		auto msb = finalIsLeading & allTopIsLeading;
 		auto lzoc_lsb = Wrapper<lzoc_up_size, false>::mux(
