@@ -40,10 +40,11 @@ namespace hint {
 
 
 
-	template<unsigned int SeqLength, template<unsigned int, bool> class Wrapper>
+	template<unsigned int SeqLength, unsigned int MaxPos, template<unsigned int, bool> class Wrapper>
 	struct _OneOneMapper {
 		template<unsigned int key>
 		static inline Wrapper<SeqLength, false> map(
+				typename enable_if<(key < MaxPos)>::type* = 0
 				)
 		{
 			static_assert (key < SeqLength, "Key should be smaller than sequence length");
@@ -52,6 +53,19 @@ namespace hint {
 			// 			Wrapper<key, false>::generateSequence({0})
 			// 	);
 			return {1<<key};
+		}
+		
+		template<unsigned int key>
+		static inline Wrapper<SeqLength, false> map(
+				typename enable_if<(key >= MaxPos)>::type* = 0
+				)
+		{
+			static_assert (key < SeqLength, "Key should be smaller than sequence length");
+			// constexpr unsigned int lead_length = SeqLength - key;
+			// return Wrapper<lead_length, false>{1}.concatenate(
+			// 			Wrapper<key, false>::generateSequence({0})
+			// 	);
+			return {1<<MaxPos};
 		}
 
 		// template<unsigned int key>
@@ -64,11 +78,12 @@ namespace hint {
 	};
 
 
-	template<unsigned int KeySize, unsigned int ValueSize, template<unsigned int, bool> class Wrapper>
+	template<unsigned int KeySize, unsigned int ValueSize, unsigned int MaxPos, template<unsigned int, bool> class Wrapper>
 	inline Wrapper<ValueSize, false> one_one(Wrapper<KeySize, false> index)
 	{
 		static_assert (ValueSize >= (1 << KeySize), "ValueSize should be bigger than key size");
-		return TabulatedFunction<_OneOneMapper<ValueSize, Wrapper>, KeySize, ValueSize, Wrapper>::read(index);
+		static_assert (ValueSize >= MaxPos, "MaxPos should be lower than ValueSize");
+		return TabulatedFunction<_OneOneMapper<ValueSize, MaxPos, Wrapper>, KeySize, ValueSize, Wrapper>::read(index);
 	}
 
 }
