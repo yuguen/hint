@@ -143,25 +143,25 @@ namespace hint {
 
 		inline CatapultWrapper<1, false> operator>(type const & rhs) const
 		{
-			us_wrapper_helper<1> ret{_val>(rhs)};
+			us_wrapper_helper<1> ret{_val>(rhs._val)};
 			return ret;
 		}
 
 		inline CatapultWrapper<1, false> operator>=(type const & rhs) const
 		{
-			us_wrapper_helper<1> ret{_val>=(rhs)};
+			us_wrapper_helper<1> ret{_val>=(rhs._val)};
 			return ret;
 		}
 
 		inline CatapultWrapper<1, false> operator<=(type const & rhs) const
 		{
-			us_wrapper_helper<1> ret{_val<=(rhs)};
+			us_wrapper_helper<1> ret{_val<=(rhs._val)};
 			return ret;
 		}
 
 		inline CatapultWrapper<1, false> operator<(type const & rhs) const
 		{
-			us_wrapper_helper<1> ret{_val<(rhs)};
+			us_wrapper_helper<1> ret{_val<(rhs._val)};
 			return ret;
 		}
 
