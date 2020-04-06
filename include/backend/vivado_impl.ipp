@@ -259,11 +259,13 @@ namespace hint
 				VivadoWrapper<1, false> const cin
 			) const
 		{
-			// auto& op1_ap = static_cast<storage_type const>(*this);
-			// auto& op2_ap = static_cast<storage_type const>(op2);
-			// auto& cin_ap = static_cast<us_storage_helper<1> const>(cin);
-			auto res = (*this) + op2 + cin;
-			return storage_helper<W+1>{res};
+			auto& op1_ap = static_cast<storage_type const>(*this);
+			auto& op2_ap = static_cast<storage_type const>(op2);
+			auto& cin_ap = static_cast<us_storage_helper<1> const>(cin);
+			storage_helper<W+1> op1_ext = op1_ap.concat(cin_ap);
+			storage_helper<W+1> op2_ext = op2_ap.concat(cin_ap);
+			storage_helper<W+2> res_ext = op1_ext + op2_ext;
+			return storage_helper<W+1>(res_ext.range(W+1, 1));
 		}
 
 		VivadoWrapper<W+1, is_signed> subWithCarry(

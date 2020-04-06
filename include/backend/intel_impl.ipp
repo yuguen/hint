@@ -255,11 +255,15 @@ namespace hint {
 				IntelWrapper<1, false> const cin
 			) const
 		{
-			// auto& op1_ap = static_cast<storage_type const &>(*this);
-			// auto& op2_ap = static_cast<storage_type const &>(op2);
-			// auto& cin_ap = static_cast<us_storage_helper<1> const &>(cin);
-			auto res = storage_type::operator+(op2) + cin;
-			return storage_helper<W+1>{res};
+			auto op2_ap = static_cast<storage_type const &>(op2);
+			auto cin_ap = static_cast<us_storage_helper<1> const &>(cin);
+			storage_helper<W+1> op1_ext, op2_ext;
+			op1_ext.set_slc(0, cin_ap);
+			op1_ext.set_slc(1, *this);
+			op2_ext.set_slc(0, cin_ap);
+			op2_ext.set_slc(1, op2_ap);
+			storage_helper<W+2> res_ext = op1_ext + op2_ext;
+			return res_ext.template slc<W+1>(1);
 		}
 
 		inline IntelWrapper<W+1, is_signed> subWithCarry(
