@@ -143,25 +143,25 @@ namespace hint {
 
 		inline CatapultWrapper<1, false> operator>(type const & rhs) const
 		{
-			us_wrapper_helper<1> ret{_val>(rhs)};
+			us_wrapper_helper<1> ret{_val>(rhs._val)};
 			return ret;
 		}
 
 		inline CatapultWrapper<1, false> operator>=(type const & rhs) const
 		{
-			us_wrapper_helper<1> ret{_val>=(rhs)};
+			us_wrapper_helper<1> ret{_val>=(rhs._val)};
 			return ret;
 		}
 
 		inline CatapultWrapper<1, false> operator<=(type const & rhs) const
 		{
-			us_wrapper_helper<1> ret{_val<=(rhs)};
+			us_wrapper_helper<1> ret{_val<=(rhs._val)};
 			return ret;
 		}
 
 		inline CatapultWrapper<1, false> operator<(type const & rhs) const
 		{
-			us_wrapper_helper<1> ret{_val<(rhs)};
+			us_wrapper_helper<1> ret{_val<(rhs._val)};
 			return ret;
 		}
 
@@ -270,7 +270,7 @@ namespace hint {
 			// auto& op2_ap = static_cast<storage_type const &>(op2);
 			// auto& cin_ap = static_cast<us_storage_helper<1> const &>(cin);
 			auto res = _val-(op2._val) + cin._val;
-			return storage_helper<W+1>{res._val};
+			return storage_helper<W+1>{res};
 		}
 
 		inline CatapultWrapper<W+1, is_signed> addWithBorrow(
@@ -279,7 +279,7 @@ namespace hint {
 			) const
 		{
 			auto res = _val+(op2._val) - bin._val;
-			return storage_helper<W+1>{res._val};
+			return storage_helper<W+1>{res};
 		}
 
 		inline CatapultWrapper<W, false> modularAdd(CatapultWrapper<W, is_signed> const op2) const
