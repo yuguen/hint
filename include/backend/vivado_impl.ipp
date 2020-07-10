@@ -341,12 +341,9 @@ namespace hint
 
 		us_wrapper_helper<W> backwards() const
 		{
-			// auto& this_ap = static_cast<storage_type const>(*this);
-			us_storage_helper<W> out;
-			for(unsigned int i = 0 ; i < W ; ++i) {
-			#pragma HLS UNROLL
-				out[i] = (*this)[W - i - 1];
-			}
+			auto& this_ap = static_cast<storage_type const>(*this);
+			us_storage_helper<W> out{this_ap};
+			out.reverse();
 			return out;
 		}
 
