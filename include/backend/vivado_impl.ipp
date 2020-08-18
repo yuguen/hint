@@ -145,6 +145,14 @@ namespace hint
 			return us_storage_helper<high-low+1>{(*this).range(high, low)};
 		}
 
+
+        template <unsigned int srcBit, unsigned int destBit>
+        inline void affect_bit(type const & input) {
+            static_assert (srcBit < W, "Input bit idx is too big");
+            static_assert (destBit < W, "Destination bit idx is too big");
+            (*this)[destBit] = input[srcBit];
+        }
+
 		template<unsigned int idx>
 		VivadoWrapper<1, false> get(
 		   typename enable_if<idx < W>::type* = 0

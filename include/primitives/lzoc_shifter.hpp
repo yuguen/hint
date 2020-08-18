@@ -25,10 +25,10 @@ namespace hint {
 		// cerr << "upper_half: " << upper_half << endl;
 
 		// -------- Backward stuff due to intel HLS that sometimes shifts slices that doesn't start at index 0 ---
-		auto backwards_input = backwards(input);
-		auto upper_backwards = backwards_input.template slice<upper_half-1,0>();
-		auto upper = backwards(upper_backwards);
-		// auto upper = input.template slice<N-1, N-upper_half>();
+        //auto backwards_input = backwards(input);
+        //auto upper_backwards = backwards_input.template slice<upper_half-1,0>();
+        //auto upper = backwards(upper_backwards);
+        auto upper = input.template slice<N-1, N-upper_half>();
 		// ---------------------------------------------------------------------------------------------------------
 		auto lower = input.template slice<N-upper_half-1, 0>();
 
@@ -118,11 +118,11 @@ namespace hint {
 
 		auto lzoc_shifted_up = getOneBelow2PowLZOC_shift<N, S-1>(input, leading, fill_bit);
 
-		// auto lzoc_up = lzoc_shifted_up.template slice<N+lzoc_up_size - 1, N>();
+        auto lzoc_up = lzoc_shifted_up.template slice<N+lzoc_up_size - 1, N>();
 
-		auto backwards_lzoc_shifted_up = backwards(lzoc_shifted_up);
-		auto lzoc_up_backwards = backwards_lzoc_shifted_up.template slice<lzoc_up_size-1,0>();
-		auto lzoc_up = backwards(lzoc_up_backwards);
+        //auto backwards_lzoc_shifted_up = backwards(lzoc_shifted_up);
+        //auto lzoc_up_backwards = backwards_lzoc_shifted_up.template slice<lzoc_up_size-1,0>();
+        //auto lzoc_up = backwards(lzoc_up_backwards);
 
 
 		// cerr << "lzoc_up: " << to_string(lzoc_up) << endl;
@@ -157,15 +157,16 @@ namespace hint {
 			typename enable_if<(N >= S) and not(Static_Val<S>::_isOneBelow2Pow or (S==1)) and not(Static_Val<S>::_is2Pow)>::type* = 0
 	)
 	{
-		constexpr unsigned int count_size = (1 << Static_Val<S>::_storage) - 1;
-		constexpr unsigned int lzoc_size = Static_Val<S>::_storage;
+
+        constexpr unsigned int lzoc_size = Static_Val<S>::_storage;
+        constexpr unsigned int count_size = (1 << lzoc_size) - 1;
 		auto lzoc_shifted_up = getOneBelow2PowLZOC_shift<N, count_size>(input, leading, fill_bit);
 
 
-		// auto lzoc_up = lzoc_shifted_up.template slice<N+lzoc_size-1, N>();
-		auto backwards_lzoc_shifted_up = backwards(lzoc_shifted_up);
-		auto lzoc_up_backwards = backwards_lzoc_shifted_up.template slice<lzoc_size-1,0>();
-		auto lzoc_up = backwards(lzoc_up_backwards);
+        auto lzoc_up = lzoc_shifted_up.template slice<N+lzoc_size-1, N>();
+        //auto backwards_lzoc_shifted_up = backwards(lzoc_shifted_up);
+        //auto lzoc_up_backwards = backwards_lzoc_shifted_up.template slice<lzoc_size-1,0>();
+        //auto lzoc_up = backwards(lzoc_up_backwards);
 
 		auto shifted = lzoc_shifted_up.template slice<N-1, 0>();
 
@@ -181,7 +182,7 @@ namespace hint {
 	/**
 	 * N : size of the input
 	 * S : how many bit to count and shift (must be a power of 2, or one below a power of two)
-	 * is_siggned : don't care
+     * is_signed : don't care
 	 */
 	template<unsigned int N, unsigned int S, bool is_signed, template<unsigned int , bool> class Wrapper>
 	inline Wrapper<Static_Val<S>::_storage + N, false> LZOC_shift(
