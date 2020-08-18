@@ -216,11 +216,21 @@ namespace hint {
 		inline IntelWrapper<W + Wrhs, false>
 		concatenate(IntelWrapper<Wrhs, isSignedRhs> const val) const
 		{
-			ac_int<W + Wrhs, false> res;
-			res.set_slc(0, val);
-			res.set_slc(Wrhs, *this);
+			/*
+			ac_int<W + Wrhs, false> res{0};
+			ac_int<Wrhs, isSignedRhs> val_ap{val};
+			storage_type copy{0};//TODO
+			res. range<Wrhs-1, 0>() = val_ap. range<Wrhs-1, 0>();
+			auto slice = copy. range<W-1, 0>();
+			auto res_slc = res. range<Wrhs + W - 1, Wrhs>();
+			res_slc = slice;
+			*/
+			auto this_ap = static_cast<ac_int<W + Wrhs, false> const >(*this);
+			auto val_ap = static_cast<ac_int<Wrhs, isSignedRhs> const &>(val);
+			return { (this_ap << Wrhs) | val_ap }; 
 
-			return res;
+/*			return (static_cast<storage_type const &>(*this) << Wrhs) | 
+				static_cast<ac_int<Wrhs, isSignedRhs> const & >(val).template slc<Wrhs-1>(0);       */
 		}
 
 
@@ -255,15 +265,14 @@ namespace hint {
 				IntelWrapper<1, false> const cin
 			) const
 		{
-			auto op2_ap = static_cast<storage_type const &>(op2);
-			auto cin_ap = static_cast<us_storage_helper<1> const &>(cin);
-			storage_helper<W+1> op1_ext, op2_ext;
-			op1_ext.set_slc(0, cin_ap);
-			op1_ext.set_slc(1, *this);
-			op2_ext.set_slc(0, cin_ap);
-			op2_ext.set_slc(1, op2_ap);
-			storage_helper<W+2> res_ext = op1_ext + op2_ext;
-			return res_ext.template slc<W+1>(1);
+			auto op2_ap = static_cast<ac_int<W+1, is_signed> const>(op2);
+			auto op2_sh_filled  = (op2_ap << 1) | ac_int<1, false>{1};
+			auto cin_ap = static_cast<ac_int<1, false> const &>(cin);
+			auto this_ap = static_cast<ac_int<W+1, is_signed> const> (*this);
+			auto this_ext = (this_ap << 1) | cin_ap;
+			storage_helper<W+2> res_ext{this_ext + op2_sh_filled};
+			storage_helper<W+1> res{res_ext.template slc<W+1>(1)};
+			return {res};
 		}
 
 		inline IntelWrapper<W+1, is_signed> subWithCarry(

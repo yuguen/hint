@@ -267,13 +267,11 @@ namespace hint
 				VivadoWrapper<1, false> const cin
 			) const
 		{
-			auto& op1_ap = static_cast<storage_type const>(*this);
-			auto& op2_ap = static_cast<storage_type const>(op2);
-			auto& cin_ap = static_cast<us_storage_helper<1> const>(cin);
-			storage_helper<W+1> op1_ext = op1_ap.concat(cin_ap);
-			storage_helper<W+1> op2_ext = op2_ap.concat(cin_ap);
-			storage_helper<W+2> res_ext = op1_ext + op2_ext;
-			return storage_helper<W+1>(res_ext.range(W+1, 1));
+			// auto& op1_ap = static_cast<storage_type const>(*this);
+			// auto& op2_ap = static_cast<storage_type const>(op2);
+			// auto& cin_ap = static_cast<us_storage_helper<1> const>(cin);
+			auto res = (*this) + op2 + cin;
+			return storage_helper<W+1>{res};
 		}
 
 		VivadoWrapper<W+1, is_signed> subWithCarry(
@@ -351,12 +349,9 @@ namespace hint
 
 		us_wrapper_helper<W> backwards() const
 		{
-			// auto& this_ap = static_cast<storage_type const>(*this);
-			us_storage_helper<W> out;
-			for(unsigned int i = 0 ; i < W ; ++i) {
-			#pragma HLS UNROLL
-				out[i] = (*this)[W - i - 1];
-			}
+			auto& this_ap = static_cast<storage_type const>(*this);
+			us_storage_helper<W> out{this_ap};
+			out.reverse();
 			return out;
 		}
 

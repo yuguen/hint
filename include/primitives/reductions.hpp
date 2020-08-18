@@ -12,7 +12,6 @@ namespace hint {
 		typename enable_if<(N>max_builtin_size) and (N%2==1)>::type* = 0
 		)
 	{
-		#pragma HLS INLINE
 		return or_reduction_impl<max_builtin_size>(
 				input.template slice<N-2, (N-1)/2>().bitwise_or(
 					input.template slice<((N-1)/2)-1, 0>()
@@ -26,7 +25,6 @@ namespace hint {
 		typename enable_if<(N>max_builtin_size) and (N%2==0)>::type* = 0
 		)
 	{
-		#pragma HLS INLINE
 		return or_reduction_impl<max_builtin_size>(
 					input.template slice<N-1, N/2>().bitwise_or(
 						input.template slice<(N/2)-1, 0>()
@@ -40,7 +38,6 @@ namespace hint {
 		typename enable_if<(N<=max_builtin_size) and (N > 1)>::type* = 0
 		)
 	{
-		#pragma HLS INLINE
 		return input.or_reduction();
 	}
 
@@ -50,7 +47,6 @@ namespace hint {
 		typename enable_if<(N==1)>::type* = 0
 		)
 	{
-		#pragma HLS INLINE
 		return input;
 	}
 
@@ -62,7 +58,6 @@ namespace hint {
 			typename  enable_if<(max_builtin_size >= 1)>::type * = 0
 		)
 	{
-		#pragma HLS INLINE
 		return or_reduction_impl<max_builtin_size>(input.as_unsigned());
 	}
 }
