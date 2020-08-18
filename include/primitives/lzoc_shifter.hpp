@@ -15,8 +15,7 @@ using namespace std;
 namespace hint {
 	template<unsigned int N, unsigned int S, template<unsigned int , bool> class Wrapper>
 	inline Wrapper<Static_Val<S>::_storage+N, false> getOneBelow2PowLZOC_shift(
-				Wrapper<N, false> const input,
-				Wrapper<1, false> const leading,
+                Wrapper<N, false> const input,
 				Wrapper<1, false> const fill_bit,
 				typename enable_if<Static_Val<S>::_isOneBelow2Pow and (S>1)>::type* = 0
 			)
@@ -32,19 +31,9 @@ namespace hint {
 		// ---------------------------------------------------------------------------------------------------------
 		auto lower = input.template slice<N-upper_half-1, 0>();
 
-		//cerr << "lower : " << to_string(lower) << endl;
+        //cerr << "lower : " << to_string(lower) << endl;
 
-
-		auto and_red = upper.and_reduction();
-		//cerr << "and_red : " << to_string(and_red) << endl;
-
-		auto or_red = upper.or_reduction();
-		//cerr << "or_red : " << to_string(or_red) << endl;
-		// or_reduction<128>(upper);
-		auto op1 = and_red;
-		auto op0inv = or_red.template get<0>();
-		auto op0 = op0inv.invert();
-		auto comp = Wrapper<1, false>::mux(leading, op1, op0);
+        auto comp = upper.or_reduction().invert();
 		auto padding = Wrapper<upper_half, false>::generateSequence(fill_bit);
 
 		auto next_stage_input = Wrapper<N, false>::mux(
@@ -53,21 +42,20 @@ namespace hint {
 					input
 				);
 		//cerr << "Next stage input : " << to_string(next_stage_input) << endl;
-		auto intermediate  = getOneBelow2PowLZOC_shift<N, upper_half-1>(next_stage_input, leading, fill_bit);
+        auto intermediate  = getOneBelow2PowLZOC_shift<N, upper_half-1>(next_stage_input, fill_bit);
 		auto ret = comp.concatenate(intermediate);
 		return ret;
 	}
 
 	template<unsigned int N, unsigned int S, template<unsigned int , bool> class Wrapper>
 	inline Wrapper<Static_Val<S>::_storage +N, false> getOneBelow2PowLZOC_shift(
-			Wrapper<N, false> const input,
-			Wrapper<1, false> const leading,
+            Wrapper<N, false> const input,
 			Wrapper<1, false> const fill_bit,
 			typename enable_if<(S==1) and (N >= 2)>::type* = 0
 		)
 	{
 		// cerr << "Eq 1 S: " << S << endl;
-		auto top_is_leading = (input.template get<N-1>() == leading);
+        auto top_is_leading = input.template get<N-1>().invert();
 		auto lower = input.template slice<N-2, 0>();
 		auto shifted = Wrapper<N, false>::mux(
 					top_is_leading,
@@ -80,14 +68,13 @@ namespace hint {
 
 	template<unsigned int N, unsigned int S, template<unsigned int , bool> class Wrapper>
 	inline Wrapper<Static_Val<S>::_storage +N, false> getOneBelow2PowLZOC_shift(
-			Wrapper<N, false> const input,
-			Wrapper<1, false> const leading,
+            Wrapper<N, false> const input,
 			Wrapper<1, false> const fill_bit,
 			typename enable_if<(S==1) and (N == 1)>::type* = 0
 		)
 	{
 		// cerr << "Eq 1 S: " << S << endl;
-		auto top_is_leading = (input.template get<0>() == leading);
+        auto top_is_leading = input.template get<0>().invert();
 		auto ret = top_is_leading.concatenate(
 					Wrapper<1, false>::mux(top_is_leading, fill_bit, input.template get<0>())
 				);
@@ -97,26 +84,24 @@ namespace hint {
 
 	template<unsigned int N, unsigned int S, template<unsigned int , bool> class Wrapper>
 	inline Wrapper<Static_Val<S>::_storage + N, false> LZOC_shift_impl(
-			Wrapper<N, false> const input,
-			Wrapper<1, false> const leading,
+            Wrapper<N, false> const input,
 			Wrapper<1, false> const fill_bit,
 			typename enable_if<(N >= S) and (Static_Val<S>::_isOneBelow2Pow or (S==1))>::type* = 0
 	)
 	{
-		return getOneBelow2PowLZOC_shift<N, S>(input, leading, fill_bit);
+        return getOneBelow2PowLZOC_shift<N, S>(input, fill_bit);
 	}
 
 	template<unsigned int N, unsigned int S, template<unsigned int , bool> class Wrapper>
 	inline Wrapper<Static_Val<S>::_storage + N, false> LZOC_shift_impl(
-			Wrapper<N, false> const input,
-			Wrapper<1, false> const leading,
+            Wrapper<N, false> const input,
 			Wrapper<1, false> const fill_bit,
 			typename enable_if<(N >= S) and not(Static_Val<S>::_isOneBelow2Pow or (S==1)) and Static_Val<S>::_is2Pow>::type* = 0
 	)
 	{
 		constexpr unsigned int lzoc_up_size = Static_Val<S-1>::_storage;
 
-		auto lzoc_shifted_up = getOneBelow2PowLZOC_shift<N, S-1>(input, leading, fill_bit);
+        auto lzoc_shifted_up = getOneBelow2PowLZOC_shift<N, S-1>(input, fill_bit);
 
         auto lzoc_up = lzoc_shifted_up.template slice<N+lzoc_up_size - 1, N>();
 
@@ -129,7 +114,7 @@ namespace hint {
 
 		auto shifted_up = lzoc_shifted_up.template slice<N-1, 0>();
 
-		auto finalIsLeading = (shifted_up.template get<N-1>() == leading);
+        auto finalIsLeading = shifted_up.template get<N-1>().invert();
 		auto allTopIsLeading = lzoc_up.and_reduction();
 
 		// cerr << "allTopIsLeading: " << to_string(allTopIsLeading) << endl;
@@ -151,8 +136,7 @@ namespace hint {
 
 	template<unsigned int N, unsigned int S, template<unsigned int , bool> class Wrapper>
 	inline Wrapper<Static_Val<S>::_storage + N, false> LZOC_shift_impl(
-			Wrapper<N, false> const input,
-			Wrapper<1, false> const leading,
+            Wrapper<N, false> const input,
 			Wrapper<1, false> const fill_bit,
 			typename enable_if<(N >= S) and not(Static_Val<S>::_isOneBelow2Pow or (S==1)) and not(Static_Val<S>::_is2Pow)>::type* = 0
 	)
@@ -160,7 +144,7 @@ namespace hint {
 
         constexpr unsigned int lzoc_size = Static_Val<S>::_storage;
         constexpr unsigned int count_size = (1 << lzoc_size) - 1;
-		auto lzoc_shifted_up = getOneBelow2PowLZOC_shift<N, count_size>(input, leading, fill_bit);
+        auto lzoc_shifted_up = getOneBelow2PowLZOC_shift<N, count_size>(input, fill_bit);
 
 
         auto lzoc_up = lzoc_shifted_up.template slice<N+lzoc_size-1, N>();
@@ -191,8 +175,13 @@ namespace hint {
 			Wrapper<1, false> const fill_bit = {0}
 	)
 	{
-		auto ret = LZOC_shift_impl<N, S>(input.as_unsigned(), leading, fill_bit);
-		return ret;
+        constexpr unsigned int RES_SIZE = Static_Val<S>::_storage + N;
+        auto input_us = input.as_unsigned();
+        auto invert_mask = Wrapper<N, false>::generateSequence(leading);
+        auto real_input = input_us.bitwise_xor(invert_mask);
+        auto lzc_inv_shift = LZOC_shift_impl<N, S>(input.as_unsigned(), fill_bit^leading);
+        auto extended_mask = invert_mask.template leftpad<RES_SIZE>();
+        return lzc_inv_shift ^ extended_mask;
 	}
 }
 
