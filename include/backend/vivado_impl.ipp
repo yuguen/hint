@@ -1,6 +1,8 @@
 #ifndef VIVADO_IMPL_IPP
 #define VIVADO_IMPL_IPP
 
+#include "config.hpp"
+
 #include <cstdint>
 #include <limits>
 #include <type_traits>
@@ -412,6 +414,13 @@ namespace hint
 		template<unsigned int N, bool val>
 		friend class VivadoWrapper;
 	};
+
+    template<>
+    struct Config_Values<VivadoWrapper>
+    {
+        constexpr static unsigned int shift_group_by = 2;
+    };
+
 }
 
 
