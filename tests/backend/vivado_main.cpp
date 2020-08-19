@@ -8,7 +8,7 @@
 
 #include "hint.hpp"
 #include "tools/printing.hpp"
-// #include "primitives/lzoc_shifter.hpp"
+#include "primitives/lzoc_shifter.hpp"
 
 using namespace std;
 using namespace hint;
@@ -130,4 +130,13 @@ BOOST_AUTO_TEST_CASE(testBackend)
     WRAPPER<14, false> expected_h2{0b0};
     WRAPPER<1, false> cmp_h2{expected_h2 == h2};
     BOOST_REQUIRE_MESSAGE(cmp_h2.isSet<0>(), "The generateSequence method failed! (h)");
+}
+
+
+BOOST_AUTO_TEST_CASE(testLZOCShift)
+{
+    WRAPPER<6, false> input{1 << 4};
+    WRAPPER<9, false> expected_output{3<<5};
+    auto output = hint::LZOC_shift<6, 6>(input, {{0}});
+    BOOST_REQUIRE_MESSAGE((output == expected_output).unravel(), "Error :  "<< output.unravel());
 }

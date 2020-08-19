@@ -13,11 +13,19 @@
 using namespace std;
 
 namespace hint {
+
+    template<unsigned int N, unsigned int S, template<unsigned int , bool> class Wrapper>
+    struct lzoc_shift_t
+    {
+        Wrapper<Static_Val<S>::_storage, false> lzoc;
+        Wrapper<N, false> shifted;
+    };
+
 	template<unsigned int N, unsigned int S, template<unsigned int , bool> class Wrapper>
-	inline Wrapper<Static_Val<S>::_storage+N, false> getOneBelow2PowLZOC_shift(
+    inline lzoc_shift_t<N, S, Wrapper> getOneBelow2PowLZOC_shift(
                 Wrapper<N, false> const input,
 				Wrapper<1, false> const fill_bit,
-				typename enable_if<Static_Val<S>::_isOneBelow2Pow and (S>1)>::type* = 0
+                typename enable_if<(S>1)>::type* = 0
 			)
 	{
 		constexpr int upper_half = (1 <<Static_Val<S>::_flog2);
@@ -33,57 +41,55 @@ namespace hint {
 
         //cerr << "lower : " << to_string(lower) << endl;
 
-        auto comp = upper.or_reduction().invert();
+        auto comp = (upper == Wrapper<upper_half, false>{0});
 		auto padding = Wrapper<upper_half, false>::generateSequence(fill_bit);
+        auto mux_select = Wrapper<N, false>::generateSequence(comp);
+        auto all_zero_input = lower.concatenate(padding) & mux_select;
+        auto not_all_zero_input = input & mux_select.invert();
 
-		auto next_stage_input = Wrapper<N, false>::mux(
-					comp,
-					lower.concatenate(padding),
-					input
-				);
+        auto next_stage_input = all_zero_input | not_all_zero_input;
+
 		//cerr << "Next stage input : " << to_string(next_stage_input) << endl;
-        auto intermediate  = getOneBelow2PowLZOC_shift<N, upper_half-1>(next_stage_input, fill_bit);
-		auto ret = comp.concatenate(intermediate);
+        auto intermediate  = getOneBelow2PowLZOC_shift<N, S-upper_half>(next_stage_input, fill_bit);
+        lzoc_shift_t<N, S, Wrapper> ret{comp.concatenate(intermediate.lzoc), intermediate.shifted};
 		return ret;
 	}
 
 	template<unsigned int N, unsigned int S, template<unsigned int , bool> class Wrapper>
-	inline Wrapper<Static_Val<S>::_storage +N, false> getOneBelow2PowLZOC_shift(
+    inline lzoc_shift_t<N, S, Wrapper> getOneBelow2PowLZOC_shift(
             Wrapper<N, false> const input,
 			Wrapper<1, false> const fill_bit,
 			typename enable_if<(S==1) and (N >= 2)>::type* = 0
 		)
 	{
 		// cerr << "Eq 1 S: " << S << endl;
-        auto top_is_leading = input.template get<N-1>().invert();
+        auto top_is_leading = (input.template get<N-1>() == Wrapper<1, false>{0});
 		auto lower = input.template slice<N-2, 0>();
 		auto shifted = Wrapper<N, false>::mux(
 					top_is_leading,
 					lower.concatenate(fill_bit),
 					input
 				);
-		auto ret = top_is_leading.concatenate(shifted);
+        lzoc_shift_t<N, S, Wrapper> ret{top_is_leading, shifted};
 		return ret;
 	}
 
 	template<unsigned int N, unsigned int S, template<unsigned int , bool> class Wrapper>
-	inline Wrapper<Static_Val<S>::_storage +N, false> getOneBelow2PowLZOC_shift(
+    inline lzoc_shift_t<N, S, Wrapper> getOneBelow2PowLZOC_shift(
             Wrapper<N, false> const input,
 			Wrapper<1, false> const fill_bit,
 			typename enable_if<(S==1) and (N == 1)>::type* = 0
 		)
 	{
 		// cerr << "Eq 1 S: " << S << endl;
-        auto top_is_leading = input.template get<0>().invert();
-		auto ret = top_is_leading.concatenate(
-					Wrapper<1, false>::mux(top_is_leading, fill_bit, input.template get<0>())
-				);
+        auto top_is_leading = (input == Wrapper<1, false>{0});
+        lzoc_shift_t<N, S, Wrapper> ret{top_is_leading, (top_is_leading &  fill_bit) | (input & top_is_leading.invert())};
 		return ret;
 	}
 
 
 	template<unsigned int N, unsigned int S, template<unsigned int , bool> class Wrapper>
-	inline Wrapper<Static_Val<S>::_storage + N, false> LZOC_shift_impl(
+    inline lzoc_shift_t<N, S, Wrapper> LZOC_shift_impl(
             Wrapper<N, false> const input,
 			Wrapper<1, false> const fill_bit,
 			typename enable_if<(N >= S) and (Static_Val<S>::_isOneBelow2Pow or (S==1))>::type* = 0
@@ -93,7 +99,7 @@ namespace hint {
 	}
 
 	template<unsigned int N, unsigned int S, template<unsigned int , bool> class Wrapper>
-	inline Wrapper<Static_Val<S>::_storage + N, false> LZOC_shift_impl(
+    inline lzoc_shift_t<N, S, Wrapper> LZOC_shift_impl(
             Wrapper<N, false> const input,
 			Wrapper<1, false> const fill_bit,
 			typename enable_if<(N >= S) and not(Static_Val<S>::_isOneBelow2Pow or (S==1)) and Static_Val<S>::_is2Pow>::type* = 0
@@ -103,7 +109,7 @@ namespace hint {
 
         auto lzoc_shifted_up = getOneBelow2PowLZOC_shift<N, S-1>(input, fill_bit);
 
-        auto lzoc_up = lzoc_shifted_up.template slice<N+lzoc_up_size - 1, N>();
+        auto lzoc_up = lzoc_shifted_up.lzoc;
 
         //auto backwards_lzoc_shifted_up = backwards(lzoc_shifted_up);
         //auto lzoc_up_backwards = backwards_lzoc_shifted_up.template slice<lzoc_up_size-1,0>();
@@ -112,30 +118,26 @@ namespace hint {
 
 		// cerr << "lzoc_up: " << to_string(lzoc_up) << endl;
 
-		auto shifted_up = lzoc_shifted_up.template slice<N-1, 0>();
+        auto shifted_up = lzoc_shifted_up.shifted;
 
-        auto finalIsLeading = shifted_up.template get<N-1>().invert();
-		auto allTopIsLeading = lzoc_up.and_reduction();
+        auto finalIsLeading = (shifted_up.template get<N-1>() == Wrapper<1, false>{0});
+        auto allTopIsLeading = (lzoc_up == Wrapper<lzoc_up_size, false>::generateSequence({{}}));
 
 		// cerr << "allTopIsLeading: " << to_string(allTopIsLeading) << endl;
 
 		auto msb = finalIsLeading & allTopIsLeading;
-		auto lzoc_lsb = Wrapper<lzoc_up_size, false>::mux(
-						msb,
-						Wrapper<lzoc_up_size, false>{0},
-						lzoc_up
-					);
+        auto lzoc_lsb = Wrapper<lzoc_up_size, false>::generateSequence(msb.invert()) & lzoc_up;
 		auto lzoc = msb.concatenate(lzoc_lsb);
 		auto shifted_final = Wrapper<N, false>::mux(
 					msb,
 					shifted_up.template slice<N-2,0>().concatenate(fill_bit),
 					shifted_up
 				);
-		return lzoc.concatenate(shifted_final);
+        return {lzoc, shifted_final};
 	}
 
 	template<unsigned int N, unsigned int S, template<unsigned int , bool> class Wrapper>
-	inline Wrapper<Static_Val<S>::_storage + N, false> LZOC_shift_impl(
+    inline lzoc_shift_t<N, S, Wrapper> LZOC_shift_impl(
             Wrapper<N, false> const input,
 			Wrapper<1, false> const fill_bit,
 			typename enable_if<(N >= S) and not(Static_Val<S>::_isOneBelow2Pow or (S==1)) and not(Static_Val<S>::_is2Pow)>::type* = 0
@@ -147,20 +149,22 @@ namespace hint {
         auto lzoc_shifted_up = getOneBelow2PowLZOC_shift<N, count_size>(input, fill_bit);
 
 
-        auto lzoc_up = lzoc_shifted_up.template slice<N+lzoc_size-1, N>();
+        auto lzoc_up = lzoc_shifted_up.lzoc;
         //auto backwards_lzoc_shifted_up = backwards(lzoc_shifted_up);
         //auto lzoc_up_backwards = backwards_lzoc_shifted_up.template slice<lzoc_size-1,0>();
         //auto lzoc_up = backwards(lzoc_up_backwards);
 
-		auto shifted = lzoc_shifted_up.template slice<N-1, 0>();
+        auto shifted = lzoc_shifted_up.shifted;
 
-		auto lzoc_has_overflowed = lzoc_up.and_reduction();
+        auto lzoc_of_mask = Wrapper<lzoc_size, false>::generateSequence({{1}});
+
+        auto lzoc_has_overflowed = (lzoc_up == lzoc_of_mask);
 		auto lzoc_final = Wrapper<lzoc_size, false>::mux(
 					lzoc_has_overflowed,
 					Wrapper<lzoc_size, false>{S},
 					lzoc_up
 					);
-		return lzoc_final.concatenate(shifted);
+        return {lzoc_final, shifted};
 	}
 
 	/**
@@ -174,14 +178,13 @@ namespace hint {
 			Wrapper<1, false> const leading,
 			Wrapper<1, false> const fill_bit = {0}
 	)
-	{
-        constexpr unsigned int RES_SIZE = Static_Val<S>::_storage + N;
+    {
         auto input_us = input.as_unsigned();
         auto invert_mask = Wrapper<N, false>::generateSequence(leading);
         auto real_input = input_us.bitwise_xor(invert_mask);
-        auto lzc_inv_shift = LZOC_shift_impl<N, S>(input.as_unsigned(), fill_bit^leading);
-        auto extended_mask = invert_mask.template leftpad<RES_SIZE>();
-        return lzc_inv_shift ^ extended_mask;
+        auto lzc_shift = LZOC_shift_impl<N, S>(real_input, fill_bit^leading);
+        auto final_shifted = invert_mask xor lzc_shift.shifted;
+        return lzc_shift.lzoc.concatenate(final_shifted);
 	}
 }
 
