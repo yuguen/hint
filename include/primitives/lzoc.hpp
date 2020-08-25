@@ -6,6 +6,8 @@
 // #include "tools/printing.hpp"
 #include "primitives/shifter.hpp"
 #include "primitives/backwards.hpp"
+#include "primitives/zero_one_normaliser.hpp"
+#include "primitives/indicator_to_index.hpp"
 #include <iostream>
 
 using namespace std;
@@ -142,15 +144,66 @@ namespace hint {
 		return res;
 	}
 
+
+    template <unsigned int W, template<unsigned int, bool> class Wrapper>
+    struct LZC_MAP_ASSO {
+        static constexpr unsigned int res_width = Static_Val<W>::_storage;
+        using res_type = Wrapper<res_width, false>;
+
+        template<bool is_signed>
+        static res_type association(unsigned int idx_leftmost_one, Wrapper<W, is_signed> const &)
+        {
+            return res_type{W-idx_leftmost_one};
+        }
+    };
+
+    template<unsigned int lvl, unsigned int N, template<unsigned int , bool> class Wrapper>
+    inline Wrapper<Static_Val<N>::_storage, false> fast_lzc_req(
+            Wrapper<N, false> const & ,
+            typename enable_if<(lvl == 0)>::type* = 0
+            )
+    {
+        return Wrapper<Static_Val<N>::_storage, false>{N};
+    }
+
+    template<unsigned int lvl, unsigned int N, template<unsigned int , bool> class Wrapper>
+    inline Wrapper<Static_Val<N>::_storage, false> fast_lzc_req(
+            Wrapper<N, false> const & input,
+            typename enable_if<(lvl <= N) and (lvl > 0)>::type* = 0
+            )
+    {
+        constexpr unsigned int retsize = Static_Val<N>::_storage;
+        return Wrapper<retsize, false>::mux(
+                    input.template get<lvl-1>(),
+                    Wrapper<retsize, false>{N-lvl},
+                    fast_lzc_req<lvl-1>(input)
+                    );
+    }
+
+    template<unsigned int N, bool is_signed, template<unsigned int , bool> class Wrapper>
+    inline Wrapper<Static_Val<N>::_storage, false> fast_lzc (
+            Wrapper<N, is_signed> const & input
+    )
+    {
+        return fast_lzc_req<N>(input);
+    }
+
+
 	template<unsigned int N, bool is_signed, template<unsigned int , bool> class Wrapper>
-	inline Wrapper<Static_Val<N+1>::_clog2, false> lzoc_wrapper (
+    inline Wrapper<Static_Val<N>::_storage, false> lzoc_wrapper (
 			Wrapper<N, is_signed> const & input,
 		Wrapper<1, false> const & leading
 	)
 	{
-
-		return lzoc(input.as_unsigned(), leading);
-
+        auto neg_mask = Wrapper<N, false>::generateSequence(leading);
+        auto real_input = input ^ neg_mask;
+        using association_type = LZC_MAP_ASSO<N, Wrapper>;
+        //return real_input.template ltr_indic_map<association_type>();
+        return fast_lzc(real_input);
 	}
+
+
+
+
 }
 #endif // LZOC

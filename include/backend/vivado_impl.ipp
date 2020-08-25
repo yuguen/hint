@@ -147,6 +147,18 @@ namespace hint
 			return us_storage_helper<high-low+1>{(*this).range(high, low)};
 		}
 
+        template<class IndicatorFunctor>
+        typename IndicatorFunctor::res_type ltr_indic_map() const
+        {
+            us_storage_helper<W+1> padded = static_cast<storage_type const &>(*this).concat(us_storage_helper<1>{1});
+
+            for (unsigned int i = 0 ; i < W+1 ; i++) {
+                if (padded[W-i]) {
+                    return IndicatorFunctor::association(W-i, *this);
+                }
+            }
+        }
+
 
         template <unsigned int srcBit, unsigned int destBit>
         inline void affect_bit(type const & input) {

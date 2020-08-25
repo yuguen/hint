@@ -12,11 +12,59 @@
 #include "primitives/lzoc.hpp"
 #include "primitives/shifter_sticky.hpp"
 #include "primitives/lossless_shifter.hpp"
+#include "primitives/zero_one_normaliser.hpp"
+
 
 using namespace  std;
 using namespace hint;
 
 #define SIZE 28
+
+template<template<unsigned int, bool> class Wrapper>
+bool test_lm_indicator(void)
+{
+    constexpr unsigned int WIDTH = 9;
+    Wrapper<WIDTH, false> zero{0};
+    auto zero_indic = leftmost_indicator(zero);
+    if (zero_indic.unravel() != 1) {
+        return false;
+    }
+    for (unsigned int shift = 0; shift < WIDTH ; shift++) {
+        unsigned int start = 1 << shift;
+        auto expected_res = start << 1;
+        for(unsigned int curoff = 0 ; curoff < (1 << shift) ;  curoff += 1) {
+            Wrapper<WIDTH, false> input {start + curoff};
+            auto res = leftmost_indicator(input);
+            if (res.unravel() != expected_res) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+template<template<unsigned int, bool> class Wrapper>
+bool test_fast_lzc(void)
+{
+    constexpr unsigned int WIDTH = 9;
+    Wrapper<WIDTH, false> zero{0};
+    auto zero_indic = fast_lzc(zero);
+    if (zero_indic.unravel() != WIDTH) {
+        return false;
+    }
+    for (unsigned int shift = 0; shift < WIDTH ; shift++) {
+        unsigned int start = 1 << shift;
+        auto expected_res = WIDTH - 1 - shift;
+        for(unsigned int curoff = 0 ; curoff < (1 << shift) ;  curoff += 1) {
+            Wrapper<WIDTH, false> input {start + curoff};
+            auto res = fast_lzc(input);
+            if (res.unravel() != expected_res) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
 
 #if defined(VIVADO_BACKEND)
 BOOST_AUTO_TEST_CASE(testLossLessShifter)
@@ -28,6 +76,15 @@ BOOST_AUTO_TEST_CASE(testLossLessShifter)
     BOOST_REQUIRE_MESSAGE(cmp.isSet<0>(), "Vivado The combined test of the shifter_sticky and the lzoc_shifter failed !");
 }
 
+BOOST_AUTO_TEST_CASE(TestLeftmostIndicatorVivado)
+{
+    BOOST_REQUIRE(test_lm_indicator<VivadoWrapper>());
+}
+
+BOOST_AUTO_TEST_CASE(TestFastLZCVivado)
+{
+    BOOST_REQUIRE(test_fast_lzc<VivadoWrapper>());
+}
 
 BOOST_AUTO_TEST_CASE(testLzocShifterAndShifterVivado)
 {

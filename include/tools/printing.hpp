@@ -10,7 +10,7 @@ using namespace std;
 namespace hint {
     template <typename val, unsigned int W, bool is_signed, template<unsigned int, bool> class wrapper>
     struct printer{
-        inline constexpr void operator()(stringstream & s, wrapper<W, is_signed> const & signal)
+        inline void operator()(stringstream & s, wrapper<W, is_signed> const & signal)
         {
             s << (signal.template isSet<val::value>() ? '1' : '0');
             printer<integral_constant<unsigned int, val::value-1>, W, is_signed, wrapper>{}(s, signal);
@@ -20,7 +20,7 @@ namespace hint {
     template <unsigned int W, bool is_signed, template<unsigned int, bool> class wrapper>
     struct printer<integral_constant<unsigned int, 0>, W, is_signed, wrapper>
     {
-        inline constexpr void operator()(stringstream& s, wrapper<W, is_signed> const & signal)
+        inline void operator()(stringstream& s, wrapper<W, is_signed> const & signal)
         {
             s << (signal.template isSet<0>() ? '1' : '0');
         }
