@@ -225,11 +225,12 @@ namespace hint {
 			auto res_slc = res. range<Wrhs + W - 1, Wrhs>();
 			res_slc = slice;
 			*/
-			auto this_ap = static_cast<ac_int<W + Wrhs, false> const >(*this);
-			auto val_ap = static_cast<ac_int<Wrhs, isSignedRhs> const &>(val);
-			return { (this_ap << Wrhs) | val_ap }; 
+			auto this_ap = static_cast<ac_int<W + Wrhs, false> const>(*this);
+			auto val_ap = static_cast<ac_int<Wrhs, isSignedRhs> const>(val);
+			ac_int<32, false> const wrhsac{Wrhs};
+			return { (this_ap << wrhsac) | val_ap };
 
-/*			return (static_cast<storage_type const &>(*this) << Wrhs) | 
+/*			return (static_cast<storage_type const &>(*this) << Wrhs) |
 				static_cast<ac_int<Wrhs, isSignedRhs> const & >(val).template slc<Wrhs-1>(0);       */
 		}
 
@@ -342,6 +343,12 @@ namespace hint {
 		{
 			// auto& this_ap = static_cast<storage_type const &>(*this);
 			return us_storage_helper<1>{(*this).or_reduce()};
+		}
+
+		inline us_wrapper_helper<1> nor_reduction() const
+		{
+			// auto& this_ap = static_cast<storage_type const &>(*this);
+			return us_storage_helper<1>{~(*this).or_reduce()};
 		}
 
 		inline us_wrapper_helper<1> and_reduction() const

@@ -147,25 +147,25 @@ namespace hint
 			return us_storage_helper<high-low+1>{(*this).range(high, low)};
 		}
 
-        template<class IndicatorFunctor>
-        typename IndicatorFunctor::res_type ltr_indic_map() const
-        {
-            us_storage_helper<W+1> padded = static_cast<storage_type const &>(*this).concat(us_storage_helper<1>{1});
+		template<class IndicatorFunctor>
+		typename IndicatorFunctor::res_type ltr_indic_map() const
+		{
+			us_storage_helper<W+1> padded = static_cast<storage_type const &>(*this).concat(us_storage_helper<1>{1});
 
-            for (unsigned int i = 0 ; i < W+1 ; i++) {
-                if (padded[W-i]) {
-                    return IndicatorFunctor::association(W-i, *this);
-                }
-            }
-        }
+			for (unsigned int i = 0 ; i < W+1 ; i++) {
+				if (padded[W-i]) {
+					return IndicatorFunctor::association(W-i, *this);
+				}
+			}
+		}
 
 
-        template <unsigned int srcBit, unsigned int destBit>
-        inline void affect_bit(type const & input) {
-            static_assert (srcBit < W, "Input bit idx is too big");
-            static_assert (destBit < W, "Destination bit idx is too big");
-            (*this)[destBit] = input[srcBit];
-        }
+		template <unsigned int srcBit, unsigned int destBit>
+		inline void affect_bit(type const & input) {
+			static_assert (srcBit < W, "Input bit idx is too big");
+			static_assert (destBit < W, "Destination bit idx is too big");
+			(*this)[destBit] = input[srcBit];
+		}
 
 		template<unsigned int idx>
 		VivadoWrapper<1, false> get(
@@ -355,6 +355,12 @@ namespace hint
 			return us_storage_helper<1>{(*this).or_reduce()};
 		}
 
+		us_wrapper_helper<1> nor_reduction() const
+		{
+			// auto& this_ap = static_cast<storage_type const>(*this);
+			return us_storage_helper<1>{(*this).nor_reduce()};
+		}
+
 		us_wrapper_helper<1> and_reduction() const
 		{
 			// auto& this_ap = static_cast<storage_type const>(*this);
@@ -427,11 +433,11 @@ namespace hint
 		friend class VivadoWrapper;
 	};
 
-    template<>
-    struct Config_Values<VivadoWrapper>
-    {
-        constexpr static unsigned int shift_group_by = 2;
-    };
+	template<>
+	struct Config_Values<VivadoWrapper>
+	{
+		constexpr static unsigned int shift_group_by = 2;
+	};
 
 }
 

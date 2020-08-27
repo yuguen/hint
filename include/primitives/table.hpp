@@ -2,7 +2,6 @@
 #define TABLE_HPP
 
 #include "hint.hpp"
-#include "tools/sequence.hpp"
 
 namespace hint {
 	template<
