@@ -157,6 +157,8 @@ namespace hint {
         }
     };
 
+    /*
+
     template<unsigned int lvl, unsigned int N, template<unsigned int , bool> class Wrapper>
     inline Wrapper<Static_Val<N>::_storage, false> fast_lzc_req(
             Wrapper<N, false> const & ,
@@ -180,14 +182,16 @@ namespace hint {
                     );
     }
 
+    */
+
     template<unsigned int N, bool is_signed, template<unsigned int , bool> class Wrapper>
     inline Wrapper<Static_Val<N>::_storage, false> fast_lzc (
             Wrapper<N, is_signed> const & input
     )
     {
-        return fast_lzc_req<N>(input);
+        using association_type = LZC_MAP_ASSO<N, Wrapper>;
+        return input.template ltr_indic_map<association_type>();
     }
-
 
 	template<unsigned int N, bool is_signed, template<unsigned int , bool> class Wrapper>
     inline Wrapper<Static_Val<N>::_storage, false> lzoc_wrapper (
@@ -195,11 +199,10 @@ namespace hint {
 		Wrapper<1, false> const & leading
 	)
 	{
-        auto neg_mask = Wrapper<N, false>::generateSequence(leading);
-        auto real_input = input ^ neg_mask;
+        auto real_input = Wrapper<N, false>::mux(leading, input.invert(), input);
         using association_type = LZC_MAP_ASSO<N, Wrapper>;
-        //return real_input.template ltr_indic_map<association_type>();
-        return fast_lzc(real_input);
+        return real_input.template ltr_indic_map<association_type>();
+        //return fast_lzc(real_input);
 	}
 
 
