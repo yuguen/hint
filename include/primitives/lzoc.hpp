@@ -91,6 +91,7 @@ namespace hint {
 	{
 		auto real_input = Wrapper<N, false>::mux(leading, input.invert(), input.as_unsigned());
 		return lzoc(real_input);
+        //return fast_lzc(real_input);
 	}
 }
 #endif // LZOC

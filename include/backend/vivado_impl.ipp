@@ -150,13 +150,15 @@ namespace hint
 		template<class IndicatorFunctor>
 		typename IndicatorFunctor::res_type ltr_indic_map() const
 		{
-			us_storage_helper<W+1> padded = static_cast<storage_type const &>(*this).concat(us_storage_helper<1>{1});
+            us_storage_helper<W> padded = static_cast<storage_type const &>(*this);
 
-			for (unsigned int i = 0 ; i < W+1 ; i++) {
-				if (padded[W-i]) {
+            for (unsigned int i = 0 ; i < W ; i++) {
+                if (padded[W-i-1]) {
 					return IndicatorFunctor::association(W-i, *this);
 				}
 			}
+
+            return IndicatorFunctor::association(0, *this);
 		}
 
 
