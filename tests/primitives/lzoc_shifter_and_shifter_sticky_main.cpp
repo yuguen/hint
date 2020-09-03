@@ -20,6 +20,7 @@ using namespace hint;
 
 #define SIZE 28
 
+
 template<template<unsigned int, bool> class Wrapper>
 bool test_lm_indicator(void)
 {
@@ -48,7 +49,7 @@ bool test_fast_lzc(void)
 {
 	constexpr unsigned int WIDTH = 9;
 	Wrapper<WIDTH, false> zero{0};
-	auto zero_indic = fast_lzc(zero);
+	auto zero_indic = lzoc_wrapper(zero, {0});
 	if (zero_indic.unravel() != WIDTH) {
 		return false;
 	}
@@ -57,7 +58,7 @@ bool test_fast_lzc(void)
 		auto expected_res = WIDTH - 1 - shift;
 		for(unsigned int curoff = 0 ; curoff < (1 << shift) ;  curoff += 1) {
 			Wrapper<WIDTH, false> input {start + curoff};
-			auto res = fast_lzc(input);
+			auto res = lzoc_wrapper(input, {0});
 			if (res.unravel() != expected_res) {
 				return false;
 			}
