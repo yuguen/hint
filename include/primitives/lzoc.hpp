@@ -11,6 +11,8 @@
 using namespace std;
 
 namespace hint {
+	constexpr unsigned int __hint_lzoc_builtin_limit = 8 * sizeof(int) - 1;
+
 	template<unsigned int N, template<unsigned int , bool> class Wrapper>
 	inline Wrapper<Static_Val<N+1>::_clog2, false> getAlmost2PowLZOC(
 				Wrapper<N, false> const & input,
@@ -46,7 +48,7 @@ namespace hint {
 	template<unsigned int N, template<unsigned int , bool> class Wrapper>
 	inline Wrapper<Static_Val<N+1>::_clog2, false> lzoc(
 			Wrapper<N, false> const & input,
-			typename enable_if<(N > 1)>::type* = 0,
+			typename enable_if<(N > __hint_lzoc_builtin_limit)>::type* = 0,
 			typename enable_if<Static_Val<N>::_isOneBelow2Pow>::type* = 0
 		)
 	{
@@ -57,7 +59,7 @@ namespace hint {
 	inline Wrapper<Static_Val<N+1>::_clog2, false> lzoc (
 			Wrapper<N, false> const & input,
 		typename enable_if<(not Static_Val<N>::_isOneBelow2Pow)>::type* = 0,
-		typename enable_if<(N > 1)>::type* = 0
+		typename enable_if<(N > __hint_lzoc_builtin_limit)>::type* = 0
 	)
 	{
 		constexpr unsigned int lzoc_size = Static_Val<N>::_storage;
@@ -67,6 +69,20 @@ namespace hint {
 		auto padded = input.concatenate(padding);
 		// cerr << "Value compound lzoc : " << to_string(result) << endl;
 		return getAlmost2PowLZOC(padded);
+	}
+
+	template<unsigned int N, template<unsigned int , bool> class Wrapper>
+	inline Wrapper<Static_Val<N+1>::_clog2, false> lzoc (
+			Wrapper<N, false> const & input,
+		typename enable_if<(not Static_Val<N>::_isOneBelow2Pow)>::type* = 0,
+		typename enable_if<(N > 1 and N <= __hint_lzoc_builtin_limit)>::type* = 0
+	)
+	{
+		constexpr unsigned int pad_width = __hint_lzoc_builtin_limit + 1 - N;
+		auto padding = Wrapper<pad_width, false>::generateSequence({{1}});
+		auto padded = input.concatenate(padding);
+		// cerr << "Value compound lzoc : " << to_string(result) << endl;
+		return {__builtin_clz(padded.unravel())};
 	}
 
 	template<unsigned int N, template<unsigned int , bool> class Wrapper>
@@ -91,7 +107,7 @@ namespace hint {
 	{
 		auto real_input = Wrapper<N, false>::mux(leading, input.invert(), input.as_unsigned());
 		return lzoc(real_input);
-        //return fast_lzc(real_input);
+		//return fast_lzc(real_input);
 	}
 }
 #endif // LZOC
