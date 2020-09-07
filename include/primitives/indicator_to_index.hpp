@@ -52,7 +52,7 @@ inline Wrapper<bs+1, false> get_indicator_bit(Wrapper<N, false> const & input,
 	using filtered = call<FilterSeq<filter, uf_seq>>;
 	auto selorred = input.select_or_reduce(filtered{});
 	//cerr << "selorred :" << endl << to_string(selorred) << endl;
-	return selorred.concatenate(get_indicator_bit<bs-1>(input));
+	return selorred.concatenate(get_indicator_bit<bs-1, N>(input));
 }
 
 template<unsigned int bs, unsigned int N, template<unsigned int, bool> class Wrapper>
@@ -73,7 +73,7 @@ inline Wrapper<Static_Val<W>::_storage, false> indicator_to_idx(Wrapper<W, false
 	//auto idx = reduce<OrReduce>(indic_table);
 	constexpr unsigned int csize = Static_Val<W-1>::_storage;
 	//cerr << "W : " << W << endl << "csize : " << csize << endl << "Indicator : " << to_string(indicator) << endl;
-	return get_indicator_bit<csize-1>(indicator);
+	return get_indicator_bit<csize-1, W>(indicator);
 }
 
 template<unsigned int W, template<unsigned int, bool> class Wrapper>
