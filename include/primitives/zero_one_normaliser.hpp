@@ -40,7 +40,7 @@ Wrapper<Stage, false> or_expand_ltr_dupl(Wrapper<W, false> const & input,
 {
 	auto cur = input.template slice<W-1, Stage-1>();
 	auto cur_bit = cur.or_reduction();
-	return cur_bit.concatenate(or_expand_ltr_dupl<Stage-1>(input));
+	return cur_bit.concatenate(or_expand_ltr_dupl<Stage-1, W>(input));
 }
 
 template <unsigned int W, template <unsigned int, bool> class Wrapper>
@@ -65,7 +65,7 @@ Wrapper<W, false> or_expand_rtl(Wrapper<W, false> const & input,
 template<unsigned int W, bool isSigned, template<unsigned int, bool> class Wrapper>
 Wrapper<W, false> propagate_leftmost_one(Wrapper<W, isSigned> input)
 {
-	return or_expand_ltr_dupl<W>(input.as_unsigned());
+	return or_expand_ltr_dupl<W, W>(input.as_unsigned());
 }
 
 template<unsigned int lvl, unsigned int W, template <unsigned int, bool> class Wrapper>
