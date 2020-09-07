@@ -49,7 +49,7 @@ inline Wrapper<bs+1, false> get_indicator_bit(Wrapper<N, false> const & input,
 	//cerr << "Selecting bit " << bs << endl;
 	using uf_seq = GenSeqCall<N>;
 	using filter = BitSelectWeightCond<N, bs>;
-	using filtered = call<FilterSeq<filter, uf_seq>>;
+	using filtered = typename FilterSeq<filter, uf_seq>::type;
 	auto selorred = input.select_or_reduce(filtered{});
 	//cerr << "selorred :" << endl << to_string(selorred) << endl;
 	return selorred.concatenate(get_indicator_bit<bs-1, N>(input));
