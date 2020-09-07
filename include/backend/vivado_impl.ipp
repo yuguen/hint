@@ -185,11 +185,11 @@ namespace hint
 			};
 		}
 
-		template<unsigned int... elem>
-		inline VivadoWrapper<1, false> select_or_reduce(UISequence<elem...> ) const
+		template<typename... elem>
+		inline VivadoWrapper<1, false> select_or_reduce(Sequence<elem...> ) const
 		{
 			auto downcast = static_cast<storage_type const &>(*this);
-			auto res = fold<us_storage_helper<1>>(std::logical_or<us_storage_helper<1>>{}, downcast[elem]...);
+			auto res = fold<us_storage_helper<1>>(std::logical_or<us_storage_helper<1>>{}, downcast[elem::val]...);
 			return us_wrapper_helper<1>{res};
 		}
 

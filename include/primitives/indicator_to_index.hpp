@@ -47,7 +47,7 @@ inline Wrapper<bs+1, false> get_indicator_bit(Wrapper<N, false> const & input,
 	)
 {
 	//cerr << "Selecting bit " << bs << endl;
-	using uf_seq = make_sequence<N>;
+	using uf_seq = GenSeqCall<N>;
 	using filter = BitSelectWeightCond<N, bs>;
 	using filtered = call<FilterSeq<filter, uf_seq>>;
 	auto selorred = input.select_or_reduce(filtered{});
@@ -60,7 +60,7 @@ inline Wrapper<bs+1, false> get_indicator_bit(Wrapper<N, false> const & input,
 	   typename enable_if<(bs == 0)>::type* = 0
 	)
 {
-	using uf_seq = make_sequence<N>;
+	using uf_seq = GenSeqCall<N>;
 	using filter = BitSelectWeightCond<N, bs>;
 	using filtered = call<FilterSeq<filter, uf_seq>>;
 	return input.select_or_reduce(filtered{});
