@@ -160,7 +160,7 @@ namespace hint {
 		inline IntelWrapper<1, false> select_or_reduce(Sequence<elem...> ) const
 		{
 			auto downcast = static_cast<storage_type const &>(*this);
-			auto res = fold<us_storage_helper<1>>(std::logical_or<us_storage_helper<1>>{}, downcast[elem::val]...);
+			auto res = fold<us_storage_helper<1>>(BinaryOr<ac_int<1, false>>{}, downcast[elem::val]...);
 			return us_wrapper_helper<1>{res};
 		}
 
