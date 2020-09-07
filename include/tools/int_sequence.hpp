@@ -119,56 +119,115 @@ struct Merger<STToType<val>, UISequence<els...>> {
 };
 
 template <typename filter, typename T, typename Enable = void>
+struct FilterHeadSeq;
+
+/****************************************************************
+ * FilterHeadSeq on Sequence
+ */
+
+template <typename filter, typename head, typename... elems>
+struct FilterHeadSeq<filter, Sequence<head, elems...>, typename enable_if<filter::check(head::val)>::type>
+{
+	using top = Sequence<head>;
+	using tail = Sequence<elems...>;
+};
+
+template <typename filter, typename head, typename... elems>
+struct FilterHeadSeq<filter, Sequence<head, elems...>, typename enable_if<!filter::check(head::val)>::type>
+{
+	using top = Sequence<>;
+	using tail = Sequence<elems...>;
+};
+
+template <typename filter, typename head>
+struct FilterHeadSeq<filter, Sequence<head>, typename enable_if<filter::check(head::val)>::type>
+{
+	using top = Sequence<head>;
+	using tail = Sequence<>;
+};
+
+template <typename filter, typename head>
+struct FilterHeadSeq<filter, Sequence<head>, typename enable_if<!filter::check(head::val)>::type>
+{
+	using top = Sequence<>;
+	using tail = Sequence<>;
+};
+
+/**************************************************************************
+ *  FilterHeadSeq on UISequence
+ */
+
+template <typename filter, unsigned int head, unsigned int... elems>
+struct FilterHeadSeq<filter, UISequence<head, elems...>, typename enable_if<filter::check(head)>::type>
+{
+	using top = UISequence<head>;
+	using tail = UISequence<elems...>;
+};
+
+template <typename filter, unsigned int head, unsigned int... elems>
+struct FilterHeadSeq<filter, UISequence<head, elems...>, typename enable_if<!filter::check(head)>::type>
+{
+	using top = UISequence<>;
+	using tail = UISequence<elems...>;
+};
+
+template <typename filter, unsigned int head>
+struct FilterHeadSeq<filter, UISequence<head>, typename enable_if<filter::check(head)>::type>
+{
+	using top = UISequence<head>;
+	using tail = UISequence<>;
+};
+
+template <typename filter, unsigned int head>
+struct FilterHeadSeq<filter, UISequence<head>, typename enable_if<!filter::check(head)>::type>
+{
+	using top = UISequence<>;
+	using tail = UISequence<>;
+};
+
+
+template <typename filter, typename T>
 struct FilterSeq;
 
-/**
+/*************************************************************
  * FilterSeq on UISequence
  */
-template<typename Condition, unsigned int head, unsigned int... elems>
-struct FilterSeq<Condition, UISequence<head, elems...>, typename enable_if<Condition::check(head)>::type> {
-	using type = call<Merger<STToType<head>, call<FilterSeq<Condition, UISequence<elems...>>>>>;
-};
-
-template<typename Condition, unsigned int head, unsigned int... elems>
-struct FilterSeq<Condition, UISequence<head, elems...>, typename enable_if<not Condition::check(head)>::type> {
-	using type = call<FilterSeq<Condition, UISequence<elems...>>>;
-};
-
-template<typename Condition, unsigned int head>
-struct FilterSeq<Condition, UISequence<head>, typename enable_if<Condition::check(head)>::type> {
-	using type = UISequence<head>;
-};
-
-template<typename Condition, unsigned int head>
-struct FilterSeq<Condition, UISequence<head>, typename enable_if<not Condition::check(head)>::type> {
+template<typename Condition>
+struct FilterSeq<Condition, UISequence<>>
+{
 	using type = UISequence<>;
 };
 
-/***
- * FilterSeq on Sequence
- */
-
-template<typename Condition, typename head>
-struct FilterSeq<Condition, Sequence<head>, typename enable_if<Condition::check(head::val)>::type> {
-	using type = Sequence<head>;
+template<typename Condition, unsigned int... elems>
+struct FilterSeq<Condition, UISequence<elems...>> {
+	using seq_type = UISequence<elems...>;
+	using filtered_head_type = FilterHeadSeq<Condition, seq_type>;
+	using top = typename filtered_head_type::top;
+	using unfiltered_tail = typename filtered_head_type::tail;
+	using filtered_tail = call<FilterSeq<Condition, unfiltered_tail>>;
+	using type = call<Merger<top, filtered_tail>>;
 };
 
-template<typename Condition, typename head>
-struct FilterSeq<Condition, Sequence<head>, typename enable_if<not Condition::check(head::val)>::type> {
+/*************************************************************
+ * FilterSeq on Sequence
+ */
+template<typename Condition>
+struct FilterSeq<Condition, Sequence<>>
+{
 	using type = Sequence<>;
 };
 
-template<typename Condition, typename head, typename... elems>
-struct FilterSeq<Condition, Sequence<head, elems...>, typename enable_if<Condition::check(head::val)>::type> {
-	using next_type = Sequence<elems...>;
-	using type = call<Merger<head, call<FilterSeq<Condition, next_type>>>>;
+template<typename Condition, typename... elems>
+struct FilterSeq<Condition, Sequence<elems...>> {
+	using seq_type = Sequence<elems...>;
+	using filtered_head_type = FilterHeadSeq<Condition, seq_type>;
+	using top = typename filtered_head_type::top;
+	using unfiltered_tail = typename filtered_head_type::tail;
+	using filtered_tail = call<FilterSeq<Condition, unfiltered_tail>>;
+	using type = call<Merger<top, filtered_tail>>;
 };
 
-template<typename Condition, typename head, typename... elems>
-struct FilterSeq<Condition, Sequence<head, elems...>, typename enable_if<not Condition::check(head::val)>::type> {
-	using next_type = Sequence<elems...>;
-	using type = call<FilterSeq<Condition, next_type>>;
-};
+/**********************************************************/
 
 template <unsigned int NElem>
 using make_sequence = call<UnWrapper<GenSeqCall<NElem>>>;
