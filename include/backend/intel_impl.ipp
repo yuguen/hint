@@ -11,7 +11,9 @@
 #endif
 using namespace std;
 
+#include "tools/functools.hpp"
 #include "tools/static_math.hpp"
+#include "tools/int_sequence.hpp"
 
 namespace hint {
 	template <unsigned int W, bool is_signed>
@@ -152,6 +154,14 @@ namespace hint {
 		{
 			us_wrapper_helper<1> ret{storage_type::operator>=(rhs)};
 			return ret;
+		}
+
+		template<unsigned int... elem>
+		inline IntelWrapper<1, false> select_or_reduce(UISequence<elem...> ) const
+		{
+			auto downcast = static_cast<storage_type const &>(*this);
+			auto res = fold(std::logical_or<>{}, downcast[elem]...);
+			return us_wrapper_helper<1>{res};
 		}
 
 		inline IntelWrapper<1, false> operator<=(type const & rhs) const

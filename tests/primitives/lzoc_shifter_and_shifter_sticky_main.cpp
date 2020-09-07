@@ -124,15 +124,15 @@ BOOST_AUTO_TEST_CASE(testLzocVivado)
 	VivadoWrapper<1, false> cmp;
 	for(int i=0; i<SIZE; i++){
 		shifted_with_sticky = shifter_sticky(backwards(currentValue), VivadoWrapper<1, false>{1}, VivadoWrapper<1, false>{1});
-		// cerr << to_string(shifted_with_sticky) << endl;
+		//cerr << to_string(shifted_with_sticky) << endl;
 		currentValue = backwards(shifted_with_sticky.slice<SIZE, 1>());
-		// cerr << to_string(currentValue) << endl;
+		//cerr << to_string(currentValue) << endl;
 		computed_lzoc = lzoc_wrapper(currentValue, VivadoWrapper<1, false>{0});
-		// cerr << to_string(computed_lzoc) << endl;
+		//cerr << to_string(computed_lzoc) << endl;
 		expected_lzoc = VivadoWrapper<Static_Val<SIZE+1>::_clog2, false>{SIZE-i-1};
-		// cerr << to_string(expected_lzoc) << endl;
+		//cerr << to_string(expected_lzoc) << endl;
 		cmp = VivadoWrapper<1, false>{expected_lzoc == computed_lzoc};
-		BOOST_REQUIRE_MESSAGE(cmp.isSet<0>(), "Test of lzoc falied !!! i = "<< i);
+		BOOST_REQUIRE_MESSAGE(cmp.isSet<0>(), "Test of lzoc failed !!! i = "<< i);
 	}
 	// fprintf(stderr, "The tests passed\n");
 	// fprintf(stderr, "The tests passed\n");

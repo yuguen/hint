@@ -4,11 +4,14 @@
 #include "config.hpp"
 
 #include <cstdint>
+#include <functional>
 #include <limits>
 #include <type_traits>
 
 #include "ap_int.h"
+#include "tools/functools.hpp"
 #include "tools/static_math.hpp"
+#include "tools/int_sequence.hpp"
 
 using namespace std;
 
@@ -31,6 +34,7 @@ namespace hint
 
 	template <unsigned int W, bool is_signed>
 	class VivadoWrapper;
+
 
 	template<unsigned int W, bool is_signed>
 	VivadoWrapper<Arithmetic_Prop<W, W>::_prodSize, is_signed> operator*(
@@ -150,15 +154,15 @@ namespace hint
 		template<class IndicatorFunctor>
 		typename IndicatorFunctor::res_type ltr_indic_map() const
 		{
-            us_storage_helper<W> padded = static_cast<storage_type const &>(*this);
+			us_storage_helper<W> padded = static_cast<storage_type const &>(*this);
 
-            for (unsigned int i = 0 ; i < W ; i++) {
-                if (padded[W-i-1]) {
+			for (unsigned int i = 0 ; i < W ; i++) {
+				if (padded[W-i-1]) {
 					return IndicatorFunctor::association(W-i, *this);
 				}
 			}
 
-            return IndicatorFunctor::association(0, *this);
+			return IndicatorFunctor::association(0, *this);
 		}
 
 
@@ -179,6 +183,14 @@ namespace hint
 					(*this)[idx]
 				}
 			};
+		}
+
+		template<unsigned int... elem>
+		inline VivadoWrapper<1, false> select_or_reduce(UISequence<elem...> ) const
+		{
+			auto downcast = static_cast<storage_type const &>(*this);
+			auto res = fold(std::logical_or<>{}, downcast[elem]...);
+			return us_wrapper_helper<1>{res};
 		}
 
 		template<unsigned int idx>

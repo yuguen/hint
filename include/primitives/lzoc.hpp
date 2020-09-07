@@ -5,8 +5,10 @@
 #include "tools/static_math.hpp"
 // #include "tools/printing.hpp"
 #include "primitives/shifter.hpp"
+#include "primitives/zero_one_normaliser.hpp"
+#include "primitives/indicator_to_index.hpp"
 #include "primitives/backwards.hpp"
-#include <iostream>
+//#include <iostream>
 
 using namespace std;
 
@@ -106,7 +108,15 @@ namespace hint {
 	)
 	{
 		auto real_input = Wrapper<N, false>::mux(leading, input.invert(), input.as_unsigned());
-		return lzoc(real_input);
+		//cerr << "Real input : " << endl << to_string(real_input) << endl;
+		auto prefix = propagate_leftmost_one(real_input);
+		//cerr << "Prefix : " << endl << to_string(prefix) << endl;
+		auto indicator = prefix + Wrapper<N, false>{1};
+		//cerr << "Indicator :" << endl << to_string(indicator) << endl;
+		auto res = indicator_to_idx(indicator);
+		//cerr << "res :" << endl << to_string(res) << endl;
+		return res;
+		//return lzoc(real_input);
 		//return fast_lzc(real_input);
 	}
 }

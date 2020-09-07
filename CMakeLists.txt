@@ -5,7 +5,7 @@ project(Hint
 	LANGUAGES CXX
 	)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 #set(CPACK_PACKAGE_NAME "libhint")
@@ -73,7 +73,7 @@ if(BUILD_UNIT_TEST)
 	else()
 			message(STATUS "CatapultHLS include path unset please set CATAPULT_INCLUDES if you intend to use Catapult HLS backend" )
 	endif()
-	
+
 	if(VIVADO_BACKEND)
 		add_executable(testVivadoBackend_exe tests/backend/vivado_main.cpp tests/backend/vivado_table.cpp)
 		target_link_libraries(testVivadoBackend_exe hint ${Boost_LIBRARIES})
@@ -100,12 +100,12 @@ if(BUILD_UNIT_TEST)
 		add_test(testCatapultBackend testCatapultBackend_exe)
 	endif()
 
-        #if(GMPTARGET-OK)
-        #	add_executable(testGMPBackend_exe tests/backend/gmp_main.cpp)
-        #	target_link_libraries(testGMPBackend_exe hint ${Boost_LIBRARIES} ${GMP} ${GMPXX})
-        #	target_compile_definitions(testGMPBackend_exe PRIVATE FASTSIM_BACKEND)
-        #	add_test(testGMPBackend testGMPBackend_exe)
-        #endif()
+		#if(GMPTARGET-OK)
+		#	add_executable(testGMPBackend_exe tests/backend/gmp_main.cpp)
+		#	target_link_libraries(testGMPBackend_exe hint ${Boost_LIBRARIES} ${GMP} ${GMPXX})
+		#	target_compile_definitions(testGMPBackend_exe PRIVATE FASTSIM_BACKEND)
+		#	add_test(testGMPBackend testGMPBackend_exe)
+		#endif()
 
 	if(VIVADO_BACKEND OR INTEL_BACKEND)
 		add_executable(testPrimitives_exe tests/primitives/lzoc_shifter_and_shifter_sticky_main.cpp)
