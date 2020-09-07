@@ -147,6 +147,17 @@ struct FilterSeq<Condition, UISequence<head>, typename enable_if<not Condition::
 /***
  * FilterSeq on Sequence
  */
+
+template<typename Condition, typename head>
+struct FilterSeq<Condition, Sequence<head>, typename enable_if<Condition::check(head::val)>::type> {
+	using type = Sequence<head>;
+};
+
+template<typename Condition, typename head>
+struct FilterSeq<Condition, Sequence<head>, typename enable_if<not Condition::check(head::val)>::type> {
+	using type = Sequence<>;
+};
+
 template<typename Condition, typename head, typename... elems>
 struct FilterSeq<Condition, Sequence<head, elems...>, typename enable_if<Condition::check(head::val)>::type> {
 	using next_type = Sequence<elems...>;
@@ -157,16 +168,6 @@ template<typename Condition, typename head, typename... elems>
 struct FilterSeq<Condition, Sequence<head, elems...>, typename enable_if<not Condition::check(head::val)>::type> {
 	using next_type = Sequence<elems...>;
 	using type = call<FilterSeq<Condition, next_type>>;
-};
-
-template<typename Condition, typename head>
-struct FilterSeq<Condition, Sequence<head>, typename enable_if<Condition::check(head::val)>::type> {
-	using type = Sequence<head>;
-};
-
-template<typename Condition, typename head>
-struct FilterSeq<Condition, Sequence<head>, typename enable_if<not Condition::check(head::val)>::type> {
-	using type = Sequence<>;
 };
 
 template <unsigned int NElem>
