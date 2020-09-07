@@ -7,14 +7,14 @@ using std::forward;
 
 namespace hint {
 
-	template<class F, class A0>
-	auto fold(F&&, A0&& a0) {
+	template<class R, class F, class A0>
+	A0&& fold(F&&, A0&& a0) {
 		return forward<A0>(a0);
 	}
 
-	template<class F, class A0, class...As>
-	auto fold(F&& f, A0&&a0, As&&...as) {
-		return f(forward<A0>(a0), fold(f, forward<As>(as)...));
+	template<class R, class F, class A0, class...As>
+	R fold(F&& f, A0&&a0, As&&...as) {
+		return f(forward<A0>(a0), fold<R>(f, forward<As>(as)...));
 	}
 
 }

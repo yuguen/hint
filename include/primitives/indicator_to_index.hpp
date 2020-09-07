@@ -2,7 +2,6 @@
 #define INDICATOR_TO_INDEX_HPP
 
 #include <type_traits>
-//#include <iostream>
 
 #include "tools/static_math.hpp"
 #include "primitives/multi_result_holder.hpp"
@@ -11,8 +10,6 @@
 #include "tools/printing.hpp"
 
 using std::enable_if;
-//using std::cerr;
-//using std::endl;
 
 namespace hint {
 
