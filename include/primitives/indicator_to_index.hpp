@@ -48,7 +48,6 @@ inline Wrapper<bs+1, false> get_indicator_bit(Wrapper<N, false> const & input,
 {
 	using filter = BitSelectWeightCond<N, bs>;
 	auto selorred = input.template select_or_reduce<filter>();
-	cerr << "selorred :" << endl << to_string(selorred) << endl;
 	return selorred.concatenate(get_indicator_bit<bs-1, N>(input));
 }
 
@@ -59,7 +58,6 @@ inline Wrapper<bs+1, false> get_indicator_bit(Wrapper<N, false> const & input,
 {
 	using filter = BitSelectWeightCond<N, bs>;
 	auto ret = input.template select_or_reduce<filter>();
-	cerr << "selorred :" << endl << to_string(ret) << endl;
 	return ret;
 }
 
@@ -67,7 +65,6 @@ template<unsigned int W, template<unsigned int, bool> class Wrapper>
 inline Wrapper<Static_Val<W>::_storage, false> indicator_to_idx(Wrapper<W, false> const & indicator)
 {
 	constexpr unsigned int csize = Static_Val<W-1>::_storage;
-	cerr << "W : " << W << endl << "csize : " << csize << endl << "Indicator : " << to_string(indicator) << endl;
 	return get_indicator_bit<csize-1, W>(indicator);
 }
 
