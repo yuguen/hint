@@ -7,7 +7,7 @@
 #include "primitives/multi_result_holder.hpp"
 #include "tools/int_sequence.hpp"
 #include "primitives/useful_functor.hpp"
-#include "tools/printing.hpp"
+//#include "tools/printing.hpp"
 
 using std::enable_if;
 
@@ -46,12 +46,9 @@ inline Wrapper<bs+1, false> get_indicator_bit(Wrapper<N, false> const & input,
 	   typename enable_if<((Static_Val<N>::_storage >= bs) and (bs > 0))>::type* = 0
 	)
 {
-	//cerr << "Selecting bit " << bs << endl;
-	using uf_seq = GenSeqCall<N>;
 	using filter = BitSelectWeightCond<N, bs>;
-	using filtered = typename FilterSeq<filter, uf_seq>::type;
-	auto selorred = input.select_or_reduce(filtered{});
-	//cerr << "selorred :" << endl << to_string(selorred) << endl;
+	auto selorred = input.template select_or_reduce<filter>();
+	cerr << "selorred :" << endl << to_string(selorred) << endl;
 	return selorred.concatenate(get_indicator_bit<bs-1, N>(input));
 }
 
@@ -60,19 +57,17 @@ inline Wrapper<bs+1, false> get_indicator_bit(Wrapper<N, false> const & input,
 	   typename enable_if<(bs == 0)>::type* = 0
 	)
 {
-	using uf_seq = GenSeqCall<N>;
 	using filter = BitSelectWeightCond<N, bs>;
-	using filtered = call<FilterSeq<filter, uf_seq>>;
-	return input.select_or_reduce(filtered{});
+	auto ret = input.template select_or_reduce<filter>();
+	cerr << "selorred :" << endl << to_string(ret) << endl;
+	return ret;
 }
 
 template<unsigned int W, template<unsigned int, bool> class Wrapper>
 inline Wrapper<Static_Val<W>::_storage, false> indicator_to_idx(Wrapper<W, false> const & indicator)
 {
-	//auto indic_table = build_idx_table(indicator);
-	//auto idx = reduce<OrReduce>(indic_table);
 	constexpr unsigned int csize = Static_Val<W-1>::_storage;
-	//cerr << "W : " << W << endl << "csize : " << csize << endl << "Indicator : " << to_string(indicator) << endl;
+	cerr << "W : " << W << endl << "csize : " << csize << endl << "Indicator : " << to_string(indicator) << endl;
 	return get_indicator_bit<csize-1, W>(indicator);
 }
 

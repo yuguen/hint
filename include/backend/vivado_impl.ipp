@@ -139,33 +139,52 @@ namespace hint
 			using signed_wrapper_helper = VivadoWrapper<N, true>;
 
 		private:
-			struct _BinaryOr {
+			template<typename Condition, typename OP>
+			struct RecSel {
 				using optype = ap_uint<1>;
-
-				static inline optype perform(optype&& op)
+				template <unsigned int Width>
+				static inline optype perform_rec(
+						ap_uint<Width> const & in,
+						typename enable_if<Condition::check(Width-1) and (Width == 1)>::type* = 0)
 				{
-					return std::forward<optype>(op);
+					return in[Width - 1];
+				};
+
+				template <int Width>
+				static inline optype perform_rec(
+						ap_uint<Width> const &,
+						typename enable_if<!Condition::check(Width-1) and (Width == 1)>::type* = 0)
+				{
+					return {0};
+				};
+
+				template <int Width>
+				static inline optype perform_rec(
+						ap_uint<Width> const & in,
+						typename enable_if<Condition::check(Width-1) and (Width > 1)>::type* = 0)
+				{
+					return OP::perform(
+								in[Width - 1],
+								perform_rec<Width-1>(in.range(Width-2, 0))
+							);
 				}
 
-				template<typename... tps>
-				static inline optype perform(optype&& op1, tps... remainder)
+				template <int Width>
+				static inline optype perform_rec(
+						ap_uint<Width> const & in,
+						typename enable_if<!Condition::check(Width-1) and (Width > 1)>::type* = 0)
 				{
-					return op1 | perform(remainder...);
+					return perform_rec<Width-1>(in.range(Width-2, 0));
+				}
+
+				template<int Width>
+				static inline optype perform(ap_uint<Width> const & in)
+				{
+					return perform_rec<Width>(in);
 				}
 
 			};
 
-			template<typename F, typename T>
-			struct Reducer;
-
-			template<typename F, typename... idx>
-			struct Reducer<F, Sequence<idx...>> {
-				using optype = ap_uint<1>;
-				static inline optype reduce(storage_type const & content)
-				{
-					return F::perform(content[idx::val]...);
-				}
-			};
 		public:
 
 			VivadoWrapper():storage_type{0}{}
@@ -216,10 +235,14 @@ namespace hint
 				};
 			}
 
-			template<typename T>
-			inline VivadoWrapper<1, false> select_or_reduce(T) const
+			template<typename Cond>
+			inline VivadoWrapper<1, false> select_or_reduce() const
 			{
-				return Reducer<_BinaryOr, T>::reduce(*this);
+				using OP = BinaryOr<ap_uint<1>>;
+				using ReducerType = RecSel<Cond, OP>;
+				auto T = static_cast<us_storage_helper<W> const &>(*this);
+				auto res = ReducerType::perform(T);
+				return res;
 			}
 
 			template<unsigned int idx>
