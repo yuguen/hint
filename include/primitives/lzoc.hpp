@@ -109,14 +109,14 @@ namespace hint {
 	{
 		auto real_input = Wrapper<N, false>::mux(leading, input.invert(), input.as_unsigned());
 		//cerr << "Real input : " << endl << to_string(real_input) << endl;
-		auto prefix = propagate_leftmost_one(real_input);
+		//auto prefix = propagate_leftmost_one(real_input);
 		//cerr << "Prefix : " << endl << to_string(prefix) << endl;
-		auto indicator = prefix + Wrapper<N, false>{1};
+		//auto indicator = prefix + Wrapper<N, false>{1};
 		//cerr << "Indicator :" << endl << to_string(indicator) << endl;
-		auto res = indicator_to_idx(indicator);
+		//auto res = indicator_to_idx(indicator);
 		//cerr << "res :" << endl << to_string(res) << endl;
-		return res;
-		//return lzoc(real_input);
+		//return res;
+		return lzoc(real_input);
 		//return fast_lzc(real_input);
 	}
 }
