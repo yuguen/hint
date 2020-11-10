@@ -137,6 +137,7 @@ namespace hint
 			using us_wrapper_helper = VivadoWrapper<N, false>;
 			template<unsigned int N>
 			using signed_wrapper_helper = VivadoWrapper<N, true>;
+			static constexpr unsigned int Width = W;
 
 		private:
 			template<typename Condition, typename OP>

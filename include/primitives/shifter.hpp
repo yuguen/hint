@@ -20,9 +20,9 @@ namespace hint {
 	//IS : Input Size (including sticky bit),
 	//S : size of shift counter
 	Wrapper<IS, false> shifter_stage(
-					Wrapper<IS, is_signed> input,
-					Wrapper<S, false> count,
-					Wrapper<1, false> fill_bit,
+					Wrapper<IS, is_signed> const & input,
+					Wrapper<S, false> const & count,
+					Wrapper<1, false> const & fill_bit,
 					typename std::enable_if<ShifterStageInfo<S>::NeedsRecursion>::type* = 0,
 					typename std::enable_if<(IS >= (1 << (S-1)))>::type * = 0
 			)
@@ -43,9 +43,9 @@ namespace hint {
 
 	template<unsigned int IS, unsigned int S, bool is_signed, template<unsigned int , bool> class Wrapper>
 	Wrapper<IS, false> shifter_stage(
-					Wrapper<IS, is_signed> input,
-					Wrapper<S, false> count,
-					Wrapper<1, false> fill_bit,
+					Wrapper<IS, is_signed> const & input,
+					Wrapper<S, false> const & count,
+					Wrapper<1, false> const & fill_bit,
 					typename std::enable_if<ShifterStageInfo<S>::IsFinalStage>::type* = 0,
 					typename std::enable_if<(IS >= (1 << (S-1)))>::type * = 0
 			)
@@ -62,9 +62,9 @@ namespace hint {
 
 	template<unsigned int IS, unsigned int S, bool is_signed, template<unsigned int, bool> class Wrapper>
 	Wrapper<IS, false> shifter_stage(
-			Wrapper<IS, is_signed> input,
-			Wrapper<S, false> count,
-			Wrapper<1, false> fill_bit,
+			Wrapper<IS, is_signed> const & input,
+			Wrapper<S, false> const & count,
+			Wrapper<1, false> const & fill_bit,
 			typename std::enable_if<(IS < (1 << (S-1)))>::type * = 0
 		)
 	{
@@ -83,9 +83,9 @@ namespace hint {
 
 	template< bool isRightShift, unsigned int IS, unsigned int S, bool is_signed, template<unsigned int , bool> class Wrapper>
 	Wrapper<IS, false> shifter(
-					Wrapper<IS, is_signed> input,
-					Wrapper<S, false> count,
-					Wrapper<1, false> fill_bit = Wrapper<1, false>{0}
+					Wrapper<IS, is_signed> const & input,
+					Wrapper<S, false> const & count,
+					Wrapper<1, false> const & fill_bit = Wrapper<1, false>{0}
 		)
 	{
 			Wrapper<IS, false> fin_input{isRightShift ? backwards(input) : input};

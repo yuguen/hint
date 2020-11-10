@@ -43,9 +43,9 @@ namespace hint {
 
 
 	template<unsigned int N>
-	constexpr bool isOneBelow2Pow()
+	constexpr inline bool isOneBelow2Pow()
 	{
-		return (((1 << ceilLog2(N) ) - 1) == N);
+		return is2Pow<N+1>();
 	}
 
 	template<unsigned int N>
