@@ -299,12 +299,34 @@ namespace hint
 			}
 
 			template<unsigned int newSize>
-			VivadoWrapper<newSize, is_signed> leftpad(
+			inline VivadoWrapper<newSize, is_signed> leftpad(
 					) const
 			{
 				static_assert((newSize >= W), "Trying to left pad a value to a size which is smaller than actual size. See slice instead.");
 				storage_helper<W> unsigned_this = (*this);
 				storage_helper<newSize> ret = unsigned_this;
+				return ret;
+			}
+
+			template<unsigned int newSize>
+			inline VivadoWrapper<newSize, is_signed> rightpad(typename enable_if<(newSize > W)>::type* = 0) const
+			{
+				auto fill = us_wrapper_helper<newSize - W>{0};
+				return {(*this).concat(fill)};
+			}
+
+			template<unsigned int newSize>
+			inline VivadoWrapper<newSize, is_signed> rightpad(typename enable_if<(newSize == W)>::type* = 0) const
+			{
+				return *this;
+			}
+
+
+			template<unsigned int newSize>
+			inline VivadoWrapper<newSize, is_signed> sign_extend() const
+			{
+				static_assert((newSize >= W), "Trying to sign extend a value to a size which is smaller than actual size. See slice instead.");
+				storage_helper<newSize> ret{static_cast<storage_type const &>(*this)};
 				return ret;
 			}
 
