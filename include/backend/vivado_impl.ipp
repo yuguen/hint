@@ -37,14 +37,13 @@ namespace hint
 	class VivadoWrapper;
 
 
-	template<unsigned int W, bool is_signed>
-	VivadoWrapper<Arithmetic_Prop<W, W>::_prodSize, is_signed> operator*(
-			VivadoWrapper<W, is_signed> const & lhs,
-			VivadoWrapper<W, is_signed> const & rhs
+	template<unsigned int W1, unsigned int W2, bool is_signed>
+	VivadoWrapper<Arithmetic_Prop<W1, W2>::_prodSize, is_signed> operator*(
+			VivadoWrapper<W1, is_signed> const & lhs,
+			VivadoWrapper<W2, is_signed> const & rhs
 			)
 	{
-		return	{static_cast<typename VivadoWrapper<W, is_signed>::storage_type const &>(lhs) *
-					static_cast<typename VivadoWrapper<W, is_signed>::storage_type const &>(rhs)};
+		return lhs.prod_with(rhs);
 	}
 
 	template<unsigned int shiftedSize, bool isShiftedSigned, unsigned int shifterSize>
@@ -464,16 +463,25 @@ namespace hint
 				return out;
 			}
 
+			template<unsigned int W2>
+			VivadoWrapper<Arithmetic_Prop<W, W2>::_prodSize, is_signed> operator*(
+					VivadoWrapper<W2, is_signed> const & rhs
+					)
+			{
+				return {
+					static_cast<storage_type const &>(*this) *
+					static_cast<typename VivadoWrapper<W2, is_signed>::storage_type const &>(rhs)
+				};
+			}
+
+
 			storage_type const unravel() const
 			{
 				return (*this);
 			}
 
-			friend
-			VivadoWrapper<Arithmetic_Prop<W, W>::_prodSize, is_signed> operator*<W, is_signed>(
-					type const & lhs,
-					type const & rhs
-					);
+			template<unsigned int Wother, bool is_signed_other>
+			friend class VivadoWrapper;
 
 			friend
 			VivadoWrapper<W+1, is_signed> operator+<W, is_signed>(

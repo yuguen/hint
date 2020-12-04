@@ -51,6 +51,11 @@ namespace hint {
 		return is2Pow<N+1>();
 	}
 
+	constexpr unsigned int prod_contrib(unsigned int N)
+	{
+		return (N <= 1) ? 0 : N; //TODO
+	}
+
 	template<unsigned int N>
 	class Static_Val
 	{
@@ -62,20 +67,19 @@ namespace hint {
 			static constexpr unsigned int _flog2 = floorLog2<N>();
 			static constexpr unsigned int _clog2 = ceilLog2<N>();
 			static constexpr unsigned int _storage = ceilLog2<N+1>();
+			static constexpr unsigned int _prod_contrib = prod_contrib(N);
 			static constexpr bool _is2Pow = is2Pow<N>();
 			static constexpr bool _isOneBelow2Pow = isOneBelow2Pow<N>();
 	};
 
-	constexpr unsigned int prod_contrib(unsigned int N)
-	{
-		return (N <= 1) ? 0 : N; //TODO
-	}
+
 
 	template<unsigned int s1, unsigned int s2>
 	class Arithmetic_Prop
 	{
 		public:
-			static constexpr unsigned int _prodSize = (prod_contrib(s1) + prod_contrib(s2)) < 1 ? 1 : prod_contrib(s1) + prod_contrib(s2);
+			static constexpr unsigned int _contrib_sum = Static_Val<s1>::_prod_contrib + Static_Val<s2>::_prod_contrib;
+			static constexpr unsigned int _prodSize = ( _contrib_sum < 1 ) ? 1 : _contrib_sum;
 	};
 }
 #endif
