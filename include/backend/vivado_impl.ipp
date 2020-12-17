@@ -43,7 +43,8 @@ namespace hint
 			VivadoWrapper<W2, is_signed> const & rhs
 			)
 	{
-		return lhs.template prod_with<W2>(rhs);
+		// Maybe one day we will be able to avoid unravel
+		return {lhs.unravel() * rhs.unravel()};
 	}
 
 	template<unsigned int shiftedSize, bool isShiftedSigned, unsigned int shifterSize>
@@ -464,22 +465,11 @@ namespace hint
 			}
 
 			template<unsigned int W2>
-			inline VivadoWrapper<Arithmetic_Prop<W, W2>::_prodSize, is_signed> prod_with(
-					VivadoWrapper<W2, is_signed> const & rhs
-					) const
-			{
-				return {
-					static_cast<storage_type const &>(*this) *
-					static_cast<typename VivadoWrapper<W2, is_signed>::storage_type const &>(rhs)
-				};
-			}
-
-			template<unsigned int W2>
 			inline VivadoWrapper<Arithmetic_Prop<W, W2>::_prodSize, is_signed> operator*(
 					VivadoWrapper<W2, is_signed> const & rhs
 					) const
 			{
-				return prod_with<W2>(rhs);
+				return {unravel() * rhs.unravel()};
 			}
 
 
@@ -487,9 +477,6 @@ namespace hint
 			{
 				return (*this);
 			}
-
-			template<unsigned int Wother, bool is_signed_other>
-			friend class VivadoWrapper;
 
 			friend
 			VivadoWrapper<W+1, is_signed> operator+<W, is_signed>(
