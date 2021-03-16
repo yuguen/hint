@@ -29,8 +29,6 @@ install(
 	)
 install(FILES ${PROJECT_NAME}Config.cmake DESTINATION lib/cmake/${PROJECT_NAME})
 install(EXPORT ${PROJECT_NAME}Targets FILE ${PROJECT_NAME}Targets.cmake DESTINATION lib/cmake/${PROJECT_NAME})
-export(PACKAGE ${PROJECT_NAME})
-
 
 #find_path(GMP_INCLUDE_DIR gmpxx.h)
 #find_library(GMP gmp)
