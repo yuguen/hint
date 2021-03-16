@@ -24,12 +24,12 @@ target_include_directories(
 install(DIRECTORY ${INCLUDE_ROOT}/ DESTINATION include/hint FILES_MATCHING PATTERN "*.hpp" PATTERN "*.ipp")
 install(
 	TARGETS hint
-	EXPORT libhint
+	EXPORT ${PROJECT_NAME}Targets
 	PUBLIC_HEADER DESTINATION "include/hint"
 	)
-install(EXPORT libhint DESTINATION ${CMAKE_INSTALL_PREFIX}/include/hint/)
-export(EXPORT libhint FILE libhint-config.cmake)
-export(PACKAGE libhint)
+install(FILES ${PROJECT_NAME}Config.cmake DESTINATION lib/cmake/${PROJECT_NAME})
+install(EXPORT ${PROJECT_NAME}Targets FILE ${PROJECT_NAME}Targets.cmake DESTINATION lib/cmake/${PROJECT_NAME})
+export(PACKAGE ${PROJECT_NAME})
 
 
 #find_path(GMP_INCLUDE_DIR gmpxx.h)
