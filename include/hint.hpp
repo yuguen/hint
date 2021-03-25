@@ -19,3 +19,7 @@ using namespace std;
 #if defined(FASTSIM_BACKEND)
 #include "backend/gmp_impl.ipp"
 #endif
+
+#if defined(EXTINT_BACKEND)
+#include "backend/extint_impl.ipp"
+#endif

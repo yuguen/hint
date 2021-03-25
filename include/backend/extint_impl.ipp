@@ -1,4 +1,5 @@
-#ifndef EXTINT_BACKEND
+#ifndef EXTINT_IMPL_IPP
+#define EXTINT_IMPL_IPP
 
 #include "config.hpp"
 
@@ -33,6 +34,18 @@ namespace hint
 	    {
 		    using type = unsigned _ExtInt(W);
 	    };
+
+		template<>
+		struct ExtIntBaseType<1, false>
+		{
+			using type = bool;
+		};
+
+		template<>
+		struct ExtIntBaseType<1, true>
+		{
+			using type = bool;
+		};
     }
 	
 
@@ -82,13 +95,13 @@ namespace hint
 		return	{lhs._val - rhs._val};
 	}
 
-	#define HINT_EXTINTIMP_BINARY_OP_IMP(SYMBOL)                                 \
-	template<unsigned int W, bool is_signed>                                     \
-	ExtIntWrapper<W, false> operator&(                                           \
-			ExtIntWrapper<W, is_signed> const & lhs,                             \
-			ExtIntWrapper<W, is_signed> const & rhs                              \
-			) {                                                                  \
-		return	{lhs._val OP rhs._val};                                          \
+	#define HINT_EXTINTIMP_BINARY_OP_IMP(SYMBOL)                                         \
+	template<unsigned int W, bool is_signed>                                             \
+	ExtIntWrapper<W, false> operator SYMBOL (                                           \
+			ExtIntWrapper<W, is_signed> const & lhs,                                     \
+			ExtIntWrapper<W, is_signed> const & rhs                                      \
+			) {                                                                          \
+		return	{lhs._val SYMBOL rhs._val};                                              \
 	}                                                               
 
 	HINT_EXTINTIMP_BINARY_OP_IMP(|)
@@ -104,11 +117,11 @@ namespace hint
 			typedef ExtIntWrapper<W, is_signed> type;
 			typedef typename detail::ExtIntBaseType<W, is_signed>::type storage_type;
 			template<unsigned int N>
-			using storage_helper = typename dtail::ExtIntBaseType<N, is_signed>::type;
+			using storage_helper = typename detail::ExtIntBaseType<N, is_signed>::type;
 			template<unsigned int N>
 			using us_storage_helper = typename detail::ExtIntBaseType<N, false>::type;
 			template<unsigned int N>
-			using signed_storage_helper = typename ExtIntBaseType<N, true>::type;
+			using signed_storage_helper = typename detail::ExtIntBaseType<N, true>::type;
 			template<unsigned int N>
 			using wrapper_helper = ExtIntWrapper<N, is_signed>;
 			template<unsigned int N>
@@ -180,7 +193,7 @@ namespace hint
              */
             template<unsigned int idx>
             constexpr ExtIntWrapper<1, false> get() const {
-                static_assert(idx < W, "Checking bit outside of range")
+                static_assert(idx < W, "Checking bit outside of range");
                 constexpr auto mask = one_at_pos<idx>();
                 return (mask & _val) != 0;
             }
@@ -195,8 +208,8 @@ namespace hint
 			}
 
             #define FORWARD_BITWISE_OP(OP, func_name)                                     \
-            constexpr ExtIntWrapper<W, false> func_name(type const rhs) const {  \
-				return {_val OP rhs._val};                                                  \
+            constexpr ExtIntWrapper<W, false> func_name(type const rhs) const {           \
+				return {_val OP rhs._val};                                                \
 			}
 
             FORWARD_BITWISE_OP(&, bitwise_and)
@@ -208,7 +221,7 @@ namespace hint
 			
 
             #define FORWARD_CMP_OP(OP)                                                    \
-            constexpr us_wrapper_helper<1> operator##OP(type const rhs) const {         \
+            constexpr us_wrapper_helper<1> operator OP(type const rhs) const {         \
                 return {_val OP rhs._val};                                                \
             }
 
@@ -239,7 +252,7 @@ namespace hint
 				if constexpr (newSize == W) {
                     return {_val};
                 } else {
-                    auto us = reinterpret_cast<us_storage_helper<W>(_val);
+                    auto us = reinterpret_cast<us_storage_helper<W>>(_val);
                     auto extended = static_cast<storage_helper<newSize> >(us);
                     return extended;
                 }
@@ -271,7 +284,7 @@ namespace hint
 			template<unsigned int newSize>
 			constexpr wrapper_helper<newSize> sign_extend() const {
 				static_assert((newSize >= W), "Trying to sign extend a value to a size which is smaller than actual size. See slice instead.");
-				return {static_cast<storage_helper<newSize>(val)}
+				return {static_cast<storage_helper<newSize>>(_val)};
 			}
 
 			/**
@@ -286,19 +299,15 @@ namespace hint
 			{
 				constexpr auto retSize = W + Wrhs;
 				auto leftmost = rightpad<retSize>();
-				auto rightmost = val.leftpad<retSize>();
+				auto rightmost = val.template leftpad<retSize>();
 				return {leftmost | rightmost};
-			}
-
-			constexpr us_wrapper_helper<1> operator==(type const rhs) const {
-				return {_val = rhs._val};
 			}
 
 			static constexpr us_wrapper_helper<W> generateSequence(us_wrapper_helper<1> const val)
 			{
-				us_wrapper_helper<W> zeros{};
-				us_wrapper_helper<W> ones = zeros.invert();
-				us_wrapper_helper<W> ret = (val._val == 1) ? ones : zero;
+				constexpr us_wrapper_helper<W> zeros{0};
+				constexpr us_wrapper_helper<W> ones = zeros.invert();
+				us_wrapper_helper<W> ret = (val._val) ? ones : zeros;
 				return ret;
 			}
 
@@ -396,7 +405,7 @@ namespace hint
 
 			#define HINT_EXTINT_BINARY_FRIENDOP(SYM)              \
 			friend                                                \
-			us_wrapper_helper<W> operator##SYM<W, is_signed>(     \
+			us_wrapper_helper<W> operator SYM<W, is_signed>(      \
 					type const & lhs,                             \
 					type const & rhs                              \
 					);
@@ -430,5 +439,4 @@ namespace hint
 	};
 
 }
-
 #endif
