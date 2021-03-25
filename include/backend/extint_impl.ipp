@@ -53,7 +53,7 @@ namespace hint
 	class ExtIntWrapper;
 
 	template<unsigned int W1, unsigned int W2, bool is_signed>
-	ExtIntWrapper<Arithmetic_Prop<W1, W2>::_prodSize, is_signed> operator*(
+	constexpr ExtIntWrapper<Arithmetic_Prop<W1, W2>::_prodSize, is_signed> operator*(
 			ExtIntWrapper<W1, is_signed> const & lhs,
 			ExtIntWrapper<W2, is_signed> const & rhs
 			)
@@ -62,7 +62,7 @@ namespace hint
 	}
 
 	template<unsigned int shiftedSize, bool isShiftedSigned, unsigned int shifterSize>
-	ExtIntWrapper<shiftedSize, isShiftedSigned> operator>>(
+	constexpr ExtIntWrapper<shiftedSize, isShiftedSigned> operator>>(
 			ExtIntWrapper<shiftedSize, isShiftedSigned> const & lhs,
 			ExtIntWrapper<shifterSize, false> const & rhs
 			) {
@@ -70,7 +70,7 @@ namespace hint
 	}
 
 	template<unsigned int shiftedSize, bool isShiftedSigned, unsigned int shifterSize>
-	ExtIntWrapper<shiftedSize, isShiftedSigned> operator<<(
+	constexpr ExtIntWrapper<shiftedSize, isShiftedSigned> operator<<(
 			ExtIntWrapper<shiftedSize, isShiftedSigned> const & lhs,
 			ExtIntWrapper<shifterSize, false> const & rhs
 			) {
@@ -78,7 +78,7 @@ namespace hint
 	}
 
 	template<unsigned int W, bool is_signed>
-	ExtIntWrapper<W+1, is_signed> operator+(
+	constexpr ExtIntWrapper<W+1, is_signed> operator+(
 			ExtIntWrapper<W, is_signed> const & lhs,
 			ExtIntWrapper<W, is_signed> const & rhs
 			)
@@ -87,7 +87,7 @@ namespace hint
 	}
 
 	template<unsigned int W, bool is_signed>
-	ExtIntWrapper<W+1, is_signed> operator-(
+	constexpr ExtIntWrapper<W+1, is_signed> operator-(
 			ExtIntWrapper<W, is_signed> const & lhs,
 			ExtIntWrapper<W, is_signed> const & rhs
 			)
@@ -97,7 +97,7 @@ namespace hint
 
 	#define HINT_EXTINTIMP_BINARY_OP_IMP(SYMBOL)                                         \
 	template<unsigned int W, bool is_signed>                                             \
-	ExtIntWrapper<W, false> operator SYMBOL (                                           \
+	constexpr ExtIntWrapper<W, false> operator SYMBOL (                                           \
 			ExtIntWrapper<W, is_signed> const & lhs,                                     \
 			ExtIntWrapper<W, is_signed> const & rhs                                      \
 			) {                                                                          \
@@ -134,18 +134,18 @@ namespace hint
             storage_type _val;
 
             template<unsigned int pos>
-            constexpr us_storage_helper<W> one_at_pos() {
+            static constexpr us_storage_helper<W> one_at_pos() {
                 return us_storage_helper<W>(1) << pos;
             }
 
             template<unsigned int n>
-            constexpr us_storage_helper<W> first_n_set() {
+            static constexpr us_storage_helper<W> first_n_set() {
                 auto successor = one_at_pos<n>();
                 return successor - 1;
             }
 
 			template <unsigned int width>
-			constexpr us_storage_helper<width> rec_backward(us_storage_helper<width> in) {
+			static constexpr us_storage_helper<width> rec_backward(us_storage_helper<width> in) {
 				if constexpr (width == 1) {
 					return in;
 				} else {
@@ -195,7 +195,7 @@ namespace hint
             constexpr ExtIntWrapper<1, false> get() const {
                 static_assert(idx < W, "Checking bit outside of range");
                 constexpr auto mask = one_at_pos<idx>();
-                return (mask & _val) != 0;
+                return (mask & _val);
             }
 
 			template<unsigned int idx>
@@ -372,7 +372,7 @@ namespace hint
 				return {invert()._val == 0};
 			}
 
-			us_wrapper_helper<W> backwards() const
+			constexpr us_wrapper_helper<W> backwards() const
 			{
 				return {rec_backward(_val)};
 			}
@@ -386,26 +386,26 @@ namespace hint
 			}
 
 
-			storage_type const unravel() const
+			constexpr storage_type const unravel() const
 			{
 				return _val;
 			}
 
 			friend
-			ExtIntWrapper<W+1, is_signed> operator+<W, is_signed>(
+			constexpr ExtIntWrapper<W+1, is_signed> operator+<W, is_signed>(
 					type const & lhs,
 					type const & rhs
 					);
 
 			friend
-			ExtIntWrapper<W+1, is_signed> operator-<W, is_signed>(
+			constexpr ExtIntWrapper<W+1, is_signed> operator-<W, is_signed>(
 					type const & lhs,
 					type const & rhs
 					);
 
 			#define HINT_EXTINT_BINARY_FRIENDOP(SYM)              \
 			friend                                                \
-			us_wrapper_helper<W> operator SYM<W, is_signed>(      \
+			constexpr us_wrapper_helper<W> operator SYM<W, is_signed>(      \
 					type const & lhs,                             \
 					type const & rhs                              \
 					);
@@ -416,13 +416,13 @@ namespace hint
 			#undef HINT_EXTINT_BINARY_FRIENDOP
 
 			template<unsigned int ShiftedSize, bool shiftedSigned, unsigned int shifterSize>
-			friend ExtIntWrapper<ShiftedSize, shiftedSigned> operator>>(
+			friend constexpr ExtIntWrapper<ShiftedSize, shiftedSigned> operator>>(
 					ExtIntWrapper<ShiftedSize, shiftedSigned> const & lhs,
 					ExtIntWrapper<shifterSize, false> const & rhs
 					);
 
 			template<unsigned int ShiftedSize, bool shiftedSigned, unsigned int shifterSize>
-			friend ExtIntWrapper<ShiftedSize, shiftedSigned> operator<<(
+			friend constexpr ExtIntWrapper<ShiftedSize, shiftedSigned> operator<<(
 					ExtIntWrapper<ShiftedSize, shiftedSigned> const & lhs,
 					ExtIntWrapper<shifterSize, false> const & rhs
 					);
