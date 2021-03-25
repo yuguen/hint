@@ -5,9 +5,9 @@ project(Hint
 	LANGUAGES CXX
 	)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_EXTENSIONS ON)
 
 #set(CPACK_PACKAGE_NAME "libhint")
 #set(CPACK_PACKAGE_VENDOR "(Florent de Dinechin, Luc Forget, Yohann Uguen)@[Citi Lab - INSA Lyon - INRIA]  David Thomas@Imperial College London")
@@ -29,18 +29,6 @@ install(
 	)
 install(FILES ${PROJECT_NAME}Config.cmake DESTINATION lib/cmake/${PROJECT_NAME})
 install(EXPORT ${PROJECT_NAME}Targets FILE ${PROJECT_NAME}Targets.cmake DESTINATION lib/cmake/${PROJECT_NAME})
-
-#find_path(GMP_INCLUDE_DIR gmpxx.h)
-#find_library(GMP gmp)
-#find_library(GMPXX gmpxx)
-
-#if (NOT (GMPXX-NOTFOUND OR GMP-NOTFOUND OR GMP_INCLUDE_DIR-NOTFOUND))
-#	set(GMPTARGET-OK ON)
-#	message(STATUS "GMP found")
-#else()
-#	set(GMPTARGET-NOTFOUND ON)
-#	message(STATUS "GMP Not found")
-#endif()
 
 OPTION(BUILD_UNIT_TEST "Build the operators unit tests")
 if(BUILD_UNIT_TEST)
@@ -119,6 +107,16 @@ if(BUILD_UNIT_TEST)
 		target_compile_definitions(testPrimitives_exe PRIVATE INTEL_BACKEND)
 	endif()
 		add_test(testPrimitives testPrimitives_exe)
+	endif()
+
+	#TODO find a way to detect compiler support of ExtInt
+	set(EXTINT_BACKEND True)
+	if(EXTINT_BACKEND)
+		add_executable(testExtIntBackend_exe tests/backend/extint_main tests/backend/extint_arithmetic tests/backend/extint_logic)
+		target_link_libraries(testExtIntBackend_exe hint ${Boost_LIBRARIES})
+		target_include_directories(testExtIntBackend_exe PRIVATE ${Boost_INCLUDE_DIR})
+		target_compile_definitions(testExtIntBackend_exe PRIVATE EXTINT_BACKEND)
+		add_test(testExtIntBackend testExtIntBackend_exe)
 	endif()
 
 	add_executable(testArithmetic_exe tests/arithmetic/arithmetic_main.cpp tests/arithmetic/tiling.cpp)
