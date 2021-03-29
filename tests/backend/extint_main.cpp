@@ -37,17 +37,6 @@ BOOST_AUTO_TEST_CASE(TestNonEmptyCtor) {
   BOOST_REQUIRE_EQUAL(static_cast<int>(test.unravel()), 0b111111111111);
 };
 
-BOOST_AUTO_TEST_CASE(TestEqualityOp) {
-  for (unsigned int i : {0, 12, 0b111111, 17, 1}) {
-    for (unsigned int j : {0, 12, 0b111111, 17, 1}) {
-      ExtIntWrapper<6, false> wrappedI{static_cast<unsigned _ExtInt(6)>(i)},
-          wrappedJ{static_cast<unsigned _ExtInt(6)>(j)};
-      auto wrappedEqual = (wrappedI == wrappedJ);
-      auto inEqual = (i == j);
-      BOOST_REQUIRE_EQUAL(wrappedEqual.unravel(), inEqual);
-    }
-  }
-}
 
 BOOST_AUTO_TEST_CASE(TestGet) {
   constexpr auto in_val = 0b01101;
@@ -151,118 +140,10 @@ BOOST_AUTO_TEST_CASE(TestSlice) {
 
 BOOST_AUTO_TEST_CASE(TestSliceWidth1) {
   constexpr ExtIntWrapper<1, false> one{1}, zero{0};
-  static_assert((one.template slice<0, 0>() == one).unravel(), "slice for w=1 error");
+  static_assert((one.template slice<0, 0>() == one).unravel(),
+                "slice for w=1 error");
   static_assert((zero.template slice<0, 0>() == zero).unravel(),
                 "slice for w=1 error");
-}
-
-BOOST_AUTO_TEST_CASE(TestInvert) {
-  constexpr ExtIntWrapper<7, false> a{0}, b{0b1111111}, c{0b1010101},
-      d{0b0101010};
-  static_assert((a.invert() == b).unravel(), "Invert error");
-  static_assert((b.invert() == a).unravel(), "Invert error");
-  static_assert((c.invert() == d).unravel(), "Invert error");
-  static_assert((d.invert() == c).unravel(), "Invert error");
-}
-
-BOOST_AUTO_TEST_CASE(TestBinaryLogic) {
-  using TestType = ExtIntWrapper<4, false>;
-  constexpr TestType halffirst{0b1100}, halfmiddle{0b0110};
-  static_assert(
-      ((halffirst.bitwise_and(halfmiddle)) == TestType{0b0100}).unravel(),
-      "bitwise_and() error");
-  static_assert(
-      ((halffirst.bitwise_or(halfmiddle)) == TestType{0b1110}).unravel(),
-      "bitwise_or() error");
-  static_assert(
-      ((halffirst.bitwise_xor(halfmiddle)) == TestType{0b1010}).unravel(),
-      "bitwise_xor() error");
-
-  static_assert(((halffirst & halfmiddle) == TestType{0b0100}).unravel(),
-                "operator&() error");
-  static_assert(((halffirst | halfmiddle) == TestType{0b1110}).unravel(),
-                "operator|() error");
-  static_assert(((halffirst ^ halfmiddle) == TestType{0b1010}).unravel(),
-                "operator^() error");
-}
-
-BOOST_AUTO_TEST_CASE(TestBinaryLogicWidth1) {
-  using TestType = ExtIntWrapper<1, false>;
-  constexpr TestType one{0b1}, zero{0b0};
-
-  // bitwise_and()
-  static_assert(((one.bitwise_and(one)) == one).unravel(),
-                "bitwise_and() error");
-  static_assert(((one.bitwise_and(zero)) == zero).unravel(),
-                "bitwise_and() error");
-  static_assert(((zero.bitwise_and(zero)) == zero).unravel(),
-                "bitwise_and() error");
-  static_assert(((zero.bitwise_and(one)) == zero).unravel(),
-                "bitwise_and() error");
-
-  // bitwise_or()
-  static_assert(((one.bitwise_or(one)) == one).unravel(), "bitwise_or() error");
-  static_assert(((one.bitwise_or(zero)) == one).unravel(),
-                "bitwise_or() error");
-  static_assert(((zero.bitwise_or(zero)) == zero).unravel(),
-                "bitwise_or() error");
-  static_assert(((zero.bitwise_or(one)) == one).unravel(),
-                "bitwise_or() error");
-
-  // bitwise_xor()
-  static_assert(((one.bitwise_xor(one)) == zero).unravel(),
-                "bitwise_xor() error");
-  static_assert(((one.bitwise_xor(zero)) == one).unravel(),
-                "bitwise_xor() error");
-  static_assert(((zero.bitwise_xor(zero)) == zero).unravel(),
-                "bitwise_xor() error");
-  static_assert(((zero.bitwise_xor(one)) == one).unravel(),
-                "bitwise_xor() error");
-
-  // operator&()
-  static_assert(((one & one) == one).unravel(), "operator&() error");
-  static_assert(((one & zero) == zero).unravel(), "operator&() error");
-  static_assert(((zero & zero) == zero).unravel(), "operator&() error");
-  static_assert(((zero & one) == zero).unravel(), "operator&() error");
-
-  // operator|()
-  static_assert(((one | one) == one).unravel(), "operator|() error");
-  static_assert(((one | zero) == one).unravel(), "operator|() error");
-  static_assert(((zero | zero) == zero).unravel(), "operator|() error");
-  static_assert(((zero | one) == one).unravel(), "operator|() error");
-
-  // operator^()
-  static_assert(((one ^ one) == zero).unravel(), "operator^() error");
-  static_assert(((one ^ zero) == one).unravel(), "operator^() error");
-  static_assert(((zero ^ zero) == zero).unravel(), "operator^() error");
-  static_assert(((zero ^ one) == one).unravel(), "operator^() error");
-}
-
-BOOST_AUTO_TEST_CASE(TestCompOP) {
-  constexpr unsigned int width = 9;
-  using TestType = ExtIntWrapper<width, false>;
-  constexpr unsigned int upper_limit = 1 << width;
-  for (unsigned int i = 0; i < upper_limit; ++i) {
-    TestType wrapped_i{static_cast<unsigned _ExtInt(width)>(i)};
-    for (unsigned int j = 0; j < i; ++j) {
-      TestType wrapped_j{static_cast<unsigned _ExtInt(width)>(j)};
-      BOOST_REQUIRE((wrapped_i >= wrapped_j).unravel());
-      BOOST_REQUIRE((wrapped_i > wrapped_j).unravel());
-      BOOST_REQUIRE(!(wrapped_j >= wrapped_i).unravel());
-      BOOST_REQUIRE(!(wrapped_j > wrapped_i).unravel());
-      BOOST_REQUIRE(!(wrapped_i <= wrapped_j).unravel());
-      BOOST_REQUIRE(!(wrapped_i < wrapped_j).unravel());
-      BOOST_REQUIRE((wrapped_j <= wrapped_i).unravel());
-      BOOST_REQUIRE((wrapped_j < wrapped_i).unravel());
-      BOOST_REQUIRE((wrapped_j != wrapped_i).unravel());
-    }
-    BOOST_REQUIRE((wrapped_i == wrapped_i).unravel());
-    BOOST_REQUIRE((wrapped_i >= wrapped_i).unravel());
-    BOOST_REQUIRE((wrapped_i <= wrapped_i).unravel());
-    BOOST_REQUIRE(!(wrapped_i > wrapped_i).unravel());
-    BOOST_REQUIRE(!(wrapped_i < wrapped_i).unravel());
-    BOOST_REQUIRE(!(wrapped_i != wrapped_i).unravel());
-  }
 }
 
 BOOST_AUTO_TEST_CASE(TestSequence) {
@@ -275,7 +156,7 @@ BOOST_AUTO_TEST_CASE(TestSequence) {
                 "Generate zero sequence error");
 }
 
-BOOST_AUTO_TEST_CASE(TestSequenceWidthOne) {
+BOOST_AUTO_TEST_CASE(TestSequenceWidth1) {
   using TestType = ExtIntWrapper<1, false>;
   constexpr TestType allOne{0b1}, allZero{0};
   static_assert((TestType::generateSequence({1}) == allOne).unravel(),

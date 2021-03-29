@@ -112,7 +112,7 @@ if(BUILD_UNIT_TEST)
 	#TODO find a way to detect compiler support of ExtInt
 	set(EXTINT_BACKEND True)
 	if(EXTINT_BACKEND)
-		add_executable(testExtIntBackend_exe tests/backend/extint_main.cpp)
+		add_executable(testExtIntBackend_exe tests/backend/extint_main tests/backend/extint_arithmetic tests/backend/extint_logic)
 		target_link_libraries(testExtIntBackend_exe hint ${Boost_LIBRARIES})
 		target_include_directories(testExtIntBackend_exe PRIVATE ${Boost_INCLUDE_DIR})
 		target_compile_definitions(testExtIntBackend_exe PRIVATE EXTINT_BACKEND)
