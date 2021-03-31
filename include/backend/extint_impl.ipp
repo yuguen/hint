@@ -29,15 +29,13 @@ template <unsigned int W> struct ExtIntBaseType<W, false> {
   using type = unsigned _ExtInt(W);
 };
 
-template <> struct ExtIntBaseType<1, false> { using type = unsigned _ExtInt(1); };
-
-template <> struct ExtIntBaseType<1, true> { using type = _ExtInt(1); };
 } // namespace detail
 
 template <unsigned int W, bool is_signed> class ExtIntWrapper;
 
 template <unsigned int W1, unsigned int W2, bool is_signed>
-constexpr ExtIntWrapper<Arithmetic_Prop<W1, W2, is_signed, is_signed>::_prodSize, is_signed>
+constexpr ExtIntWrapper<
+    Arithmetic_Prop<W1, W2, is_signed, is_signed>::_prodSize, is_signed>
 operator*(ExtIntWrapper<W1, is_signed> const &lhs,
           ExtIntWrapper<W2, is_signed> const &rhs) {
   return {lhs._val * rhs._val};
@@ -73,21 +71,17 @@ operator-(ExtIntWrapper<W, is_signed> const &lhs,
   return {lhs._val - rhs._val};
 }
 
-#define HINT_EXTINTIMP_BINARY_OP_IMP(SYMBOL, BOOL_SYMBOL)                      \
+#define HINT_EXTINTIMP_BINARY_OP_IMP(SYMBOL)                                   \
   template <unsigned int W, bool is_signed>                                    \
   constexpr ExtIntWrapper<W, false> operator SYMBOL(                           \
       ExtIntWrapper<W, is_signed> const &lhs,                                  \
       ExtIntWrapper<W, is_signed> const &rhs) {                                \
-    if constexpr (false && W == 1) {                                           \
-      return {lhs._val BOOL_SYMBOL rhs._val};                                  \
-    } else {                                                                   \
-      return {lhs._val SYMBOL rhs._val};                                       \
-    }                                                                          \
+    return {lhs._val SYMBOL rhs._val};                                         \
   }
 
-HINT_EXTINTIMP_BINARY_OP_IMP(|, ||)
-HINT_EXTINTIMP_BINARY_OP_IMP(&, &&)
-HINT_EXTINTIMP_BINARY_OP_IMP(^, !=)
+HINT_EXTINTIMP_BINARY_OP_IMP(|)
+HINT_EXTINTIMP_BINARY_OP_IMP(&)
+HINT_EXTINTIMP_BINARY_OP_IMP(^)
 
 #undef HINT_EXTINTIMP_BINARY_OP_IMP
 
@@ -189,18 +183,14 @@ public:
     return us_storage_helper<W>{~_val};
   }
 
-#define FORWARD_BITWISE_OP(OP, BOOL_OP, func_name)                             \
+#define FORWARD_BITWISE_OP(OP, func_name)                                      \
   constexpr ExtIntWrapper<W, false> func_name(type const rhs) const {          \
-    if constexpr (false && W == 1) {                                                    \
-      return {_val BOOL_OP rhs._val};                                          \
-    } else {                                                                   \
-      return {_val OP rhs._val};                                               \
-    }                                                                          \
+    return {_val OP rhs._val};                                                 \
   }
 
-  FORWARD_BITWISE_OP(&, &&, bitwise_and)
-  FORWARD_BITWISE_OP(|, ||, bitwise_or)
-  FORWARD_BITWISE_OP(^, !=, bitwise_xor)
+  FORWARD_BITWISE_OP(&, bitwise_and)
+  FORWARD_BITWISE_OP(|, bitwise_or)
+  FORWARD_BITWISE_OP(^, bitwise_xor)
 
 #undef FORWARD_BITWISE_OP
 
@@ -382,7 +372,8 @@ public:
   }
 
   template <unsigned int W2>
-  constexpr wrapper_helper<Arithmetic_Prop<W, W2, is_signed, is_signed>::_prodSize>
+  constexpr wrapper_helper<
+      Arithmetic_Prop<W, W2, is_signed, is_signed>::_prodSize>
   operator*(ExtIntWrapper<W2, is_signed> const &rhs) const {
     return {_val * rhs.unravel()};
   }
