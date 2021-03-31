@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_CASE(TestInstantiation) {
 }
 
 BOOST_AUTO_TEST_CASE(TestInstantiationWidth1) {
-  constexpr ExtIntWrapper<1, false> test{};
+  constexpr ExtIntWrapper<1, false> test{0};
   static_assert(!test.unravel(), "Error with default w=1 Ctor");
 }
 
@@ -47,11 +47,11 @@ BOOST_AUTO_TEST_CASE(TestGet) {
   constexpr auto d = in.template get<3>();
   constexpr auto e = in.template get<4>();
 
-  static_assert(a.unravel(), "Error with bit 0");
-  static_assert(!b.unravel(), "Error with bit 1");
-  static_assert(c.unravel(), "Error with bit 2");
-  static_assert(d.unravel(), "Error with bit 3");
-  static_assert(!e.unravel(), "Error with bit 4");
+  static_assert(a.template isSet<0>(), "Error with bit 0");
+  static_assert(!b.template isSet<0>(), "Error with bit 1");
+  static_assert(c.template isSet<0>(), "Error with bit 2");
+  static_assert(d.template isSet<0>(), "Error with bit 3");
+  static_assert(!e.template isSet<0>(), "Error with bit 4");
 }
 
 BOOST_AUTO_TEST_CASE(TestGetWidth1) {

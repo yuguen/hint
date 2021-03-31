@@ -29,15 +29,15 @@ template <unsigned int W> struct ExtIntBaseType<W, false> {
   using type = unsigned _ExtInt(W);
 };
 
-template <> struct ExtIntBaseType<1, false> { using type = bool; };
+template <> struct ExtIntBaseType<1, false> { using type = unsigned _ExtInt(1); };
 
-template <> struct ExtIntBaseType<1, true> { using type = bool; };
+template <> struct ExtIntBaseType<1, true> { using type = _ExtInt(1); };
 } // namespace detail
 
 template <unsigned int W, bool is_signed> class ExtIntWrapper;
 
 template <unsigned int W1, unsigned int W2, bool is_signed>
-constexpr ExtIntWrapper<Arithmetic_Prop<W1, W2>::_prodSize, is_signed>
+constexpr ExtIntWrapper<Arithmetic_Prop<W1, W2, is_signed, is_signed>::_prodSize, is_signed>
 operator*(ExtIntWrapper<W1, is_signed> const &lhs,
           ExtIntWrapper<W2, is_signed> const &rhs) {
   return {lhs._val * rhs._val};
@@ -78,7 +78,7 @@ operator-(ExtIntWrapper<W, is_signed> const &lhs,
   constexpr ExtIntWrapper<W, false> operator SYMBOL(                           \
       ExtIntWrapper<W, is_signed> const &lhs,                                  \
       ExtIntWrapper<W, is_signed> const &rhs) {                                \
-    if constexpr (W == 1) {                                                    \
+    if constexpr (false && W == 1) {                                           \
       return {lhs._val BOOL_SYMBOL rhs._val};                                  \
     } else {                                                                   \
       return {lhs._val SYMBOL rhs._val};                                       \
@@ -156,8 +156,11 @@ public:
    */
   template <unsigned int idx> constexpr ExtIntWrapper<1, false> get() const {
     static_assert(idx < W, "Checking bit outside of range");
+    if constexpr (W == 1) {
+      return {_val};
+    }
     constexpr auto mask = one_at_pos<idx>();
-    return (mask & _val);
+    return static_cast<us_storage_helper<1>>((mask & _val) >> idx);
   }
 
   /**
@@ -179,7 +182,7 @@ public:
   }
 
   template <unsigned int idx> constexpr bool isSet() const {
-    return get<idx>()._val;
+    return (get<idx>()._val != us_storage_helper<1>{0});
   }
 
   constexpr ExtIntWrapper<W, false> invert() const {
@@ -188,7 +191,7 @@ public:
 
 #define FORWARD_BITWISE_OP(OP, BOOL_OP, func_name)                             \
   constexpr ExtIntWrapper<W, false> func_name(type const rhs) const {          \
-    if constexpr (W == 1) {                                                    \
+    if constexpr (false && W == 1) {                                                    \
       return {_val BOOL_OP rhs._val};                                          \
     } else {                                                                   \
       return {_val OP rhs._val};                                               \
@@ -306,30 +309,59 @@ public:
   constexpr wrapper_helper<W + 1>
   addWithCarry(wrapper_helper<W> const op2,
                us_wrapper_helper<1> const cin) const {
-    auto res = _val + op2._val + cin._val;
-    return {res};
+    // Should be implemented with a adder between op2._val and _val having
+    // cin._val plugged in the carry chain entry.
+    storage_helper<W + 1> ext{_val}, extop2{op2._val}, extcarry{cin._val};
+    if constexpr (false && W == 1 and is_signed) {
+      // TODO: remove once signed ExtInt(1) is valid
+      return {extcarry - extop2 - ext};
+    } else {
+      return {ext + extop2 + extcarry};
+    }
   }
 
   constexpr wrapper_helper<W + 1>
   subWithCarry(wrapper_helper<W> const op2,
                us_wrapper_helper<1> const cin) const {
-    auto res = _val - op2._val + cin._val;
-    return {res};
+    storage_helper<W + 1> ext{_val}, extop2{op2._val}, extcarry{cin._val};
+    // No evident clever instantiation of such an op : should be deprecated once
+    // a full expression framework is in place
+    if constexpr (false && W == 1 and is_signed) {
+      // TODO: remove once signed ExtInt(1) is valid
+      return {extcarry + extop2 - ext};
+    } else {
+      return {ext - extop2 + extcarry};
+    }
   }
 
   constexpr wrapper_helper<W + 1>
   addWithBorrow(wrapper_helper<W> const op2,
                 us_wrapper_helper<1> const bin) const {
-    auto res = _val + op2._val - bin._val;
-    return {res};
+    storage_helper<W + 1> ext{_val}, extop2{op2._val}, extborrow{bin._val};
+    // No evident clever instantiation of such an op : should be deprecated once
+    // a full expression framework is in place
+    if constexpr (false && W == 1 and is_signed) {
+      // TODO: remove once signed ExtInt(1) is valid
+      return {extborrow - extop2 - ext};
+    } else {
+      return {ext + extop2 - extborrow};
+    }
   }
 
   constexpr us_wrapper_helper<W> modularAdd(type const op2) const {
-    return {_val + op2._val};
+    if constexpr (false && W == 1) {
+      return {op2._val != _val};
+    } else {
+      return {_val + op2._val};
+    }
   }
 
   constexpr us_wrapper_helper<W> modularSub(type const op2) const {
-    return {_val - op2._val};
+    if constexpr (false && W == 1) {
+      return {op2._val != _val};
+    } else {
+      return {_val - op2._val};
+    }
   }
 
   static constexpr type mux(us_wrapper_helper<1> const &control,
@@ -350,7 +382,7 @@ public:
   }
 
   template <unsigned int W2>
-  constexpr wrapper_helper<Arithmetic_Prop<W, W2>::_prodSize>
+  constexpr wrapper_helper<Arithmetic_Prop<W, W2, is_signed, is_signed>::_prodSize>
   operator*(ExtIntWrapper<W2, is_signed> const &rhs) const {
     return {_val * rhs.unravel()};
   }

@@ -51,11 +51,6 @@ namespace hint {
 		return is2Pow<N+1>();
 	}
 
-	constexpr unsigned int prod_contrib(unsigned int N)
-	{
-		return (N <= 1) ? 0 : N; //TODO
-	}
-
 	template<unsigned int N>
 	class Static_Val
 	{
@@ -67,19 +62,26 @@ namespace hint {
 			static constexpr unsigned int _flog2 = floorLog2<N>();
 			static constexpr unsigned int _clog2 = ceilLog2<N>();
 			static constexpr unsigned int _storage = ceilLog2<N+1>();
-			static constexpr unsigned int _prod_contrib = prod_contrib(N);
 			static constexpr bool _is2Pow = is2Pow<N>();
 			static constexpr bool _isOneBelow2Pow = isOneBelow2Pow<N>();
 	};
 
 
 
-	template<unsigned int s1, unsigned int s2>
+	template<unsigned int s1, unsigned int s2, bool isSigned1, bool isSigned2>
 	class Arithmetic_Prop
 	{
+		private:
+			static constexpr unsigned int _generalProdWidth = s1 + s2;
+			static constexpr unsigned int _max = (s1 > s2) ? s1 : s2;
+			static constexpr bool _sameSignedness = (isSigned1 == isSigned2);
+			static constexpr bool _oneIsOne = ((s1 == 1) || (s2 == 1));
+			static constexpr bool _bothAreOne = ((s1 == 1) && (s2 == 1));
+			static constexpr unsigned int _caseOneWidth = (_sameSignedness || _bothAreOne) ? _max : _max + 1; 
+			static constexpr bool _oneSigned = isSigned1 or isSigned2;
 		public:
-			static constexpr unsigned int _contrib_sum = Static_Val<s1>::_prod_contrib + Static_Val<s2>::_prod_contrib;
-			static constexpr unsigned int _prodSize = ( _contrib_sum < 1 ) ? 1 : _contrib_sum;
+			static constexpr bool _prodSigned = (_oneSigned and (!_bothAreOne || !_sameSignedness));
+			static constexpr unsigned int _prodSize = ( _oneIsOne ) ? _caseOneWidth : _generalProdWidth;
 	};
 }
 #endif

@@ -7,7 +7,6 @@ using hint::ExtIntWrapper;
 #define STATIC_COMPARE(ref, val, msg)                                          \
   static_assert((ref == val).unravel(), msg);
 
-
 BOOST_AUTO_TEST_CASE(TestCompOP) {
   constexpr unsigned int width = 9;
   using TestType = ExtIntWrapper<width, false>;
@@ -165,11 +164,11 @@ BOOST_AUTO_TEST_CASE(TestAddCarryWidth1US) {
 }
 
 BOOST_AUTO_TEST_CASE(TestAddCarryWidth1Signed) {
-  constexpr ExtIntWrapper<1, true> one{1}, zero{false};
+  constexpr ExtIntWrapper<1, true> one{-1}, zero{false};
   using ExtResType = ExtIntWrapper<2, true>;
   constexpr ExtIntWrapper<1, false> cin{1}, nocin{0};
 #define HINT_EXTINT_TEST_AC(op1, op2, resnocarry, rescarry)                    \
-  STATIC_COMPARE(ExtResType{resnocarry}, op1.addWithCarry(op2, nocin),          \
+  STATIC_COMPARE(ExtResType{resnocarry}, op1.addWithCarry(op2, nocin),         \
                  "addWithCarry() Error")                                       \
   STATIC_COMPARE(ExtResType{rescarry}, op1.addWithCarry(op2, cin),             \
                  "addWithCarry() Error")
@@ -180,3 +179,9 @@ BOOST_AUTO_TEST_CASE(TestAddCarryWidth1Signed) {
 
 #undef HINT_EXTINT_TEST_AC
 }
+
+BOOST_AUTO_TEST_CASE(TestProduct) { 
+    constexpr ExtIntWrapper<4, false> all_one{0xF}, zero{0}, one{1}, half{6};
+    using resType = ExtIntWrapper<8, false>;
+      
+ }
