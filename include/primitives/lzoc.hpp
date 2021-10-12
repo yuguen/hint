@@ -82,10 +82,13 @@ namespace hint {
 	{
 		constexpr unsigned int pad_width = __hint_lzoc_builtin_limit + 1 - N;
 		auto padding = Wrapper<pad_width, false>::generateSequence({{1}});
-		auto padded = input.concatenate(padding);
-		// cerr << "Value compound lzoc : " << to_string(result) << endl;
-		return {__builtin_clz(padded.unravel())};
-	}
+        auto padded = input.concatenate(padding);
+        // cerr << "Value compound lzoc : " << to_string(result) <<
+        // endl;
+        return {static_cast<typename Wrapper<Static_Val<N + 1>::_clog2,
+                                                false>::storage_type>(
+            __builtin_clz(padded.unravel()))};
+    }
 
 	template<unsigned int N, template<unsigned int , bool> class Wrapper>
 	// template<bool is_signed, template<unsigned int , bool> class Wrapper>
