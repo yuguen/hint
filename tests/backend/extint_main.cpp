@@ -11,9 +11,6 @@
 #include "hint.hpp"
 
 using hint::ExtIntWrapper;
-using std::array;
-using std::cout;
-using std::endl;
 
 namespace {
 

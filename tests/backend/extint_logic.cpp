@@ -1,5 +1,7 @@
 #include <boost/test/unit_test.hpp>
+#include <boost/test/unit_test_suite.hpp>
 
+#include "backend/extint_impl.ipp"
 #include "hint.hpp"
 
 using hint::ExtIntWrapper;
@@ -13,7 +15,7 @@ BOOST_AUTO_TEST_CASE(TestInvert) {
   static_assert((d.invert() == c).unravel(), "Invert error");
 }
 
-BOOST_AUTO_TEST_CASE(TestInvertWidth1) {
+BOOST_AUTO_TEST_CASE(TestInvertWidth_1) {
   constexpr ExtIntWrapper<1, false> one{1}, zero{0};
   static_assert((one.invert() == zero).unravel(), "One inversion error");
   static_assert((zero.invert() == one).unravel(), "Zero inversion error");
@@ -90,4 +92,10 @@ BOOST_AUTO_TEST_CASE(TestBinaryLogicWidth1) {
   static_assert(((one ^ zero) == one).unravel(), "operator^() error");
   static_assert(((zero ^ zero) == zero).unravel(), "operator^() error");
   static_assert(((zero ^ one) == one).unravel(), "operator^() error");
+}
+
+BOOST_AUTO_TEST_CASE(Backward) {
+  using TestTypeEven = ExtIntWrapper<7, false>;
+  constexpr TestTypeEven a{0b11101101}, b{0b10110111};
+  static_assert((a.backwards()==b).unravel(), "Inversion error");
 }
