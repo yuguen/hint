@@ -247,7 +247,7 @@ public:
                   "actual size. See slice instead.");
     constexpr auto sizeDiff = newSize - W;
     if constexpr (sizeDiff > 0) {
-      auto ret = static_cast<wrapper_helper<newSize>>(_val);
+      auto ret = static_cast<storage_helper<newSize>>(_val);
       return {ret << sizeDiff};
     } else {
       return {_val};
