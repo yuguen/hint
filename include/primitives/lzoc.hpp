@@ -50,7 +50,6 @@ namespace hint {
 	template<unsigned int N, template<unsigned int , bool> class Wrapper>
 	inline Wrapper<Static_Val<N+1>::_clog2, false> lzoc(
 			Wrapper<N, false> const & input,
-			typename enable_if<(N > __hint_lzoc_builtin_limit)>::type* = 0,
 			typename enable_if<Static_Val<N>::_isOneBelow2Pow>::type* = 0
 		)
 	{
