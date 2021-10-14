@@ -38,7 +38,7 @@ namespace hint
 
 
 	template<unsigned int W1, unsigned int W2, bool is_signed>
-	VivadoWrapper<Arithmetic_Prop<W1, W2>::_prodSize, is_signed> operator*(
+	VivadoWrapper<Arithmetic_Prop<W1, W2, is_signed, is_signed>::_prodSize, Arithmetic_Prop<W1, W2, is_signed, is_signed>::_prodSigned> operator*(
 			VivadoWrapper<W1, is_signed> const & lhs,
 			VivadoWrapper<W2, is_signed> const & rhs
 			)
@@ -465,7 +465,10 @@ namespace hint
 			}
 
 			template<unsigned int W2>
-			inline VivadoWrapper<Arithmetic_Prop<W, W2>::_prodSize, is_signed> operator*(
+			inline VivadoWrapper<
+                Arithmetic_Prop<W, W2, is_signed, is_signed>::_prodSize, 
+                Arithmetic_Prop<W, W2, is_signed, is_signed>::_prodSigned
+            > operator*(
 					VivadoWrapper<W2, is_signed> const & rhs
 					) const
 			{
