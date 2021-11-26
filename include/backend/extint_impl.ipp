@@ -356,7 +356,10 @@ public:
 
   static constexpr type mux(us_wrapper_helper<1> const control,
                             type const opt1, type const opt0) {
-    return (control._val) ? opt1 : opt0;
+    auto true_val_mask = type::generateSequence(control);
+    auto false_val_mask = type::generateSequence(control.invert());
+    auto res = (opt1 & true_val_mask) | (opt0 & false_val_mask); 
+    return res;
   }
 
   constexpr us_wrapper_helper<1> or_reduction() const { return {_val != 0}; }
