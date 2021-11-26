@@ -354,9 +354,15 @@ public:
     }
   }
 
-  static constexpr type mux(us_wrapper_helper<1> const control,
-                            type const opt1, type const opt0) {
-    return (control._val) ? opt1 : opt0;
+  static constexpr type mux(us_wrapper_helper<1> const control, type const opt1,
+                            type const opt0) {
+    storage_type res;
+    if (control.unravel()) {
+      res = opt1._val;
+    } else {
+      res = opt0._val;
+    }
+    return { res };
   }
 
   constexpr us_wrapper_helper<1> or_reduction() const { return {_val != 0}; }
